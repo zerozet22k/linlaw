@@ -71,7 +71,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Main App Layout with Providers
 export default async function AppLayout({
   children,
 }: {
