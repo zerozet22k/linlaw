@@ -26,9 +26,9 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <LanguageProvider>
       <UserProvider>
-        <FileProvider>
-          <LayoutRouter>{children}</LayoutRouter>
-        </FileProvider>
+        {/* <FileProvider> */}
+        <LayoutRouter>{children}</LayoutRouter>
+        {/* </FileProvider> */}
       </UserProvider>
     </LanguageProvider>
   );
