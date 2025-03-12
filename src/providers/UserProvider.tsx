@@ -19,7 +19,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const [initialLoading, setInitialLoading] = useState(true);
   const [hasShownLogoutMessage, setHasShownLogoutMessage] = useState(false);
 
-  // SWR fetcher suppresses logging 401 errors.
   const fetcher = useCallback(async (url: string) => {
     try {
       const res = await apiClient.get(url);

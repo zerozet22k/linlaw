@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import UserService from "@/services/UserService";
 import SettingService from "@/services/SettingService";
 import { SETTINGS_KEYS } from "@/config/CMS/settings/settingKeys";
-import userRepository from "@/repositories/UserRepository"; // Ensure correct import
+import userRepository from "@/repositories/UserRepository";
 
 const userService = new UserService();
 const settingService = new SettingService();
@@ -25,10 +25,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Ensure only one system user exists
     await userService.setupDefaultRolesAndSystemUser(data.user);
 
-    // Save settings
     const settingsUpdates = {
       [SETTINGS_KEYS.SITE_SETTINGS]: siteSettings,
     };
