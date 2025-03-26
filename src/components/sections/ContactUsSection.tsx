@@ -3,7 +3,7 @@
 import React from "react";
 import { Form, Input, Button, Typography, Row, Col, message, Card } from "antd";
 import { PagesInterface } from "@/config/CMS/pages/pageKeys";
-import { HOME_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+import { HOME_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 import apiClient from "@/utils/api/apiClient";
 
 const { Title, Text } = Typography;
@@ -101,8 +101,6 @@ const ContactUsSection: React.FC<ContactUsSectionProps> = ({ contactInfo }) => {
             </Form>
           </Card>
         </Col>
-
-        {/* Contact Information */}
         <Col
           xs={24}
           md={12}

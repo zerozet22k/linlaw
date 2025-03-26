@@ -6,7 +6,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
-} from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 const { Title, Text } = Typography;
 
@@ -19,7 +19,7 @@ const AdCard: React.FC<{
     <div
       style={{
         width: "100%",
-        maxWidth: 500, // keep it from stretching too wide
+        maxWidth: 500,
         margin: "0 auto",
         borderRadius: 12,
         overflow: "hidden",
@@ -31,7 +31,7 @@ const AdCard: React.FC<{
         style={{
           position: "relative",
           width: "100%",
-          paddingTop: "56.25%", // 16:9 aspect ratio
+          paddingTop: "56.25%",
           backgroundImage: `url(${ad.image})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -56,7 +56,7 @@ const AdCard: React.FC<{
       <Card
         bordered={false}
         style={{
-          borderRadius: 0, // matches outer container
+          borderRadius: 0,
           padding: "16px 20px",
         }}
         bodyStyle={{ padding: 0 }}

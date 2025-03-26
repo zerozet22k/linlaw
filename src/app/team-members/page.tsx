@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import React from "react";
 import TeamContent from "./content";
 import PageService from "@/services/PageService";
-import { TEAM_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/TEAM_PAGE_SETTINGS";
+import { TEAM_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 
 const getDefaultTeamData = () => ({
   [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
@@ -20,7 +20,7 @@ const getDefaultTeamData = () => ({
     },
     backgroundImage: "https://source.unsplash.com/1600x900/?team,office",
   },
-  [TEAM_PAGE_SETTINGS_KEYS.TEAM_SECTION]: {
+  [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxMembersCount: 8,
   },
 });

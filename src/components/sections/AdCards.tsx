@@ -4,7 +4,7 @@ import AdCard from "./AdCard";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
-} from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 const AdCards: React.FC<{
   cards?: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS];

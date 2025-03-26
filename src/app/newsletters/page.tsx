@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import React from "react";
 import NewsletterContent from "./content";
 import PageService from "@/services/PageService";
-import { NEWSLETTER_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/NEWSLETTER_PAGE_SETTINGS";
+import { NEWSLETTER_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 
 const getDefaultNewsletterData = () => ({
   [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {

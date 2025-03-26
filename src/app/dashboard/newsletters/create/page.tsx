@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import NewsletterForm from "@/components/forms/NewsletterForm";
+import NewsletterForm from "@/components/FormsF/NewsletterForm";
 
 const CreateNewsletterPage: React.FC = () => {
   return (

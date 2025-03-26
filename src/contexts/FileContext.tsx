@@ -3,37 +3,31 @@
 import { createContext } from "react";
 import { FileDataAPI, FileType, FileTypeWithEmpty } from "@/models/FileModel";
 
-/** Represents a successfully uploaded file */
 export interface UploadedFile {
   name: string;
   url: string;
 }
 
-/** Represents search state for fetching files */
 export type SearchState = {
   search: string;
   page: number;
   type: FileTypeWithEmpty;
 };
 
-/** Represents a pending file waiting to be uploaded */
 export type PendingItem = {
   file: File;
 };
 
-/** Represents a file that failed to upload */
 export type FailedFile = {
   file: File;
   error: string;
 };
 
 type FileContextProps = {
-  /** Firebase readiness checks */
   firebaseLoading: boolean;
   firebaseReady: boolean;
   checkFirebaseConfig: () => Promise<void>;
 
-  /** File listing logic */
   files: FileDataAPI[];
   loading: boolean;
   syncing: boolean;

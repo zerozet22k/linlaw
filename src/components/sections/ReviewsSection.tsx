@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Row, Col, Card, Typography, Avatar, Rate } from "antd";
-import CustomCarousel from "@/components/CustomCarousel";
+import CustomCarousel from "@/components/sections/CustomCarousel";
 import {
   HOME_PAGE_SETTINGS_KEYS,
   HOME_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 

@@ -4,11 +4,11 @@ import React from "react";
 import { Typography, Spin, Alert } from "antd";
 import ImageComponent from "@/components/ImageComponent";
 import apiClient from "@/utils/api/apiClient";
-import CustomCarousel from "@/components/CustomCarousel";
+import CustomCarousel from "@/components/sections/CustomCarousel";
 import {
   TEAM_PAGE_SETTINGS_KEYS,
   TEAM_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/TEAM_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 
 const { Title, Text } = Typography;
 
@@ -20,7 +20,7 @@ interface TeamMember {
 }
 
 type TeamSectionProps = {
-  teamSection: TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.TEAM_SECTION];
+  teamSection: TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 };
 
 const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {

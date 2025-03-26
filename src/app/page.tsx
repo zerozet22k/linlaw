@@ -1,7 +1,7 @@
 import React from "react";
 import HomePageContent from "./content";
 import PageService from "@/services/PageService";
-import { HOME_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+import { HOME_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 // ✅ Function for default homepage data
 const getDefaultHomePageData = () => ({

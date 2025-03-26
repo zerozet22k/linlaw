@@ -6,7 +6,7 @@ import PageService from "@/services/PageService";
 import {
   ABOUT_PAGE_SETTINGS_KEYS,
   ABOUT_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/ABOUT_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/ABOUT_PAGE_SETTINGS";
 
 const getDefaultAboutUsData = (): ABOUT_PAGE_SETTINGS_TYPES => ({
   [ABOUT_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {

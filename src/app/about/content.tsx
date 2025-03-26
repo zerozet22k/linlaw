@@ -8,7 +8,7 @@ import PageWrapper from "@/components/PageWrapper";
 import {
   ABOUT_PAGE_SETTINGS_KEYS,
   ABOUT_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/ABOUT_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/ABOUT_PAGE_SETTINGS";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 

@@ -18,7 +18,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import {
   NEWSLETTER_PAGE_SETTINGS_KEYS,
   NEWSLETTER_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/NEWSLETTER_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 import { INewsletterAPI } from "@/models/Newsletter";
 
 const { Title, Paragraph } = Typography;
@@ -31,8 +31,7 @@ type NewsletterContentProps = {
 const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const { language } = useLanguage();
   const pageContent = data[NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT];
-  const newsletterSection =
-    data[NEWSLETTER_PAGE_SETTINGS_KEYS.NEWSLETTER_SECTION];
+  const newsletterSection = data[NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS];
 
   const [newsletters, setNewsletters] = useState<INewsletterAPI[]>([]);
   const [loading, setLoading] = useState<boolean>(false);

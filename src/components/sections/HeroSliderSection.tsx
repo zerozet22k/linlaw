@@ -7,7 +7,7 @@ import "swiper/css/effect-cube";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/autoplay";
-import "./HeroSlider.css";
+import "./HeroSliderSection.css";
 
 import { EffectCube, Navigation, Pagination, Autoplay } from "swiper/modules";
 import { LanguageJson, getTranslatedText } from "@/utils/getTranslatedText";
@@ -30,8 +30,8 @@ interface HeroSliderProps {
   delay: number;
 }
 
-const HeroSlider: React.FC<HeroSliderProps> = ({ slides, delay }) => {
-  const { language } = useLanguage(); // Get the current language dynamically
+const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay }) => {
+  const { language } = useLanguage();
 
   return (
     <div className="swiper-wrapper no-select">
@@ -82,4 +82,4 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ slides, delay }) => {
   );
 };
 
-export default HeroSlider;
+export default HeroSliderSection;

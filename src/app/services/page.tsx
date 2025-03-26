@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import React from "react";
 import ServicesContent from "./content";
 import PageService from "@/services/PageService";
-import { SERVICES_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/SERVICES_PAGE_SETTINGS";
+import { SERVICES_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/SERVICES_PAGE_SETTINGS";
 
 const getDefaultServiceData = () => ({
   [SERVICES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
@@ -20,7 +20,7 @@ const getDefaultServiceData = () => ({
     },
     backgroundImage: "https://source.unsplash.com/1600x900/?law,justice,legal",
   },
-  [SERVICES_PAGE_SETTINGS_KEYS.SERVICES_LIST]: [
+  [SERVICES_PAGE_SETTINGS_KEYS.SECTIONS]: [
     {
       title: { en: "Corporate Law", my: "ကုမ္ပဏီဥပဒေ" },
       description: {

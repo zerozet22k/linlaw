@@ -2,16 +2,16 @@
 
 import React from "react";
 import { Layout, Card, Row, Col, Typography } from "antd";
-import HeroSlider from "@/components/HeroSlider";
-import FAQSection from "@/components/FAQSection";
+import HeroSliderSection from "@/components/sections/HeroSliderSection";
+import FAQSection from "@/components/sections/FAQSection";
 import InfoCards from "@/components/sections/InfoCards";
 import AdCards from "@/components/sections/AdCards";
 import {
   HOME_PAGE_SETTINGS_KEYS,
   HOME_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 import SendMailForm from "@/components/SendMailForm";
-import Testimonials from "@/components/sections/Testimonials";
+import Testimonials from "@/components/sections/TestimonialsSection";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -30,7 +30,7 @@ const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
   return (
     <Layout style={{ width: "100%", maxWidth: "100%", padding: "0px" }}>
       <Content style={{ margin: 0, minHeight: 380 }}>
-        <HeroSlider slides={heroSlides} delay={5000} />
+        <HeroSliderSection slides={heroSlides} delay={5000} />
         <div style={{ width: "100%" }}>
           <InfoCards cards={infoCards} />
           <AdCards cards={ads} />

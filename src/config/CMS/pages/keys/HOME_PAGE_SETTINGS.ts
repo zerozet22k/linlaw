@@ -9,7 +9,7 @@ import {
   TextAlign,
   ChildArrayDesign,
   ResponsiveImagesType,
-} from "../settings";
+} from "../../settings";
 import { LanguageJson } from "@/utils/getTranslatedText";
 
 const pageName = "Home";

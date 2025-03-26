@@ -6,14 +6,20 @@ import {
   ArrayDesign,
   ArrayFunctionality,
   ModalBehaviorType,
-} from "../settings";
+} from "../../settings";
 import { LanguageJson } from "@/utils/getTranslatedText";
+import {
+  SHARED_PAGE_CONTENT_FIELDS,
+  SHARED_PAGE_DESIGN_FIELDS,
+} from "./shared/sharedPageConfig";
+import { SharedPageContentType, SharedPageDesignType } from "./shared/sharedPageTypes";
 
 const pageName = "Services";
 
 export const SERVICES_PAGE_SETTINGS_KEYS = {
   PAGE_CONTENT: `${pageName}-page-content`,
-  SERVICES_LIST: `${pageName}-services-list`,
+  DESIGN: `${pageName}-design`,
+  SECTIONS: `${pageName}-sections`,
 } as const;
 
 export const SERVICES_PAGE_SETTINGS: GeneralConfig<
@@ -23,32 +29,16 @@ export const SERVICES_PAGE_SETTINGS: GeneralConfig<
     label: "Page Content",
     type: NestedFieldType.JSON,
     design: JsonDesign.PARENT,
-    fields: {
-      title: {
-        label: "Page Title",
-        guide: "The main title of the services page.",
-        formType: FormType.LANGUAGE_JSON_TEXT,
-      },
-      subtitle: {
-        label: "Page Subtitle",
-        guide: "The subtitle of the services page.",
-        formType: FormType.LANGUAGE_JSON_TEXT,
-      },
-      description: {
-        label: "Page Description",
-        guide: "A brief description of the services page.",
-        formType: FormType.LANGUAGE_JSON_TEXTAREA,
-      },
-      backgroundImage: {
-        label: "Background Image",
-        guide: "The background image for the services page.",
-        formType: FormType.IMAGE_SELECTOR,
-      },
-    },
+    fields: SHARED_PAGE_CONTENT_FIELDS,
   },
-
-  [SERVICES_PAGE_SETTINGS_KEYS.SERVICES_LIST]: {
-    label: "Services List",
+  [SERVICES_PAGE_SETTINGS_KEYS.DESIGN]: {
+    label: "Page Design",
+    type: NestedFieldType.JSON,
+    design: JsonDesign.PARENT,
+    fields: SHARED_PAGE_DESIGN_FIELDS,
+  },
+  [SERVICES_PAGE_SETTINGS_KEYS.SECTIONS]: {
+    label: "Sections",
     type: NestedFieldType.ARRAY,
     keyLabel: "Service",
     arrayDesign: ArrayDesign.PARENT,
@@ -81,21 +71,23 @@ export const SERVICES_PAGE_SETTINGS: GeneralConfig<
         guide: "Color of the service icon.",
         formType: FormType.COLOR,
       },
+      image: {
+        label: "Service Image",
+        guide: "Optional image for the service.",
+        formType: FormType.IMAGE_SELECTOR,
+      },
     },
   },
 };
 
 export type SERVICES_PAGE_SETTINGS_TYPES = {
-  [SERVICES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
-    title: LanguageJson;
-    subtitle: LanguageJson;
-    description: LanguageJson;
-    backgroundImage?: string;
-  };
-  [SERVICES_PAGE_SETTINGS_KEYS.SERVICES_LIST]: {
+  [SERVICES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
+  [SERVICES_PAGE_SETTINGS_KEYS.DESIGN]: SharedPageDesignType;
+  [SERVICES_PAGE_SETTINGS_KEYS.SECTIONS]: {
     title: LanguageJson;
     description: LanguageJson;
     icon: string;
     iconColor: string;
+    image?: string;
   }[];
 };

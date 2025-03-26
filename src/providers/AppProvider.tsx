@@ -2,7 +2,7 @@
 
 import React from "react";
 import LayoutRouter from "@/router/LayoutRouter";
-import SetupForm from "@/components/forms/SetupForm";
+import SetupForm from "@/components/FormsF/SetupForm";
 import { UserProvider } from "./UserProvider";
 import { FileProvider } from "./FileProvider";
 import { useSettings } from "@/hooks/useSettings";

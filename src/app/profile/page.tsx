@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Card, Descriptions, Alert } from "antd";
-import ProfileUpdateForm from "@/components/forms/ProfileUpdateForm";
+import ProfileUpdateForm from "@/components/FormsF/ProfileUpdateForm";
 import { useRouter } from "next/navigation";
 import SubLoader from "@/components/loaders/SubLoader";
 import { useUser } from "@/hooks/useUser";

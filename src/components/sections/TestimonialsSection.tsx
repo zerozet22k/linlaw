@@ -5,7 +5,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
-} from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 const { Title, Text } = Typography;
 

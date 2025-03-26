@@ -5,11 +5,10 @@ import { useLanguage } from "@/hooks/useLanguage";
 import {
   HOME_PAGE_SETTINGS_KEYS,
   HOME_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/HOME_PAGE_SETTINGS";
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 const { Title, Text } = Typography;
 
-// Define the individual card type
 export type InfoCardProps = {
   title: LanguageJson;
   description: LanguageJson;
@@ -17,7 +16,6 @@ export type InfoCardProps = {
   maxHeight?: number;
 };
 
-// Update InfoCardsProps to use full width cards
 type InfoCardsProps = {
   cards: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.CARDS];
 };
@@ -50,7 +48,7 @@ const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
 }) => {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Only enable fade if there is more than 1 image.
+
   const [fade, setFade] = useState(images.length > 1 ? true : true);
 
   useEffect(() => {

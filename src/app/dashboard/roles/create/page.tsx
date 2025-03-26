@@ -1,5 +1,5 @@
 "use client";
-import RoleForm from "@/components/forms/RoleForm";
+import RoleForm from "@/components/FormsF/RoleForm";
 import React from "react";
 
 const CreateRolePage: React.FC = () => {

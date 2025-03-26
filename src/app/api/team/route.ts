@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import UserService from "@/services/UserService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import PageService from "@/services/PageService";
-import { PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/pageKeys";
+import {
+  TEAM_PAGE_SETTINGS_KEYS,
+} from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 
 const userService = new UserService();
 const pageService = new PageService();
@@ -10,7 +12,7 @@ const pageService = new PageService();
 async function handleGetAllUsersRequest(request: Request) {
   try {
     const teamPage = await pageService.getPageByKey(
-      PAGE_SETTINGS_KEYS.TEAM_SECTION
+      TEAM_PAGE_SETTINGS_KEYS.SECTIONS
     );
     if (!teamPage) {
       return NextResponse.json(
@@ -18,7 +20,7 @@ async function handleGetAllUsersRequest(request: Request) {
         { status: 404 }
       );
     }
-
+    
     const memberRole = teamPage.memberRole;
     if (!memberRole) {
       return NextResponse.json(
