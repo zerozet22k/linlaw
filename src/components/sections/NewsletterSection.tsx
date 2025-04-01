@@ -1,58 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
-import { Collapse, Typography, Card, Button } from "antd";
-
-import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
+import React from "react";
+import { Card } from "antd";
+import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
+import {
+  newsletterTitle,
+  newsletterSubtitle,
+  newsletterTagline,
+} from "@/translations";
 
-const { Panel } = Collapse;
-
-interface FAQItem {
-  question: LanguageJson;
-  answer: LanguageJson;
-}
-
-interface FAQSectionProps {
-  faqs: FAQItem[];
-}
-
-const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
+const NewsletterSection: React.FC = () => {
   const { language } = useLanguage();
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const toggleReadMore = (index: number) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
-  };
 
   return (
-    <Card title={"Frequently Asked Questions"}>
-      <Collapse accordion>
-        {faqs.map((faq, index) => {
-          const translatedAnswer = getTranslatedText(faq.answer, language);
-          const isExpanded = expandedIndex === index;
-          const previewText =
-            translatedAnswer.length > 100
-              ? `${translatedAnswer.substring(0, 100)}...`
-              : translatedAnswer;
-
-          return (
-            <Panel
-              header={getTranslatedText(faq.question, language)}
-              key={index}
-            >
-              <p>{isExpanded ? translatedAnswer : previewText}</p>
-              {translatedAnswer.length > 100 && (
-                <Button type="link" onClick={() => toggleReadMore(index)}>
-                  {isExpanded ? "Read Less" : "Read More"}
-                </Button>
-              )}
-            </Panel>
-          );
-        })}
-      </Collapse>
+    <Card
+      title={getTranslatedText(newsletterTitle, language)}
+      bordered={false}
+      style={{ textAlign: "center", padding: "20px" }}
+    >
+      <h2>{getTranslatedText(newsletterSubtitle, language)}</h2>
+      <p>{getTranslatedText(newsletterTagline, language)}</p>
     </Card>
   );
 };
 
-export default FAQSection;
+export default NewsletterSection;

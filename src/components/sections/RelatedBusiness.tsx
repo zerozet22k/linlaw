@@ -1,8 +1,11 @@
+"use client";
+
 import React from "react";
 import { Card, Typography, Divider } from "antd";
 import { PhoneOutlined } from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
+import { contactsTranslations, noContactsTranslations } from "@/translations";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
@@ -10,7 +13,7 @@ import {
 
 const { Title, Text } = Typography;
 
-const AdCard: React.FC<{
+const RelatedBusiness: React.FC<{
   ad: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS][number];
 }> = ({ ad }) => {
   const { language } = useLanguage();
@@ -105,7 +108,7 @@ const AdCard: React.FC<{
               color: "#333",
             }}
           >
-            Contacts
+            {getTranslatedText(contactsTranslations, language)}
           </Title>
 
           {Array.isArray(ad.contacts) && ad.contacts.length > 0 ? (
@@ -133,7 +136,7 @@ const AdCard: React.FC<{
             ))
           ) : (
             <Text style={{ fontSize: 14, color: "#999" }}>
-              No contacts available
+              {getTranslatedText(noContactsTranslations, language)}
             </Text>
           )}
         </div>
@@ -142,4 +145,4 @@ const AdCard: React.FC<{
   );
 };
 
-export default AdCard;
+export default RelatedBusiness;

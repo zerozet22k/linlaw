@@ -5,13 +5,14 @@ import { Layout, Card, Row, Col, Typography } from "antd";
 import HeroSliderSection from "@/components/sections/HeroSliderSection";
 import FAQSection from "@/components/sections/FAQSection";
 import InfoCards from "@/components/sections/InfoCards";
-import AdCards from "@/components/sections/AdCards";
+import RelatedBusinesses from "@/components/sections/RelatedBusinesses";
 import {
   HOME_PAGE_SETTINGS_KEYS,
   HOME_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
-import SendMailForm from "@/components/SendMailForm";
+import SendMailForm from "@/components/sections/SendMailForm";
 import Testimonials from "@/components/sections/TestimonialsSection";
+import NewsletterSection from "@/components/sections/NewsletterSection";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -33,7 +34,7 @@ const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
         <HeroSliderSection slides={heroSlides} delay={5000} />
         <div style={{ width: "100%" }}>
           <InfoCards cards={infoCards} />
-          <AdCards cards={ads} />
+          <RelatedBusinesses cards={ads} />
           <Row
             gutter={[16, 16]}
             justify="center"
@@ -43,9 +44,7 @@ const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
               <FAQSection faqs={faqs} />
             </Col>
             <Col sm={24} lg={12}>
-              <Card title="Lin Myanmar News Letters">
-                <Text>{`Latest updates on Myanmar's legal landscape.`}</Text>
-              </Card>
+              <NewsletterSection />
             </Col>
           </Row>
           <Testimonials testimonials={testimonials} />

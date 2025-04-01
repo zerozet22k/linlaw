@@ -30,12 +30,6 @@ interface RoleFormProps {
   role?: RoleAPI;
 }
 
-/**
- * In this logic:
- * - A higher numeric 'level' means higher authority (e.g. level=100 is top).
- * - The user with level=100 can only create/edit roles with level < 100.
- * - FREE_PERMISSIONS are always delegated, so they are auto‑added and always checked.
- */
 const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);

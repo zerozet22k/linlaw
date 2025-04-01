@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Collapse, Typography, Card, Button } from "antd";
-
+import { Collapse, Card, Button } from "antd";
 import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
+import { faqTranslations } from "@/translations";
 
 const { Panel } = Collapse;
 
@@ -26,7 +26,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
   };
 
   return (
-    <Card title={"Frequently Asked Questions"}>
+    <Card title={getTranslatedText(faqTranslations.faqTitle, language)}>
       <Collapse accordion>
         {faqs.map((faq, index) => {
           const translatedAnswer = getTranslatedText(faq.answer, language);
@@ -44,7 +44,9 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
               <p>{isExpanded ? translatedAnswer : previewText}</p>
               {translatedAnswer.length > 100 && (
                 <Button type="link" onClick={() => toggleReadMore(index)}>
-                  {isExpanded ? "Read Less" : "Read More"}
+                  {isExpanded
+                    ? getTranslatedText(faqTranslations.readLess, language)
+                    : getTranslatedText(faqTranslations.readMore, language)}
                 </Button>
               )}
             </Panel>

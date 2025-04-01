@@ -56,6 +56,26 @@ export default class MailService {
             pass: settings[MAIL_SETTINGS_KEYS.SENDGRID].apiKey,
           },
         });
+      } else if (settings[MAIL_SETTINGS_KEYS.BREVO]?.apiKey) {
+        this.transporter = nodemailer.createTransport({
+          host: "smtp-relay.brevo.com",
+          port: 587,
+          secure: false,
+          auth: {
+            user: "apikey",
+            pass: settings[MAIL_SETTINGS_KEYS.BREVO].apiKey,
+          },
+        });
+      } else if (settings[MAIL_SETTINGS_KEYS.MAILERSEND]?.apiKey) {
+        this.transporter = nodemailer.createTransport({
+          host: "smtp.mailersend.net",
+          port: 587,
+          secure: false,
+          auth: {
+            user: "apikey",
+            pass: settings[MAIL_SETTINGS_KEYS.MAILERSEND].apiKey,
+          },
+        });
       } else {
         console.error("❌ Email configuration is incomplete.");
       }
@@ -63,7 +83,7 @@ export default class MailService {
       console.error("❌ Error initializing mail service:", error);
     }
   }
-  public async sendMail(
+  public async receiveMail(
     subject: string,
     text: string,
     attachments?: SendMailOptions["attachments"]
@@ -86,6 +106,33 @@ export default class MailService {
       return info;
     } catch (error) {
       console.error("❌ Error sending email:", error);
+      throw error;
+    }
+  }
+  public async sendMail(
+    to: string,
+    subject: string,
+    text: string,
+    attachments?: SendMailOptions["attachments"]
+  ) {
+    if (!this.transporter) {
+      throw new Error("❌ Email configuration is incomplete.");
+    }
+
+    const mailOptions: SendMailOptions = {
+      from: (this.transporter.options as any)?.auth?.user,
+      to,
+      subject,
+      text,
+      attachments,
+    };
+
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log("✅ Email sent:", info.messageId);
+      return info;
+    } catch (error) {
+      console.error("❌ Error sending email to", to, ":", error);
       throw error;
     }
   }

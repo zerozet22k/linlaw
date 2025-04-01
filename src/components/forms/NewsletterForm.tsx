@@ -6,7 +6,7 @@ import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
-import LanguageTextInput from "../LanguageTextInput";
+import LanguageTextInput from "../inputs/LanguageTextInput";
 
 interface NewsletterFormProps {
   newsletter?: INewsletterAPI;
@@ -16,13 +16,11 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
   const [form] = Form.useForm();
   const router = useRouter();
 
-  // Main newsletter submission state
   const [submitting, setSubmitting] = useState<boolean>(false);
-  // Store current newsletter (for attachments management)
+
   const [currentNewsletter, setCurrentNewsletter] =
     useState<INewsletterAPI | null>(newsletter || null);
 
-  // Attachment states
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [deletingAttachmentIds, setDeletingAttachmentIds] = useState<string[]>(
@@ -39,10 +37,9 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
     }
   }, [newsletter, form]);
 
-  // Handle file selection via Upload component
   const handleBeforeUpload = (file: File) => {
     setSelectedFile(file);
-    // Return false to prevent automatic upload
+
     return false;
   };
 
@@ -96,7 +93,6 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
     }
     setUploading(true);
     try {
-      // 1) Get the upload URL and filePath from server
       const signResponse = await apiClient.post(
         `/newsletters/${currentNewsletter._id}/attachment/signurl`,
         {
@@ -114,7 +110,6 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
         return;
       }
 
-      // 2) Upload the file using the obtained uploadUrl
       const uploadResponse = await fetch(uploadUrl, {
         method: "PUT",
         headers: { "Content-Type": selectedFile.type },
@@ -125,7 +120,6 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
         return;
       }
 
-      // 3) Inform the server of the new attachment with minimal required fields
       const attachmentPayload = {
         attachment: {
           rawFilePath: filePath,
@@ -141,9 +135,9 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
         message.error("Failed to add attachment to newsletter");
       } else {
         message.success("Attachment uploaded successfully");
-        // Clear file selection
+
         setSelectedFile(null);
-        // Update local newsletter data with the new attachment
+
         setCurrentNewsletter(addResponse.data.newsletter);
       }
     } catch (error) {

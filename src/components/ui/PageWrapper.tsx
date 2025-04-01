@@ -2,7 +2,7 @@
 
 import React, { ReactNode, CSSProperties } from "react";
 import { Layout, Typography } from "antd";
-import SendMailForm from "./SendMailForm";
+import SendMailForm from "../sections/SendMailForm";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
 

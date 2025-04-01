@@ -1,12 +1,12 @@
 import React from "react";
-import PublicAPIDynamicDropdown from "./PublicAPIDynamicDropdown";
+import PublicAPIDynamicDropdown from "../PublicAPIDynamicDropdown";
 
 interface UserSelectorProps {
   value?: string;
   onChange?: (value: string) => void;
 }
 
-const UserSelector: React.FC<UserSelectorProps> = ({ value, onChange }) => {
+const UserSelection: React.FC<UserSelectorProps> = ({ value, onChange }) => {
   return (
     <PublicAPIDynamicDropdown
       type="users"
@@ -19,4 +19,4 @@ const UserSelector: React.FC<UserSelectorProps> = ({ value, onChange }) => {
   );
 };
 
-export default UserSelector;
+export default UserSelection;

@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 
 import { FileContext } from "@/contexts/FileContext";
-import FileSelectionModal from "@/components/inputs/FileSelectionModal";
+import FileSelectionModal from "@/components/modals/FileSelectionModal";
 import { useFetchFiles } from "@/hooks/useFetchFiles";
 import { useFileModal } from "@/hooks/useFileModal";
 import { useFileUpload } from "@/hooks/useFileUpload";

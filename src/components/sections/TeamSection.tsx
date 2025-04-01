@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Typography, Spin, Alert } from "antd";
-import ImageComponent from "@/components/ImageComponent";
+import ImageComponent from "@/components/ui/ImageComponent";
 import apiClient from "@/utils/api/apiClient";
 import CustomCarousel from "@/components/sections/CustomCarousel";
 import {

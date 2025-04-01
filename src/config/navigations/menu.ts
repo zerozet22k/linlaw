@@ -108,6 +108,13 @@ export const dashboardMenu: NavigationMenuItem[] = [
     ],
   },
   {
+    key: ROUTE_KEYS.SEND_EMAILS,
+    icon: ROUTES[ROUTE_KEYS.SEND_EMAILS].icon!,
+    label: ROUTES[ROUTE_KEYS.SEND_EMAILS].label!,
+    link: ROUTES[ROUTE_KEYS.SEND_EMAILS].path,
+    access: ROUTES[ROUTE_KEYS.SEND_EMAILS].access,
+  },
+  {
     key: ROUTE_KEYS.PAGES,
     icon: ROUTES[ROUTE_KEYS.PAGES].icon!,
     label: ROUTES[ROUTE_KEYS.PAGES].label!,

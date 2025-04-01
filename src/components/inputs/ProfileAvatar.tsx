@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { message, Button, Modal, Avatar, Spin } from "antd";
 import { CameraOutlined } from "@ant-design/icons";
-import ImageCropper from "./inputs/ImageCropper";
+import ImageCropper from "./ImageCropper";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
 

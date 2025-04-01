@@ -20,7 +20,7 @@ export async function sendPaymentEmail(
 
     const attachments = [{ filename: "screenshot.png", content: screenshot }];
 
-    await mailService.sendMail(mailSubject, mailText, attachments);
+    await mailService.receiveMail(mailSubject, mailText, attachments);
     console.log(`Email sent successfully for user ${user._id}`);
     return true;
   } catch (error) {

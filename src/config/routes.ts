@@ -32,8 +32,7 @@ export const ROUTE_KEYS = {
   FORGOT_PASSWORD: "forgot-password",
   PROFILE: "profile",
 
-  // INQUIRY: "inquiry",
-  // INQUIRY_INFO: "inquiry-info",
+  SEND_EMAILS: "send-emails",
 
   NEWSLETTER_LIST: "newsletter-list",
   CREATE_NEWSLETTER: "create-newsletter",
@@ -183,15 +182,17 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     IfNotLoggedInRedirectUrl: "/login?redirect=/dashboard/files/upload",
     noAccessMessage: "You do not have permission to upload files.",
   },
-
-  [ROUTE_KEYS.SETTINGS]: {
-    key: ROUTE_KEYS.SETTINGS,
-    path: `${dashboardRoute}/settings`,
-    label: "Settings",
-    icon: "SettingOutlined",
-    access: [APP_PERMISSIONS.EDIT_SETTINGS, APP_PERMISSIONS.ADMIN],
+  [ROUTE_KEYS.SEND_EMAILS]: {
+    key: ROUTE_KEYS.SEND_EMAILS,
+    path: `${dashboardRoute}/send-emails`,
+    label: "Send Emails",
+    icon: "MailOutlined",
+    access: [APP_PERMISSIONS.ADMIN],
     loginRequired: true,
+    IfNotLoggedInRedirectUrl: "/login?redirect=/dashboard/send-emails",
+    noAccessMessage: "You do not have permission to send emails.",
   },
+
   [ROUTE_KEYS.PAGES]: {
     key: ROUTE_KEYS.PAGES,
     path: `${dashboardRoute}/pages`,
@@ -200,7 +201,14 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     access: [APP_PERMISSIONS.EDIT_PAGES, APP_PERMISSIONS.ADMIN],
     loginRequired: true,
   },
-
+  [ROUTE_KEYS.SETTINGS]: {
+    key: ROUTE_KEYS.SETTINGS,
+    path: `${dashboardRoute}/settings`,
+    label: "Settings",
+    icon: "SettingOutlined",
+    access: [APP_PERMISSIONS.EDIT_SETTINGS, APP_PERMISSIONS.ADMIN],
+    loginRequired: true,
+  },
   [ROUTE_KEYS.HOME]: {
     key: ROUTE_KEYS.HOME,
     path: "/",
@@ -225,7 +233,6 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
-
   [ROUTE_KEYS.TEAM_MEMBERS]: {
     key: ROUTE_KEYS.TEAM_MEMBERS,
     path: "/team-members",
@@ -234,22 +241,6 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
-  // [ROUTE_KEYS.INQUIRY]: {
-  //   key: ROUTE_KEYS.INQUIRY,
-  //   path: "/inquiry",
-  //   label: "Inquiry",
-  //   icon: "FileTextOutlined",
-  //   loginRequired: false,
-  //   showGoTop: true,
-  // },
-  // [ROUTE_KEYS.INQUIRY_INFO]: {
-  //   key: ROUTE_KEYS.INQUIRY_INFO,
-  //   path: "/inquiry/:id",
-  //   label: "Inquiry Info",
-  //   icon: "FileTextOutlined",
-  //   loginRequired: false,
-  //   showGoTop: true,
-  // },
   [ROUTE_KEYS.NEWSLETTERS]: {
     key: ROUTE_KEYS.NEWSLETTERS,
     path: "/newsletters",

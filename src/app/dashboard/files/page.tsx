@@ -20,7 +20,7 @@ import {
 } from "@ant-design/icons";
 import { useFile } from "@/hooks/useFile";
 import debounce from "lodash/debounce";
-import FileThumbnail from "@/components/FileThumbnail";
+import FileThumbnail from "@/components/ui/FileThumbnail";
 import {
   FileType,
   STORAGE_SERVICES,

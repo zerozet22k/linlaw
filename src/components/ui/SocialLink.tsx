@@ -1,4 +1,5 @@
-// components/SocialLink.tsx
+"use client";
+
 import { Button } from "antd";
 import Link from "next/link";
 import { ReactNode } from "react";

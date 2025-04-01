@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { RoleAPI } from "@/models/RoleModel";
 import { Result, Button, Card } from "antd";
-import RoleForm from "@/components/FormsF/RoleForm";
+import RoleForm from "@/components/forms/RoleForm";
 import apiClient from "@/utils/api/apiClient";
 import SubLoader from "@/components/loaders/SubLoader";
 

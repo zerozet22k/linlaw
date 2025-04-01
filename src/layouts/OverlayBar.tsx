@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Typography } from "antd";
 import { useLayout } from "@/hooks/useLayout";
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelection from "@/components/inputs/standalone/LanguageSelection";
 
 const { Text } = Typography;
 
@@ -64,7 +64,7 @@ const OverlayBar: React.FC<{
             transform: "translateY(-50%)",
           }}
         >
-          <LanguageSelector />
+          <LanguageSelection />
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ const OverlayBar: React.FC<{
       <Text style={{ color: textColor }}>{items[0]}</Text>
       <Text style={{ color: textColor }}>{items[1]}</Text>
       <Text style={{ color: textColor }}>{items[2]}</Text>
-      <LanguageSelector />
+      <LanguageSelection />
     </div>
   );
 };

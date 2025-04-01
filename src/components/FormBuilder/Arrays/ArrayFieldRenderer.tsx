@@ -31,7 +31,6 @@ const ArrayFieldRenderer: React.FC<ArrayFieldRendererProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeItemIndex, setActiveItemIndex] = useState<number | null>(null);
 
-  // If parent's value is not an array (e.g. empty string), update it to []
   useEffect(() => {
     if (!Array.isArray(value)) {
       onChange([]);

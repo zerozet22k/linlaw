@@ -6,8 +6,7 @@ import { UserOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import apiClient from "@/utils/api/apiClient";
 import { rgba } from "polished";
-import PageWrapper from "@/components/PageWrapper";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+import PageWrapper from "@/components/ui/PageWrapper";
 import {
   TEAM_PAGE_SETTINGS_KEYS,
   TEAM_PAGE_SETTINGS_TYPES,
@@ -21,7 +20,6 @@ type TeamContentProps = {
 };
 
 const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
-  const { language } = useLanguage();
   const pageContent = data[TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT];
   const teamSection = data[TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
   const design = data[TEAM_PAGE_SETTINGS_KEYS.DESIGN] || {};
@@ -34,16 +32,20 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
   const [error, setError] = useState<string | null>(null);
 
   const { token } = theme.useToken();
-
-  // Map the design.animation value to Framer Motion variants.
   const getAnimationVariants = (animation: string) => {
     switch (animation) {
       case "fade-in":
         return { initial: { opacity: 0 }, animate: { opacity: 1 } };
       case "slide-up":
-        return { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } };
+        return {
+          initial: { opacity: 0, y: 10 },
+          animate: { opacity: 1, y: 0 },
+        };
       case "scale-in":
-        return { initial: { opacity: 0, scale: 0.9 }, animate: { opacity: 1, scale: 1 } };
+        return {
+          initial: { opacity: 0, scale: 0.9 },
+          animate: { opacity: 1, scale: 1 },
+        };
       default:
         return { initial: {}, animate: {} };
     }
@@ -86,7 +88,10 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
         }}
       >
         {loading && (
-          <Spin size="large" style={{ display: "block", margin: "40px auto" }} />
+          <Spin
+            size="large"
+            style={{ display: "block", margin: "40px auto" }}
+          />
         )}
         {error && (
           <Alert
@@ -100,7 +105,10 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
         <Row gutter={[gridGutter, gridGutter]} justify="center">
           {teamMembers.map((member) => (
             <Col xs={24} sm={12} md={8} lg={6} key={member._id}>
-              <Link href={`/team-members/${member._id}`} style={{ textDecoration: "none" }}>
+              <Link
+                href={`/team-members/${member._id}`}
+                style={{ textDecoration: "none" }}
+              >
                 <motion.div
                   initial={variants.initial}
                   animate={variants.animate}
@@ -126,13 +134,14 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                       textAlign: design.textAlign || "center",
                     }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
+                      (e.currentTarget as HTMLElement).style.transform =
+                        "translateY(-4px)";
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                      (e.currentTarget as HTMLElement).style.transform =
+                        "translateY(0)";
                     }}
                   >
-                    {/* Conditional rendering: show image if enabled; fallback to icon if enabled */}
                     {design.showImages && member.avatar ? (
                       <Avatar
                         size={96}
@@ -163,7 +172,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                           color: typography.color || "inherit",
                         }}
                       >
-                        {member.roles.map((role) => role.name).join(", ")}
+                        {member.position}
                       </p>
                     </div>
                   </Card>

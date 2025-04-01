@@ -12,6 +12,8 @@ export const MAIL_SETTINGS_KEYS = {
   OUTLOOK: "outlook",
   SENDGRID: "sendgrid",
   ADMIN_EMAIL: "adminEmail",
+  BREVO: "brevo",
+  MAILERSEND: "mailersend",
 } as const;
 
 export const MAIL_SETTINGS: GeneralConfig<typeof MAIL_SETTINGS_KEYS> = {
@@ -68,8 +70,34 @@ export const MAIL_SETTINGS: GeneralConfig<typeof MAIL_SETTINGS_KEYS> = {
     label: "Admin Email",
     guide: "Enter the admin email for receiving notifications.",
     formType: FormType.EMAIL,
-    parentDesign:FieldDesign.PARENT,
+    parentDesign: FieldDesign.PARENT,
     visibility: "private",
+  },
+  [MAIL_SETTINGS_KEYS.BREVO]: {
+    label: "Brevo Settings",
+    type: NestedFieldType.JSON,
+    visibility: "private",
+    design: JsonDesign.PARENT,
+    fields: {
+      apiKey: {
+        label: "Brevo API Key",
+        guide: "Enter your Brevo API key.",
+        formType: FormType.TEXT,
+      },
+    },
+  },
+  [MAIL_SETTINGS_KEYS.MAILERSEND]: {
+    label: "Mailersend Settings",
+    type: NestedFieldType.JSON,
+    visibility: "private",
+    design: JsonDesign.PARENT,
+    fields: {
+      apiKey: {
+        label: "Mailersend API Key",
+        guide: "Enter your Mailersend API key.",
+        formType: FormType.TEXT,
+      },
+    },
   },
 };
 
@@ -86,4 +114,10 @@ export type MAIL_SETTINGS_TYPES = {
     apiKey: string;
   };
   [MAIL_SETTINGS_KEYS.ADMIN_EMAIL]: string;
+  [MAIL_SETTINGS_KEYS.BREVO]: {
+    apiKey: string;
+  };
+  [MAIL_SETTINGS_KEYS.MAILERSEND]: {
+    apiKey: string;
+  };
 };

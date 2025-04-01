@@ -52,7 +52,6 @@ const ContactUsSection: React.FC<ContactUsSectionProps> = ({ contactInfo }) => {
           margin: "0 auto",
         }}
       >
-        {/* Contact Form */}
         <Col
           xs={24}
           md={12}

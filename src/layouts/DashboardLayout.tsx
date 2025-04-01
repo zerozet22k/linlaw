@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useMediaQuery } from "react-responsive";
 import { useSettings } from "@/hooks/useSettings";
 import { SettingsInterface } from "@/config/CMS/settings/settingKeys";
-import UserAvatar from "../components/UserAvatar";
+import UserAvatar from "../components/ui/UserAvatar";
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import AppMenu from "@/config/navigations/navigationMenu";
 
@@ -29,6 +29,11 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
       siteUrl: "",
       siteBanner: "",
       siteLogo: "",
+      businessInfo: {
+        openingHours: "8:30 AM - 6:00 PM",
+        phoneNumber: "+95 9 765432100",
+        email: "contact@myanmarbiz.com",
+      },
     };
   const {
     token: { colorBgContainer },
@@ -123,9 +128,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
             height: "84px",
           }}
         >
-          <div>
-
-          </div>
+          <div></div>
           {/* <Text
             style={{
               fontSize: "18px",

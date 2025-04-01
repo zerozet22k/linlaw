@@ -4,7 +4,7 @@ import React from "react";
 import { Card, Row, Col, Typography, Image } from "antd";
 import { motion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
-import PageWrapper from "@/components/PageWrapper";
+import PageWrapper from "@/components/ui/PageWrapper";
 import {
   ABOUT_PAGE_SETTINGS_KEYS,
   ABOUT_PAGE_SETTINGS_TYPES,

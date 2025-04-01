@@ -10,7 +10,6 @@ import {
 import { useRouter } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 
-// Helper function to format bytes into human-readable sizes.
 const formatBytes = (bytes: number, decimals = 2): string => {
   if (bytes === 0) return "0 Bytes";
   const k = 1024;

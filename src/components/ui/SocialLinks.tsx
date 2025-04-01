@@ -1,3 +1,5 @@
+"use client";
+
 import SocialLink from "./SocialLink";
 import {
   FacebookOutlined,

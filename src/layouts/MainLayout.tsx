@@ -6,12 +6,12 @@ import { ArrowUpOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useSettings } from "@/hooks/useSettings";
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
-import UserAvatar from "../components/UserAvatar";
-import SocialLinks from "../components/SocialLinks";
+import UserAvatar from "../components/ui/UserAvatar";
+import SocialLinks from "../components/ui/SocialLinks";
 import AppMenu from "@/config/navigations/navigationMenu";
 import { RouteConfig } from "@/config/routes";
 import { useLayout } from "@/hooks/useLayout";
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelection from "@/components/inputs/standalone/LanguageSelection";
 import OverlayBar from "./OverlayBar";
 
 const { Header, Content, Footer } = Layout;
@@ -27,17 +27,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, routeConfig }) => {
   const { showGoTop, scrollToTop, isMobile } = useLayout();
   const [drawerVisible, setDrawerVisible] = useState(false);
 
-  const overlayInfo = {
-    openingHours: "8:30 AM - 6:00 PM",
-    phoneNumber: "+95 9 765432100",
-    email: "contact@myanmarbiz.com",
-  };
-
   const siteSettings = settings?.[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS] || {
     siteName: "",
     siteUrl: "",
     siteBanner: "",
     siteLogo: "",
+    businessInfo: {
+      openingHours: "8:30 AM - 6:00 PM",
+      phoneNumber: "+95 9 765432100",
+      email: "contact@myanmarbiz.com",
+    },
   };
 
   const {
@@ -56,9 +55,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, routeConfig }) => {
     >
       <OverlayBar
         overlayInfo={{
-          openingHours: overlayInfo.openingHours,
-          phoneNumber: overlayInfo.phoneNumber,
-          email: overlayInfo.email,
+          openingHours:
+            siteSettings.businessInfo?.openingHours || "8:30 AM - 6:00 PM",
+          phoneNumber:
+            siteSettings.businessInfo?.phoneNumber || "+95 9 765432100",
+          email: siteSettings.businessInfo?.email || "contact@myanmarbiz.com",
         }}
       />
 

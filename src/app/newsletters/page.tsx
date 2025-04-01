@@ -3,24 +3,16 @@ import React from "react";
 import NewsletterContent from "./content";
 import PageService from "@/services/PageService";
 import { NEWSLETTER_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
+import { newsletterPageTranslations } from "@/translations"; // Import centralized texts
 
 const getDefaultNewsletterData = () => ({
   [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
-    title: {
-      en: "Our Newsletters",
-      my: "ကျွန်ုပ်တို့၏သတင်းစာများ",
-    },
-    subtitle: {
-      en: "Stay Updated with Our Latest News",
-      my: "နောက်ဆုံးရသတင်းများနှင့် အချက်အလက်များ",
-    },
-    description: {
-      en: "Explore our collection of newsletters for the latest updates.",
-      my: "နောက်ဆုံးရသတင်းများကို ရယူရန် ကျွန်ုပ်တို့၏သတင်းစာများကို ကြည့်ရှုပါ",
-    },
+    title: newsletterPageTranslations.title,
+    subtitle: newsletterPageTranslations.subtitle,
+    description: newsletterPageTranslations.description,
     backgroundImage: "https://source.unsplash.com/1600x900/?newsletter",
   },
-  [NEWSLETTER_PAGE_SETTINGS_KEYS.NEWSLETTER_SECTION]: {
+  [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxNewslettersCount: 8,
   },
 });

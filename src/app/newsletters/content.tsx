@@ -13,7 +13,7 @@ import {
 } from "antd";
 import Link from "next/link";
 import apiClient from "@/utils/api/apiClient";
-import PageWrapper from "@/components/PageWrapper";
+import PageWrapper from "@/components/ui/PageWrapper";
 import { useLanguage } from "@/hooks/useLanguage";
 import {
   NEWSLETTER_PAGE_SETTINGS_KEYS,
@@ -40,9 +40,8 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const { token } = theme.useToken();
-
-  // Number of newsletters per page from CMS settings.
-  const limit = newsletterSection.maxNewslettersCount;
+  
+  const limit = newsletterSection?.maxNewslettersCount || 5;
 
   const fetchNewsletters = useCallback(
     async (reset: boolean = false) => {

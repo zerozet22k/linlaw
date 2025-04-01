@@ -1,44 +1,36 @@
 import { NextResponse } from "next/server";
 import MailService from "@/services/MailService";
 
-const mailService = new MailService();
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW = 60 * 1000;
+const MAX_REQUESTS = 5;
 
-export const POST = async (req: Request): Promise<NextResponse> => {
+export const POST = async (request: Request) => {
   try {
-    const { name, email, message } = await req.json();
+    const body = await request.json();
+    const { email, subject, message } = body;
 
-    if (!name || !email || !message) {
+    if (!email || !subject || !message) {
       return NextResponse.json(
-        { error: "All fields are required." },
+        { error: "Email, subject, and message are required." },
         { status: 400 }
       );
     }
 
-    const mailSubject = "New Contact Us Message";
-    const mailText = `
-      A new message has been received from the contact form:
-      - Name: ${name}
-      - Email: ${email}
-      - Message: ${message}
-    `;
+    const mailService = new MailService();
 
-    try {
-      const response = await mailService.sendMail(mailSubject, mailText);
-      return NextResponse.json(
-        { message: "Your message has been sent successfully!" },
-        { status: 200 }
-      );
-    } catch (error) {
-      console.error("Error sending Contact Us email:", error);
-      return NextResponse.json(
-        { error: "Failed to send your message. Please try again later." },
-        { status: 500 }
-      );
-    }
-  } catch (error) {
-    console.error("Error handling Contact Us request:", error);
+    const fullMessage = `Sender Email: ${email}\n\n${message}`;
+
+    await mailService.receiveMail(subject, fullMessage);
+
     return NextResponse.json(
-      { error: "An internal server error occurred." },
+      { message: "Email sent successfully." },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("Error sending email:", error);
+    return NextResponse.json(
+      { error: "Failed to send email. Please try again later." },
       { status: 500 }
     );
   }

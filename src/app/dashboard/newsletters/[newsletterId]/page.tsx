@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Card, Result, Button } from "antd";
-import NewsletterForm from "@/components/FormsF/NewsletterForm";
+import NewsletterForm from "@/components/forms/NewsletterForm";
 import apiClient from "@/utils/api/apiClient";
 import SubLoader from "@/components/loaders/SubLoader";
 

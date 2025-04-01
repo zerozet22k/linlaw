@@ -1,3 +1,5 @@
+"use client";
+
 import { FileType } from "@/models/FileModel";
 import {
   VideoCameraOutlined,

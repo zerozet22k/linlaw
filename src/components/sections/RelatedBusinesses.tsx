@@ -1,14 +1,24 @@
+"use client";
+
 import React from "react";
-import { Row, Col, Divider } from "antd";
-import AdCard from "./AdCard";
+import { Row, Col } from "antd";
+import RelatedBusiness from "./RelatedBusiness";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
+import { getTranslatedText } from "@/utils/getTranslatedText";
+import { useLanguage } from "@/hooks/useLanguage";
+import {
+  relatedBusinessTitleTranslations,
+  noAdsTranslations,
+} from "@/translations";
 
-const AdCards: React.FC<{
+const RelatedBusinesses: React.FC<{
   cards?: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS];
 }> = ({ cards = [] }) => {
+  const { language } = useLanguage();
+
   return (
     <section style={{ padding: "40px 20px", backgroundColor: "#f7f7f7" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -21,13 +31,13 @@ const AdCards: React.FC<{
             color: "#333",
           }}
         >
-          Related Businesses
+          {getTranslatedText(relatedBusinessTitleTranslations, language)}
         </h2>
         <Row gutter={[24, 24]} justify="center">
           {cards.length > 0 ? (
             cards.map((ad, index) => (
               <Col key={index} xs={24} sm={12} md={8} lg={6}>
-                <AdCard ad={ad} />
+                <RelatedBusiness ad={ad} />
               </Col>
             ))
           ) : (
@@ -43,7 +53,7 @@ const AdCards: React.FC<{
                 justifyContent: "center",
               }}
             >
-              No ads available.
+              {getTranslatedText(noAdsTranslations, language)}
             </div>
           )}
         </Row>
@@ -52,4 +62,4 @@ const AdCards: React.FC<{
   );
 };
 
-export default AdCards;
+export default RelatedBusinesses;

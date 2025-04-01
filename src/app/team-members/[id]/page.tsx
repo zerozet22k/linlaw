@@ -16,7 +16,6 @@ const TeamMemberPage: React.FC = () => {
   const params = useParams();
   const userId = params?.id as string;
 
-  // Access the current theme tokens
   const { token } = useToken();
 
   useEffect(() => {
@@ -59,12 +58,12 @@ const TeamMemberPage: React.FC = () => {
     );
   }
 
-  // Create a glass effect background using your theme's container color
   const glassBackground = rgba(token.colorBgContainer, 0.2);
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
-      {/* Subtle wave shape at the bottom, using theme text color */}
+    <div
+      style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}
+    >
       <svg
         viewBox="0 0 1440 320"
         style={{
@@ -91,7 +90,7 @@ const TeamMemberPage: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: "20px",
-          color: token.colorTextBase, // Let text adapt to theme
+          color: token.colorTextBase,
         }}
       >
         {/* Glassmorphism Card */}
@@ -152,12 +151,21 @@ const TeamMemberPage: React.FC = () => {
             {user.position && (
               <Title
                 level={4}
-                style={{ marginBottom: "1em", color: token.colorTextDescription }}
+                style={{
+                  marginBottom: "1em",
+                  color: token.colorTextDescription,
+                }}
               >
                 {user.position}
               </Title>
             )}
-            <Paragraph style={{ fontSize: "16px", lineHeight: "1.6", marginBottom: "1.5em" }}>
+            <Paragraph
+              style={{
+                fontSize: "16px",
+                lineHeight: "1.6",
+                marginBottom: "1.5em",
+              }}
+            >
               {user.bio || "No biography available."}
             </Paragraph>
             <Paragraph style={{ fontSize: "16px" }}>

@@ -3,7 +3,7 @@
 import React from "react";
 import { Row, Col, Card, Image } from "antd";
 import { motion } from "framer-motion";
-import PageWrapper from "@/components/PageWrapper";
+import PageWrapper from "@/components/ui/PageWrapper";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
@@ -31,9 +31,15 @@ const ServicesContent: React.FC<ServicesContentProps> = ({ data }) => {
       case "fade-in":
         return { initial: { opacity: 0 }, animate: { opacity: 1 } };
       case "slide-up":
-        return { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } };
+        return {
+          initial: { opacity: 0, y: 10 },
+          animate: { opacity: 1, y: 0 },
+        };
       case "scale-in":
-        return { initial: { opacity: 0, scale: 0.9 }, animate: { opacity: 1, scale: 1 } };
+        return {
+          initial: { opacity: 0, scale: 0.9 },
+          animate: { opacity: 1, scale: 1 },
+        };
       default:
         return { initial: {}, animate: {} };
     }

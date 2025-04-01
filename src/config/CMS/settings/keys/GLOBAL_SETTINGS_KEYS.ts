@@ -26,6 +26,28 @@ export const GLOBAL_SETTINGS: GeneralConfig<typeof GLOBAL_SETTINGS_KEYS> = {
         guide: "The logo image for your site.",
         formType: FormType.IMAGE_SELECTOR,
       },
+      businessInfo: {
+        label: "Business Info",
+        design: JsonDesign.NONE,
+        type: NestedFieldType.JSON,
+        fields: {
+          openingHours: {
+            label: "Opening Hours",
+            guide: "The opening hours of your buinsess.",
+            formType: FormType.TEXT,
+          },
+          phoneNumber: {
+            label: "Phone Number",
+            guide: "The phone number of your buinsess.",
+            formType: FormType.TEXT,
+          },
+          email: {
+            label: "Email",
+            guide: "The email of your buinsess.",
+            formType: FormType.EMAIL,
+          },
+        },
+      },
     },
   },
 };
@@ -36,5 +58,10 @@ export type GLOBAL_SETTINGS_TYPES = {
     siteUrl: string;
     siteBanner: string;
     siteLogo: string;
+    businessInfo: {
+      openingHours: string;
+      phoneNumber: string;
+      email: string;
+    };
   };
 };

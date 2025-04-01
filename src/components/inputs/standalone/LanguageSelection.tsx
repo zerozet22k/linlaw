@@ -2,11 +2,11 @@ import React from "react";
 import { Select, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags } from "./FormBuilder/Fields/Inputs/SupportedLanguageSelector";
+import { languageFlags } from "../../FormBuilder/Fields/Inputs/SupportedLanguageSelector";
 
 const { Option } = Select;
 
-const LanguageSelector: React.FC = () => {
+const LanguageSelection: React.FC = () => {
   const { language, setLanguage, supportedLanguages } = useLanguage();
   const { token } = theme.useToken();
 
@@ -31,7 +31,7 @@ const LanguageSelector: React.FC = () => {
         const countryCode = languageFlags[lang] || "un";
         const flagUrl = getFlagUrl(countryCode, 40);
 
-        return (  
+        return (
           <Option key={lang} value={lang}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <img src={flagUrl} alt={lang} style={{ width: 24, height: 16 }} />
@@ -46,4 +46,4 @@ const LanguageSelector: React.FC = () => {
   );
 };
 
-export default LanguageSelector;
+export default LanguageSelection;

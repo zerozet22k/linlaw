@@ -3,30 +3,20 @@ import React from "react";
 import ServicesContent from "./content";
 import PageService from "@/services/PageService";
 import { SERVICES_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/SERVICES_PAGE_SETTINGS";
+import { servicesPageTranslations } from "@/translations"; // Import centralized translations
 
 const getDefaultServiceData = () => ({
   [SERVICES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
-    title: {
-      en: "Our Legal Services",
-      my: "ကျွန်ုပ်တို့၏ ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုများ",
-    },
-    subtitle: {
-      en: "Tailored Solutions for Your Legal Needs",
-      my: "သင့်ဥပဒေလိုအပ်ချက်များအတွက် အထူးသင့်လျှော်သည့် ဖြေရှင်းချက်များ",
-    },
-    description: {
-      en: "Comprehensive legal solutions designed to meet all your needs.",
-      my: "သင့်လိုအပ်ချက်များအတွက် ပြည့်စုံသော ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုများ။",
-    },
+    title: servicesPageTranslations.pageContent.title,
+    subtitle: servicesPageTranslations.pageContent.subtitle,
+    description: servicesPageTranslations.pageContent.description,
+    // Other non-localized data remains defined locally:
     backgroundImage: "https://source.unsplash.com/1600x900/?law,justice,legal",
   },
   [SERVICES_PAGE_SETTINGS_KEYS.SECTIONS]: [
     {
-      title: { en: "Corporate Law", my: "ကုမ္ပဏီဥပဒေ" },
-      description: {
-        en: "Expert legal guidance on business formations, contracts, and compliance.",
-        my: "စီးပွားရေးဖွဲ့စည်းပုံများ၊ စာချုပ်များနှင့်လိုက်နာမှုအတွက် ကျွမ်းကျင်သောဥပဒေညွှန်ကြားမှု။",
-      },
+      title: servicesPageTranslations.sections[0].title,
+      description: servicesPageTranslations.sections[0].description,
       icon: "BankOutlined",
       iconColor: "#1890ff",
     },

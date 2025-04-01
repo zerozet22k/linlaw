@@ -17,7 +17,7 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
-import ProfileAvatar from "../ProfileAvatar";
+import ProfileAvatar from "../inputs/ProfileAvatar";
 import PublicAPIDynamicMultiSelect from "../inputs/PublicAPIDynamicMultiSelect";
 import { APP_PERMISSIONS } from "@/config/permissions";
 import { useUser } from "@/hooks/useUser";

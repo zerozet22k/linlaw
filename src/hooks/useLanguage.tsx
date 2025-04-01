@@ -1,3 +1,5 @@
+"use client";
+
 import { LanguageContext, SupportedLanguage } from "@/contexts/LanguageContext";
 import { useContext } from "react";
 
