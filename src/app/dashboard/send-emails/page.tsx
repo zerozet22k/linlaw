@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Form,
   Input,
@@ -82,12 +82,20 @@ const SendEmailPage: React.FC = () => {
     }
   };
 
-  const debouncedSetSearch = useCallback(
-    debounce((value: string) => {
-      setSearchQuery(value);
-    }, 500),
-    []
+  // Memoize the debounced function and cancel it on unmount.
+  const debouncedSetSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setSearchQuery(value);
+      }, 500),
+    [setSearchQuery]
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearch.cancel();
+    };
+  }, [debouncedSetSearch]);
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     debouncedSetSearch(e.target.value);
@@ -123,7 +131,9 @@ const SendEmailPage: React.FC = () => {
 
   return (
     <div style={{ padding: 16 }}>
-      <Title level={3} style={{ marginBottom: 16 }}>Send Emails</Title>
+      <Title level={3} style={{ marginBottom: 16 }}>
+        Send Emails
+      </Title>
       <Row gutter={16}>
         <Col xs={24} md={8}>
           <div style={{ position: "sticky", top: 80 }}>
@@ -136,9 +146,6 @@ const SendEmailPage: React.FC = () => {
                 onChange={setIncludeRoles}
                 style={{ width: "100%", marginBottom: 16 }}
               >
-                {/*
-                  Replace these with dynamic role options fetched from your API if needed.
-                */}
                 <Select.Option value="admin">Admin</Select.Option>
                 <Select.Option value="editor">Editor</Select.Option>
                 <Select.Option value="user">User</Select.Option>
@@ -185,7 +192,7 @@ const SendEmailPage: React.FC = () => {
                 <Spin spinning={filterLoading} />
                 {!filterLoading && (
                   <p style={{ marginTop: 16 }}>
-                    No users loaded yet. Use filters and click "Load Matching Users".
+                    No users loaded yet. Use filters and click &quot;Load Matching Users&quot;.
                   </p>
                 )}
               </div>
