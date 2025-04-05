@@ -67,7 +67,14 @@ class UserRepository {
       .populate("roles")
       .exec();
   }
-
+  async findByIds(ids: Types.ObjectId[]): Promise<User[]> {
+    await dbConnect();
+    return this.userModel
+      .find({ _id: { $in: ids } })
+      .select("-hashedPassword -salt -tokens")
+      .populate("roles")
+      .exec();
+  }
   async findByRole(roleId: Types.ObjectId): Promise<User[]> {
     await dbConnect();
 

@@ -44,10 +44,11 @@ class UserService {
     const userObjectId = toObjectId(userId);
     return userRepository.findById(userObjectId);
   }
-  async getUserByIds(userId: string): Promise<User | null> {
-    const userObjectId = toObjectId(userId);
-    return userRepository.findById(userObjectId);
+  async getUsersByIds(userIds: string[]): Promise<User[]> {
+    const objectIds = userIds.map((id) => toObjectId(id));
+    return userRepository.findByIds(objectIds);
   }
+
   async setupDefaultRolesAndSystemUser(userData: Partial<User>): Promise<void> {
     let systemRole = await roleRepository.findByRoleType(RoleType.SYSTEM);
 

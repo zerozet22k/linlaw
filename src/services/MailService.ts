@@ -23,7 +23,6 @@ export default class MailService {
   private async init() {
     try {
       const settings = (await settingService.getAllSettings()) as SettingsInterface;
-      console.log("Loaded system email:", settings[MAIL_SETTINGS_KEYS.APP_EMAIL]);
       this.appEmail = settings[MAIL_SETTINGS_KEYS.APP_EMAIL];
       this.brevoAccounts = settings[MAIL_SETTINGS_KEYS.BREVO] as BrevoAccount[];
       if (!this.appEmail) {
@@ -51,7 +50,6 @@ export default class MailService {
         },
       });
       const data = await response.json();
-      console.log("Brevo account data:", data);
       if (data.plan) {
         const limit = data.plan.limit || 300;
         const used = data.plan.emailsSentToday ?? data.plan.used ?? 0;
@@ -67,7 +65,6 @@ export default class MailService {
   private async selectBrevoAccount(): Promise<BrevoAccount | null> {
     for (const account of this.brevoAccounts) {
       const remaining = await this.getBrevoRemainingLimit(account);
-      console.log(`Remaining quota for ${account.accountEmail}:`, remaining);
       if (remaining > 0) {
         return account;
       }
@@ -114,7 +111,6 @@ export default class MailService {
     };
     try {
       const info = await transporter.sendMail(mailOptions);
-      console.log("✅ Email sent:", info.messageId);
       return info;
     } catch (error) {
       console.error("❌ Error sending email:", error);
@@ -143,7 +139,6 @@ export default class MailService {
     };
     try {
       const info = await transporter.sendMail(mailOptions);
-      console.log("✅ Email sent:", info.messageId);
       return info;
     } catch (error) {
       console.error("❌ Error sending email to", to, ":", error);

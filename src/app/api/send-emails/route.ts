@@ -10,30 +10,32 @@ const handleSendEmails = async (
   params: { id: string }
 ) => {
   try {
-    // Parse and validate the request body
     const body = await req.json();
-    const { subject, message } = body;
-
-    if (!subject || !message) {
+    const { subject, message, userIds } = body;
+    if (
+      !subject ||
+      !message ||
+      !userIds ||
+      !Array.isArray(userIds) ||
+      userIds.length === 0
+    ) {
       return NextResponse.json(
-        { error: "Subject and message are required." },
+        { error: "Subject, message, and at least one user ID are required." },
         { status: 400 }
       );
     }
 
-    // Retrieve all users from the UserService
     const userService = new UserService();
-    const { users } = await userService.getAllUsers();
+    const users = await userService.getUsersByIds(userIds);
+    if (!users || users.length === 0) {
+      return NextResponse.json({ error: "No users found." }, { status: 404 });
+    }
 
-    // Initialize the MailService
     const mailService = new MailService();
-
-    // Send emails to all users in parallel and capture the results.
     const results = await Promise.allSettled(
       users.map((u: any) => mailService.sendMail(u.email, subject, message))
     );
 
-    // Collect any errors for failed email sends
     const errors: Array<{ email: string; error: string }> = [];
     results.forEach((result, index) => {
       if (result.status === "rejected") {
@@ -48,7 +50,6 @@ const handleSendEmails = async (
       }
     });
 
-    // If there were any errors, return a 207 (Multi-Status) with the details.
     if (errors.length > 0) {
       return NextResponse.json(
         { message: "Emails sent with some errors", errors },
