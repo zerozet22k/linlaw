@@ -10,6 +10,7 @@ const handleSendEmails = async (
   params: { id: string }
 ) => {
   try {
+    // Parse and validate the request body
     const body = await req.json();
     const { subject, message } = body;
 
@@ -20,22 +21,34 @@ const handleSendEmails = async (
       );
     }
 
+    // Retrieve all users from the UserService
     const userService = new UserService();
     const { users } = await userService.getAllUsers();
 
+    // Initialize the MailService
     const mailService = new MailService();
+
+    // Send emails to all users in parallel and capture the results.
+    const results = await Promise.allSettled(
+      users.map((u: any) => mailService.sendMail(u.email, subject, message))
+    );
+
+    // Collect any errors for failed email sends
     const errors: Array<{ email: string; error: string }> = [];
-
-    for (const user of users) {
-      try {
-        const fullMessage = message;
-        await mailService.sendMail(user.email, subject, fullMessage);
-      } catch (error: any) {
-        errors.push({ email: user.email, error: error.message });
-        console.error(`Error sending email to ${user.email}:`, error);
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        errors.push({
+          email: users[index].email,
+          error: result.reason?.message || String(result.reason),
+        });
+        console.error(
+          `Error sending email to ${users[index].email}:`,
+          result.reason
+        );
       }
-    }
+    });
 
+    // If there were any errors, return a 207 (Multi-Status) with the details.
     if (errors.length > 0) {
       return NextResponse.json(
         { message: "Emails sent with some errors", errors },

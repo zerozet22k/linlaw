@@ -11,19 +11,25 @@ export async function sendPaymentEmail(
   try {
     const mailSubject = "New Offline Top-up Request";
     const mailText = `
-      User requested a top-up:
-      - Name: ${user.name}
-      - Username: ${user.username}
-      - Email: ${user.email}
-      - User ID: ${user._id}
-    `;
+      New offline top-up request received:
 
-    const attachments = [{ filename: "screenshot.png", content: screenshot }];
+      Name: ${user.name}
+      Username: ${user.username}
+      Email: ${user.email}
+      User ID: ${user._id}
+      Top-up Amount: ${amount}
+    `.trim();
 
+    const attachments = [
+      {
+        filename: "screenshot.png",
+        content: screenshot,
+      },
+    ];
     await mailService.receiveMail(mailSubject, mailText, attachments);
     console.log(`Email sent successfully for user ${user._id}`);
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`Failed to send email for user ${user._id}:`, error);
     return false;
   }

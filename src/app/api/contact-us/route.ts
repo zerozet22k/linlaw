@@ -7,9 +7,25 @@ const MAX_REQUESTS = 5;
 
 export const POST = async (request: Request) => {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    const now = Date.now();
+    const timestamps = rateLimitMap.get(ip) || [];
+
+    const recentTimestamps = timestamps.filter(
+      (ts) => now - ts < RATE_LIMIT_WINDOW
+    );
+    recentTimestamps.push(now);
+    rateLimitMap.set(ip, recentTimestamps);
+
+    if (recentTimestamps.length > MAX_REQUESTS) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { email, subject, message } = body;
-
     if (!email || !subject || !message) {
       return NextResponse.json(
         { error: "Email, subject, and message are required." },
