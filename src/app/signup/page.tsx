@@ -30,7 +30,6 @@ export default function SignupPage() {
 
     try {
       await signUp(values.username, values.email, values.password);
-      router.replace(redirect || "/dashboard");
     } catch (err: any) {
       setError(
         err.message || "An unexpected error occurred. Please try again."

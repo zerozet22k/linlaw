@@ -8,10 +8,13 @@ import "@/styles/globals.css";
 import { useUser } from "@/hooks/useUser";
 import LoadingSpin from "@/components/loaders/LoadingSpin";
 import { ROUTES } from "@/config/routes";
-import { hasPermission } from "@/config/permissions";
+import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
 import { LayoutProvider } from "@/providers/LayoutProvider";
 import { useSettings } from "@/hooks/useSettings";
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
+import { Typography } from "antd";
+
+const { Title, Text } = Typography;
 
 interface LayoutRouterProps {
   children: React.ReactNode;
@@ -75,7 +78,11 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
     }
 
     if (user && pathname === "/login") {
-      redirectTo(routeConfig?.IfLoggedInRedirectUrl || "/dashboard");
+      if (hasPermission(user, [APP_PERMISSIONS.VIEW_DASHBOARD])) {
+        redirectTo(routeConfig?.IfLoggedInRedirectUrl || "/dashboard");
+      } else {
+        redirectTo("/");
+      }
       return;
     }
   }, [initialLoading, user, routeConfig, pathname, router]);
@@ -95,14 +102,13 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
           height: "100%",
           width: "100%",
           textAlign: "center",
-          fontWeight: "bold",
-          fontSize: "20px",
-          color: "white",
         }}
       >
-        ❌
-        {routeConfig?.noAccessMessage ||
-          "You do not have permission to view this page."}
+        <Title level={2}>❌</Title>
+        <Text strong>
+          {routeConfig?.noAccessMessage ||
+            "You do not have permission to view this page."}
+        </Text>
       </div>
     ) : (
       children

@@ -24,11 +24,11 @@ export default function LoginPage() {
 
   const onFinish = async (values: any) => {
     setLoading(true);
-    setError(null);
+    setError(null); 
 
     try {
       await signIn(values.email, values.password);
-      router.replace(redirect || "/dashboard");
+     
     } catch (err: any) {
       console.error("Login Error:", err);
       setError(
