@@ -1,16 +1,17 @@
-// TeamPageSettings.ts
 import {
   FormType,
   GeneralConfig,
   NestedFieldType,
   JsonDesign,
 } from "../../settings";
-import { LanguageJson } from "@/utils/getTranslatedText";
 import {
   SHARED_PAGE_CONTENT_FIELDS,
   SHARED_PAGE_DESIGN_FIELDS,
 } from "./shared/sharedPageConfig";
-import { SharedPageContentType, SharedPageDesignType } from "./shared/sharedPageTypes";
+import {
+  SharedPageContentType,
+  SharedPageDesignType,
+} from "./shared/sharedPageTypes";
 
 const pageName = "Team";
 
@@ -44,10 +45,10 @@ export const TEAM_PAGE_SETTINGS: GeneralConfig<typeof TEAM_PAGE_SETTINGS_KEYS> =
           guide: "Maximum number of team members displayed.",
           formType: FormType.NUMBER,
         },
-        memberRole: {
-          label: "Member Role",
-          guide: "Select the role assigned to team members.",
-          formType: FormType.ROLE_SELECTOR,
+        members: {
+          label: "Members",
+          guide: "Pick the users shown on the page (drag to change order).",
+          formType: FormType.USERS_SELECTOR,
         },
       },
     },
@@ -58,6 +59,6 @@ export type TEAM_PAGE_SETTINGS_TYPES = {
   [TEAM_PAGE_SETTINGS_KEYS.DESIGN]: SharedPageDesignType;
   [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxMembersCount: number;
-    memberRole: string;
+    members: string[];
   };
 };

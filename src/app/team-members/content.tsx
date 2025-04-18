@@ -57,8 +57,8 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
     const fetchTeamMembers = async () => {
       try {
         const response = await apiClient.get<UserAPI[]>("/team");
+        console.log(response)
         if (response.data && Array.isArray(response.data)) {
-          // Limit the number of members based on the CMS setting.
           const members = response.data.slice(0, teamSection.maxMembersCount);
           setTeamMembers(members);
         } else {

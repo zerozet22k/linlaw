@@ -12,6 +12,8 @@ export enum FormType {
   IMAGE_SELECTOR = "image-selector",
   ICON_SELECTOR = "icon-selector",
   ROLE_SELECTOR = "role-selector",
+  USER_SELECTOR  = "user-selector",
+  USERS_SELECTOR = "users-selector",
   SUPPORTED_LANGUAGE_SELECTOR = "supported-language-selector",
   LANGUAGE_JSON_TEXT = "language-json-text",
   LANGUAGE_JSON_TEXTAREA = "language-json-textarea",

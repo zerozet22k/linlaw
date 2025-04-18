@@ -13,6 +13,8 @@ import FieldDesignRenderer from "./FieldDesignRenderer";
 import FieldTitle from "./extra/FieldTitle";
 import SizeInput from "./Inputs/SizeInput";
 import ResponsiveImagesInput from "./Inputs/ResponsiveImagesInput";
+import UserSelector from "./Inputs/UserSelector";
+import UsersSelector from "./Inputs/UsersSelector";
 
 type FieldRendererProps = {
   config: ChildFieldInfo;
@@ -48,6 +50,11 @@ const renderFormField = (
       return (
         <RoleSelector value={value} onChange={onChange} style={commonStyle} />
       );
+    case FormType.USER_SELECTOR:
+      return <UserSelector value={value} onChange={onChange} style={commonStyle}/>;
+
+    case FormType.USERS_SELECTOR:
+      return <UsersSelector value={value} onChange={onChange} style={commonStyle} />;
 
     case FormType.ICON_SELECTOR:
       return (

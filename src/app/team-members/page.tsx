@@ -14,6 +14,7 @@ const getDefaultTeamData = () => ({
   },
   [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxMembersCount: 8,
+    members: [],
   },
 });
 

@@ -1,46 +1,34 @@
 import { NextResponse } from "next/server";
 import UserService from "@/services/UserService";
-import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import PageService from "@/services/PageService";
-import {
-  TEAM_PAGE_SETTINGS_KEYS,
-} from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
+import { withAuthMiddleware } from "@/middlewares/authMiddleware";
+import { TEAM_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
+import { User } from "@/models/UserModel";
 
 const userService = new UserService();
 const pageService = new PageService();
 
-async function handleGetAllUsersRequest(request: Request) {
+async function handleGetAllUsersRequest(_req: Request) {
   try {
-    const teamPage = await pageService.getPageByKey(
+    const teamSections = await pageService.getPageByKey(
       TEAM_PAGE_SETTINGS_KEYS.SECTIONS
     );
-    if (!teamPage) {
+    if (!teamSections) {
       return NextResponse.json(
         { error: "Team page not found" },
         { status: 404 }
       );
     }
-    
-    const memberRole = teamPage.memberRole;
-    if (!memberRole) {
-      return NextResponse.json(
-        { error: "Member role is not defined" },
-        { status: 404 }
-      );
-    }
+    console.log(teamSections);
+    const memberIds: string[] | undefined = teamSections.members;
 
-    const users = await userService.getUsersByRole(memberRole);
-
-    if (!users) {
-      return NextResponse.json(
-        { error: "No users found for the given role" },
-        { status: 404 }
-      );
-    }
-
+    const users: User[] =
+      Array.isArray(memberIds) && memberIds.length
+        ? await userService.getUsersByIds(memberIds)
+        : [];
     return NextResponse.json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
+  } catch (err) {
+    console.error("Error fetching users:", err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -48,5 +36,5 @@ async function handleGetAllUsersRequest(request: Request) {
   }
 }
 
-export const GET = async (request: Request) =>
-  withAuthMiddleware(handleGetAllUsersRequest, false)(request);
+export const GET = (req: Request) =>
+  withAuthMiddleware(handleGetAllUsersRequest, false)(req);
