@@ -26,7 +26,24 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
   };
 
   return (
-    <Card title={getTranslatedText(faqTranslations.faqTitle, language)}>
+    <Card
+      title={getTranslatedText(faqTranslations.faqTitle, language)}
+      bordered={false}
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: "10px",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+        padding: 0,
+      }}
+      bodyStyle={{
+        padding: "20px",
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+      }}
+    >
       <Collapse accordion>
         {faqs.map((faq, index) => {
           const translatedAnswer = getTranslatedText(faq.answer, language);
@@ -38,10 +55,16 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
 
           return (
             <Panel
-              header={getTranslatedText(faq.question, language)}
+              header={
+                <span style={{ fontSize: 14, fontWeight: 500 }}>
+                  {getTranslatedText(faq.question, language)}
+                </span>
+              }
               key={index}
             >
-              <p>{isExpanded ? translatedAnswer : previewText}</p>
+              <p style={{ marginBottom: 8 }}>
+                {isExpanded ? translatedAnswer : previewText}
+              </p>
               {translatedAnswer.length > 100 && (
                 <Button type="link" onClick={() => toggleReadMore(index)}>
                   {isExpanded
@@ -58,3 +81,4 @@ const FAQSection: React.FC<FAQSectionProps> = ({ faqs }) => {
 };
 
 export default FAQSection;
+  

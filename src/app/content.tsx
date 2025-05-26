@@ -38,15 +38,29 @@ const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
           <Row
             gutter={[16, 16]}
             justify="center"
-            style={{ width: "100%", margin: "0 auto" }}
+            style={{
+              width: "100%",
+              margin: "0 auto",
+              display: "flex",
+              alignItems: "stretch",
+            }}
           >
-            <Col xs={24} lg={12}>
+            <Col
+              xs={24}
+              lg={12}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
               <FAQSection faqs={faqs} />
             </Col>
-            <Col sm={24} lg={12}>
+            <Col
+              xs={24}
+              lg={12}
+              style={{ display: "flex", flexDirection: "column" }}
+            >
               <NewsletterSection />
             </Col>
           </Row>
+
           <Testimonials testimonials={testimonials} />
           <div style={{ width: "100%" }}>
             <SendMailForm />

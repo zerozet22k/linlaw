@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import UserService from "@/services/UserService";
-import {
-  AppPermissionType,
-  checkPermission,
-} from "@/config/permissions";
+import { AppPermissionType, checkPermission } from "@/config/permissions";
 import { User } from "@/models/UserModel";
 
 const userService = new UserService();
@@ -24,8 +21,10 @@ async function authMiddleware(
       if (typeof decoded === "object" && decoded.userId) {
         userId = decoded.userId;
       }
-    } catch (error) {
-      console.error("Invalid token:", error);
+    } catch (error: any) {
+      if (error.name !== "TokenExpiredError") {
+        console.error("Invalid token:", error);
+      }
     }
   }
 

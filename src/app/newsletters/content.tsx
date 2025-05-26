@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  List,
-  Input,
-  Button,
-  Spin,
-  Alert,
-  Typography,
-  Divider,
-  theme,
-} from "antd";
+import { List, Input, Button, Spin, Alert, Typography, theme } from "antd";
 import Link from "next/link";
 import apiClient from "@/utils/api/apiClient";
 import PageWrapper from "@/components/ui/PageWrapper";
@@ -40,7 +31,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const { token } = theme.useToken();
-  
+
   const limit = newsletterSection?.maxNewslettersCount || 5;
 
   const fetchNewsletters = useCallback(
@@ -74,7 +65,6 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
     [searchText, page, limit]
   );
 
-  // Trigger a new search when the search text changes.
   useEffect(() => {
     fetchNewsletters(true);
   }, [searchText]);
@@ -91,10 +81,9 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
     <PageWrapper pageContent={pageContent}>
       <div
         style={{
-          maxWidth: "1200px",
+          maxWidth: "1000px",
           margin: "0 auto",
-          padding: "40px 20px",
-          color: token.colorTextBase,
+          padding: "40px 20px 80px",
         }}
       >
         <Search
@@ -102,8 +91,13 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
           enterButton="Search"
           size="large"
           onSearch={handleSearch}
-          style={{ marginBottom: 24 }}
+          style={{
+            marginBottom: 32,
+            borderRadius: 8,
+            overflow: "hidden",
+          }}
         />
+
         {loading && newsletters.length === 0 ? (
           <Spin
             size="large"
@@ -120,33 +114,41 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
         ) : (
           <>
             <List
-              itemLayout="vertical"
+              grid={{ gutter: 24, column: 1 }}
               dataSource={newsletters}
               renderItem={(newsletter: INewsletterAPI) => {
                 const title =
                   typeof newsletter.title === "string"
                     ? newsletter.title
-                    : newsletter.title.en || "Untitled";
-                const excerpt = "Click to view newsletter details.";
+                    : newsletter.title[language] ||
+                      newsletter.title.en ||
+                      "Untitled";
+
                 return (
-                  <List.Item
-                    style={{
-                      padding: "16px 0",
-                      borderBottom: `1px solid ${token.colorBorder}`,
-                    }}
-                  >
-                    <List.Item.Meta
-                      title={
+                  <List.Item>
+                    <div
+                      style={{
+                        padding: "20px",
+                        borderRadius: "10px",
+                        boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+                        border: "1px solid #222",
+                        transition: "box-shadow 0.2s",
+                      }}
+                    >
+                      <Title level={4} style={{ marginBottom: 12 }}>
                         <Link href={`/newsletters/${newsletter._id}`}>
                           {title}
                         </Link>
-                      }
-                      description={excerpt}
-                    />
+                      </Title>
+                      <Paragraph style={{ color: token.colorTextSecondary }}>
+                        Click to view newsletter details.
+                      </Paragraph>
+                    </div>
                   </List.Item>
                 );
               }}
             />
+
             {hasMore && (
               <div style={{ textAlign: "center", marginTop: 32 }}>
                 <Button type="primary" onClick={loadMore} disabled={loading}>
@@ -156,12 +158,6 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
             )}
           </>
         )}
-        <Divider style={{ marginTop: 40 }} />
-        <Paragraph style={{ textAlign: "center" }}>
-          {typeof pageContent.description === "string"
-            ? pageContent.description
-            : pageContent.description[language] || pageContent.description.en}
-        </Paragraph>
       </div>
     </PageWrapper>
   );

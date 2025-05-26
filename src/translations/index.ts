@@ -47,6 +47,17 @@ export const contactsTranslations: LanguageJson = {
   th: "ผู้ติดต่อ",
   my: "Kenalan",
 };
+export const newsletterViewAllTranslations: LanguageJson = {
+  en: "View all newsletters →",
+  fr: "Voir tous les bulletins →",
+  de: "Alle Newsletter anzeigen →",
+  es: "Ver todos los boletines →",
+  zh: "查看所有新闻通讯 →",
+  ja: "すべてのニュースレターを見る →",
+  ko: "모든 뉴스레터 보기 →",
+  th: "ดูจดหมายข่าวทั้งหมด →",
+  my: "သတင်းစာအားလုံးကိုကြည့်ရန် →",
+};
 
 export const noContactsTranslations: LanguageJson = {
   en: "No contacts available",
