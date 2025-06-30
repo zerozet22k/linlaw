@@ -22,10 +22,34 @@ const FlatOutsideCard: React.FC<FlatOutsideCardProps> = ({
   const { token } = theme.useToken();
 
   return (
-    <div style={{ marginBottom: "16px" }}>
-      <Typography.Title level={5} style={{ marginBottom: "8px" }}>
-        {label}
-      </Typography.Title>
+    <div
+      style={{
+        padding: "12px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "8px",
+        }}
+      >
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          {label}
+        </Typography.Title>
+
+        {showAddButton && (
+          <Button
+            type="dashed"
+            icon={<PlusOutlined />}
+            onClick={onAdd}
+            size="small"
+          >
+            Add New Block
+          </Button>
+        )}
+      </div>
 
       <div
         style={{
@@ -36,17 +60,6 @@ const FlatOutsideCard: React.FC<FlatOutsideCardProps> = ({
           ...style,
         }}
       >
-        {showAddButton && (
-          <Button
-            type="dashed"
-            icon={<PlusOutlined />}
-            onClick={onAdd}
-            style={{ width: "100%", marginBottom: "12px" }}
-          >
-            Add New Block
-          </Button>
-        )}
-
         {children}
       </div>
     </div>

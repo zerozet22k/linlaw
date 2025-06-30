@@ -1,100 +1,5 @@
 import { LanguageJson } from "@/utils/getTranslatedText";
 
-export const newsletterTitle: LanguageJson = {
-  en: "Lin Myanmar News Letters",
-  fr: "Bulletin Lin Myanmar",
-  de: "Lin Myanmar Newsletter",
-  es: "Boletín Lin Myanmar",
-  zh: "林律缅甸新闻通讯",
-  ja: "リンロウミャンマー・ニュースレター",
-  ko: "린로우 미얀마 뉴스레터",
-  th: "จดหมายข่าว Lin Myanmar",
-  my: "Buletin Lin Myanmar",
-};
-
-export const newsletterSubtitle: LanguageJson = {
-  en: "Your Source for Legal Updates",
-  fr: "Votre source d'actualités juridiques",
-  de: "Ihre Quelle für rechtliche Neuigkeiten",
-  es: "Tu fuente de actualizaciones legales",
-  zh: "您的法律更新来源",
-  ja: "法務の最新情報をお届け",
-  ko: "법률 업데이트의 출처",
-  th: "แหล่งข้อมูลอัปเดตกฎหมายของคุณ",
-  my: "Sumber untuk Kemaskini Guaman Anda",
-};
-
-export const newsletterTagline: LanguageJson = {
-  en: "Stay Informed, Stay Ahead",
-  fr: "Restez informé, restez en avance",
-  de: "Bleiben Sie informiert, bleiben Sie voraus",
-  es: "Mantente informado, mantente a la vanguardia",
-  zh: "保持知情，走在前沿",
-  ja: "情報をキャッチし、先を行こう",
-  ko: "정보를 유지하고, 앞서 나가세요",
-  th: "รับรู้ข่าวสารและก้าวไปข้างหน้า",
-  my: "Sentiasa Dimaklumkan, Sentiasa Mendahului",
-};
-
-export const contactsTranslations: LanguageJson = {
-  en: "Contacts",
-  fr: "Contacts",
-  de: "Kontakte",
-  es: "Contactos",
-  zh: "联系方式",
-  ja: "連絡先",
-  ko: "연락처",
-  th: "ผู้ติดต่อ",
-  my: "Kenalan",
-};
-export const newsletterViewAllTranslations: LanguageJson = {
-  en: "View all newsletters →",
-  fr: "Voir tous les bulletins →",
-  de: "Alle Newsletter anzeigen →",
-  es: "Ver todos los boletines →",
-  zh: "查看所有新闻通讯 →",
-  ja: "すべてのニュースレターを見る →",
-  ko: "모든 뉴스레터 보기 →",
-  th: "ดูจดหมายข่าวทั้งหมด →",
-  my: "သတင်းစာအားလုံးကိုကြည့်ရန် →",
-};
-
-export const noContactsTranslations: LanguageJson = {
-  en: "No contacts available",
-  fr: "Aucun contact disponible",
-  de: "Keine Kontakte verfügbar",
-  es: "No hay contactos disponibles",
-  zh: "没有可用的联系方式",
-  ja: "利用可能な連絡先がありません",
-  ko: "사용 가능한 연락처가 없습니다",
-  th: "ไม่มีผู้ติดต่อ",
-  my: "Tiada kenalan yang tersedia",
-};
-
-export const relatedBusinessTitleTranslations: LanguageJson = {
-  en: "Related Business",
-  fr: "Entreprise Associée",
-  de: "Verwandtes Unternehmen",
-  es: "Negocio Relacionado",
-  zh: "相关业务",
-  ja: "関連するビジネス",
-  ko: "관련 비즈니스",
-  th: "ธุรกิจที่เกี่ยวข้อง",
-  my: "Perniagaan Berkaitan",
-};
-
-export const noAdsTranslations: LanguageJson = {
-  en: "No ads available.",
-  fr: "Aucune annonce disponible.",
-  de: "Keine Anzeigen verfügbar.",
-  es: "No hay anuncios disponibles.",
-  zh: "没有可用的广告。",
-  ja: "利用可能な広告がありません。",
-  ko: "사용 가능한 광고가 없습니다。",
-  th: "ไม่มีโฆษณา",
-  my: "Tiada iklan yang tersedia.",
-};
-
 export const commonFormValidations = {
   emailRequired: {
     en: "Please input your email!",
@@ -266,7 +171,6 @@ export const sendMailTranslations = {
     my: "Gagal menghantar e-mel, sila cuba lagi kemudian.",
   },
 };
-
 export const commonTranslations = {
   readMore: {
     en: "Read More",
@@ -290,25 +194,53 @@ export const commonTranslations = {
     th: "อ่านน้อยลง",
     my: "Baca kurang",
   },
-};
-
-export const faqTranslations = {
-  faqTitle: {
-    en: "Frequently Asked Questions",
-    fr: "Questions Fréquemment Posées",
-    de: "Häufig gestellte Fragen",
-    es: "Preguntas Frecuentes",
-    zh: "常见问题",
-    ja: "よくある質問",
-    ko: "자주 묻는 질문",
-    th: "คำถามที่พบบ่อย",
-    my: "Soalan Lazim",
+  contacts: {
+    en: "Contacts",
+    fr: "Contacts",
+    de: "Kontakte",
+    es: "Contactos",
+    zh: "联系方式",
+    ja: "連絡先",
+    ko: "연락처",
+    th: "ผู้ติดต่อ",
+    my: "Kenalan",
   },
-  readMore: commonTranslations.readMore,
-  readLess: commonTranslations.readLess,
+  noContacts: {
+    en: "No contacts available",
+    fr: "Aucun contact disponible",
+    de: "Keine Kontakte verfügbar",
+    es: "No hay contactos disponibles",
+    zh: "没有可用的联系方式",
+    ja: "利用可能な連絡先がありません",
+    ko: "사용 가능한 연락처가 없습니다",
+    th: "ไม่มีผู้ติดต่อ",
+    my: "Tiada kenalan yang tersedia",
+  },
+  relatedBusinessTitle: {
+    en: "Related Business",
+    fr: "Entreprise Associée",
+    de: "Verwandtes Unternehmen",
+    es: "Negocio Relacionado",
+    zh: "相关业务",
+    ja: "関連するビジネス",
+    ko: "관련 비즈니스",
+    th: "ธุรกิจที่เกี่ยวข้อง",
+    my: "Perniagaan Berkaitan",
+  },
+  noAds: {
+    en: "No ads available.",
+    fr: "Aucune annonce disponible.",
+    de: "Keine Anzeigen verfügbar.",
+    es: "No hay anuncios disponibles.",
+    zh: "没有可用的广告。",
+    ja: "利用可能な広告がありません。",
+    ko: "사용 가능한 광고가 없습니다。",
+    th: "ไม่มีโฆษณา",
+    my: "Tiada iklan yang tersedia.",
+  },
 };
 
-export const homePageHeroTranslations = {
+export const heroTranslations = {
   header: {
     en: "We Know Myanmar Business",
     fr: "Nous connaissons les affaires en Birmanie",
@@ -334,33 +266,87 @@ export const homePageHeroTranslations = {
 };
 
 export const testimonialTranslations = {
-  testimonial1: {
-    name: {
-      en: "John Doe",
-      fr: "Jean Dupont",
-      de: "Max Mustermann",
-      es: "Juan Pérez",
-      zh: "约翰·多伊",
-      ja: "ジョン・ドウ",
-      ko: "존 도",
-      th: "จอห์น โด",
-      my: "ဂျွန် ဒိုး",
+  title: {
+    en: "What Our Clients Say",
+    fr: "Ce que disent nos clients",
+    de: "Was unsere Kunden sagen",
+    es: "Lo que dicen nuestros clientes",
+    zh: "客户的评价",
+    ja: "お客様の声",
+    ko: "고객의 소리",
+    th: "ความคิดเห็นจากลูกค้า",
+    my: "ဖောက်သည်များ ပြောကြားသည်",
+  } as LanguageJson,
+  description: {
+    en: "Read what our clients think about our legal services.",
+    fr: "Lisez ce que nos clients pensent de nos services juridiques.",
+    de: "Lesen Sie, was unsere Kunden über unsere juristischen Dienstleistungen sagen.",
+    es: "Lea lo que piensan nuestros clientes sobre nuestros servicios legales.",
+    zh: "了解客户对我们法律服务的看法。",
+    ja: "当事務所の法務サービスに関するお客様の声をご覧ください。",
+    ko: "법률 서비스에 대한 고객들의 평가를 확인하세요.",
+    th: "อ่านความคิดเห็นของลูกค้าเกี่ยวกับบริการด้านกฎหมายของเรา",
+    my: "ကျွန်ုပ်တို့၏ ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုများအကြောင်း ဖောက်သည်များ၏အမြင်များကို ဖတ်ရှုပါ။",
+  } as LanguageJson,
+  testimonials: [
+    {
+      name: {
+        en: "John Doe",
+        fr: "Jean Dupont",
+        de: "Max Mustermann",
+        es: "Juan Pérez",
+        zh: "约翰·多伊",
+        ja: "ジョン・ドウ",
+        ko: "존 도",
+        th: "จอห์น โด",
+        my: "ဂျွန် ဒိုး",
+      },
+      comment: {
+        en: "Excellent service with professional legal advice.",
+        fr: "Service excellent avec des conseils juridiques professionnels.",
+        de: "Ausgezeichneter Service mit professioneller Rechtsberatung.",
+        es: "Servicio excelente con asesoramiento legal profesional.",
+        zh: "优质服务，专业的法律建议。",
+        ja: "プロフェッショナルな法的アドバイスによる素晴らしいサービス。",
+        ko: "전문적인 법률 상담이 포함된 훌륭한 서비스.",
+        th: "บริการยอดเยี่ยมพร้อมคำแนะนำทางกฎหมายอย่างมืออาชีพ",
+        my: "အထူးသင့်တော်သော ဥပဒေ အကြံပေးဝန်ဆောင်မှုများ။",
+      },
+      title: "CEO",
+      company: "Lincoln Myanmar",
+      avatar: "/images/avatars/john.png",
     },
-    comment: {
-      en: "Excellent service with professional legal advice.",
-      fr: "Service excellent avec des conseils juridiques professionnels.",
-      de: "Ausgezeichneter Service mit professioneller Rechtsberatung.",
-      es: "Servicio excelente con asesoramiento legal profesional.",
-      zh: "优质服务，专业的法律建议。",
-      ja: "プロフェッショナルな法的アドバイスによる素晴らしいサービス。",
-      ko: "전문적인 법률 상담이 포함된 훌륭한 서비스.",
-      th: "บริการยอดเยี่ยมพร้อมคำแนะนำทางกฎหมายอย่างมืออาชีพ",
-      my: "အထူးသင့်တော်သော ဥပဒေ အကြံပေးဝန်ဆောင်မှုများ။",
+    {
+      name: {
+        en: "Sophia Lee",
+        fr: "Sophie Lee",
+        de: "Sophia Lee",
+        es: "Sofía Lee",
+        zh: "李索菲亚",
+        ja: "ソフィア・リー",
+        ko: "소피아 리",
+        th: "โซเฟีย ลี",
+        my: "ဆိုဖီယာ လီ",
+      },
+      comment: {
+        en: "They handled our legal case flawlessly and professionally.",
+        fr: "Ils ont géré notre affaire juridique de manière irréprochable.",
+        de: "Sie haben unseren Fall makellos und professionell bearbeitet.",
+        es: "Manejaron nuestro caso legal de manera impecable.",
+        zh: "他们以专业而完美的方式处理了我们的案件。",
+        ja: "法的な案件を完璧に処理してくれました。",
+        ko: "법적 사건을 완벽하게 처리해 주셨습니다.",
+        th: "พวกเขาดูแลคดีความของเราอย่างไร้ที่ติ",
+        my: "သူတို့က ဥပဒေရေးရာအမှုကို ကျွမ်းကျင်စွာဖြေရှင်းပေးခဲ့တယ်။",
+      },
+      title: "Operations Manager",
+      company: "Yangon Logistics",
+      avatar: "/images/avatars/sophia.png",
     },
-  },
+  ],
 };
 
-export const homePageAdTranslations = {
+export const adTranslations = {
   title: {
     en: "Special Offer",
     fr: "Offre Spéciale",
@@ -395,56 +381,165 @@ export const homePageAdTranslations = {
     my: "ပထမဆုံး အကြိမ်လာရောက်သော အချိန်အတွက် အခမဲ့ အကြံပေးမှု။",
   },
 };
+export const faqTranslations = {
+  title: {
+    en: "Frequently Asked Questions",
+    fr: "Questions fréquentes",
+    de: "Häufig gestellte Fragen",
+    es: "Preguntas frecuentes",
+    zh: "常见问题",
+    ja: "よくある質問",
+    ko: "자주 묻는 질문",
+    th: "คำถามที่พบบ่อย",
+    my: "မကြာခဏမေးလေ့ရှိသောမေးခွန်းများ",
+  } as LanguageJson,
 
-export const homePageFaqTranslations = {
-  faq1: {
-    question: {
-      en: "What services do you offer?",
-      fr: "Quels services offrez-vous ?",
-      de: "Welche Dienstleistungen bieten Sie an?",
-      es: "¿Qué servicios ofrece?",
-      zh: "您提供哪些服务？",
-      ja: "どのようなサービスを提供していますか？",
-      ko: "어떤 서비스를 제공하나요?",
-      th: "คุณให้บริการอะไรบ้าง?",
-      my: "သင်ဘာဝန်ဆောင်မှုများပေးသလဲ?",
+  description: {
+    en: "Below are the questions we hear most often from new and existing clients.",
+    fr: "Voici les questions que nos clients nous posent le plus souvent.",
+    de: "Nachfolgend finden Sie die Fragen, die uns am häufigsten gestellt werden.",
+    es: "Aquí tienes las preguntas que más escuchamos de nuestros clientes.",
+    zh: "以下汇总了新老客户最常提出的问题。",
+    ja: "新規・既存のお客様から多く寄せられるご質問をまとめました。",
+    ko: "신규 및 기존 고객에게서 자주 받는 질문을 모아두었습니다.",
+    th: "ด้านล่างคือคำถามที่เราพบได้บ่อยจากลูกค้าใหม่และลูกค้าเดิมของเรา",
+    my: "ဤအောက်တွင် အသစ်နှင့် ရှိပြီးသားသုံးစွဲသူများထံမှ မကြာခဏစျေးခံရသော မေးခွန်းများဖြစ်ပါတယ်။",
+  } as LanguageJson,
+
+  backgroundImage: "/images/faq-bg.jpg",
+
+  items: [
+    {
+      question: {
+        en: "What services do you offer?",
+        fr: "Quels services offrez-vous ?",
+        de: "Welche Dienstleistungen bieten Sie an?",
+        es: "¿Qué servicios ofrece?",
+        zh: "您提供哪些服务？",
+        ja: "どのようなサービスを提供していますか？",
+        ko: "어떤 서비스를 제공하나요?",
+        th: "คุณให้บริการอะไรบ้าง?",
+        my: "သင်ဘာဝန်ဆောင်မှုများပေးသလဲ?",
+      } as LanguageJson,
+      answer: {
+        en: "We provide expert legal, tax, and audit services for businesses in Myanmar.",
+        fr: "Nous fournissons des services juridiques, fiscaux et d'audit experts pour les entreprises en Birmanie.",
+        de: "Wir bieten fachkundige Rechts-, Steuer- und Prüfungsdienstleistungen für Unternehmen in Myanmar an.",
+        es: "Proporcionamos servicios legales, fiscales y de auditoría expertos para empresas en Myanmar.",
+        zh: "我们为缅甸的企业提供专业的法律、税务和审计服务。",
+        ja: "ミャンマーの企業に対して、専門的な法務、税務、監査サービスを提供しています。",
+        ko: "미얀마 내 기업들을 위한 전문적인 법률, 세금 및 감사 서비스를 제공합니다.",
+        th: "เรามีบริการทางกฎหมาย ภาษี และการตรวจสอบที่เชี่ยวชาญสำหรับธุรกิจในพม่า",
+        my: "ကျွန်ုပ်တို့သည် မြန်မာနိုင်ငံရှိ လုပ်ငန်းများအတွက် ဥပဒေ၊ အခွန်၊ နှင့် စစ်ဆေးမှုဝန်ဆောင်မှုများပေးပါသည်။",
+      } as LanguageJson,
+      list: [],
     },
-    answer: {
-      en: "We provide expert legal, tax, and audit services for businesses in Myanmar.",
-      fr: "Nous fournissons des services juridiques, fiscaux et d'audit experts pour les entreprises en Birmanie.",
-      de: "Wir bieten fachkundige Rechts-, Steuer- und Prüfungsdienstleistungen für Unternehmen in Myanmar an.",
-      es: "Proporcionamos servicios legales, fiscales y de auditoría expertos para empresas en Myanmar.",
-      zh: "我们为缅甸的企业提供专业的法律、税务和审计服务。",
-      ja: "ミャンマーの企業に対して、専門的な法務、税務、監査サービスを提供しています。",
-      ko: "미얀마 내 기업들을 위한 전문적인 법률, 세금 및 감사 서비스를 제공합니다.",
-      th: "เรามีบริการทางกฎหมาย ภาษี และการตรวจสอบที่เชี่ยวชาญสำหรับธุรกิจในพม่า",
-      my: "ကျွန်ုပ်တို့သည် မြန်မာနိုင်ငံရှိ လုပ်ငန်းများအတွက် ဥပဒေ၊ အခွန်၊ နှင့် စစ်ဆေးမှုဝန်ဆောင်မှုများပေးပါသည်။",
+    {
+      question: {
+        en: "How can I contact you?",
+        fr: "Comment puis-je vous contacter ?",
+        de: "Wie kann ich Sie kontaktieren?",
+        es: "¿Cómo puedo contactarlos?",
+        zh: "我该如何联系您？",
+        ja: "どのように連絡すればよいですか？",
+        ko: "어떻게 연락할 수 있나요?",
+        th: "ฉันจะติดต่อคุณได้อย่างไร?",
+        my: "သင့်ကိုဘယ်လိုဆက်သွယ်ရမလဲ?",
+      } as LanguageJson,
+      answer: {
+        en: "You can reach us via phone at 0951515 or email at info@lincolnmyanmar.com.",
+        fr: "Vous pouvez nous joindre par téléphone au 0951515 ou par e-mail à info@lincolnmyanmar.com.",
+        de: "Sie können uns telefonisch unter 0951515 oder per E-Mail an info@lincolnmyanmar.com erreichen.",
+        es: "Puede comunicarse con nosotros por teléfono al 0951515 o por correo electrónico a info@lincolnmyanmar.com.",
+        zh: "您可以通过电话0951515或电子邮件 info@lincolnmyanmar.com 与我们联系。",
+        ja: "電話 0951515 またはメール info@lincolnmyanmar.com でご連絡いただけます。",
+        ko: "0951515번으로 전화하시거나 info@lincolnmyanmar.com 으로 이메일을 보내주세요.",
+        th: "คุณสามารถติดต่อเราทางโทรศัพท์ที่ 0951515 หรือทางอีเมลที่ info@lincolnmyanmar.com",
+        my: "သင်သည် 0951515 တွင် ဖုန်းဖြင့် သို့မဟုတ် info@lincolnmyanmar.com သို့ အီးမေးလ်ဖြင့် ဆက်သွယ်နိုင်ပါသည်။",
+      } as LanguageJson,
+      list: [],
     },
+  ],
+};
+export const servicesTranslations = {
+  title: {
+    en: "Our Legal Services",
+    fr: "Nos services juridiques",
+    de: "Unsere juristischen Dienstleistungen",
+    es: "Nuestros servicios legales",
+    zh: "我们的法律服务",
+    ja: "私たちの法務サービス",
+    ko: "우리의 법률 서비스",
+    th: "บริการทางกฎหมายของเรา",
+    my: "ကျွန်ုပ်တို့၏ ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုများ",
   },
-  faq2: {
-    question: {
-      en: "How can I contact you?",
-      fr: "Comment puis-je vous contacter ?",
-      de: "Wie kann ich Sie kontaktieren?",
-      es: "¿Cómo puedo contactarlos?",
-      zh: "我该如何联系您？",
-      ja: "どのように連絡すればよいですか？",
-      ko: "어떻게 연락할 수 있나요?",
-      th: "ฉันจะติดต่อคุณได้อย่างไร?",
-      my: "သင့်ကိုဘယ်လိုဆက်သွယ်ရမလဲ?",
-    },
-    answer: {
-      en: "You can reach us via phone at 0951515 or email at info@lincolnmyanmar.com.",
-      fr: "Vous pouvez nous joindre par téléphone au 0951515 ou par e-mail à info@lincolnmyanmar.com.",
-      de: "Sie können uns telefonisch unter 0951515 oder per E-Mail an info@lincolnmyanmar.com erreichen.",
-      es: "Puede comunicarse con nosotros por teléfono al 0951515 o por correo electrónico a info@lincolnmyanmar.com.",
-      zh: "您可以通过电话0951515或电子邮件 info@lincolnmyanmar.com 与我们联系。",
-      ja: "電話 0951515 またはメール info@lincolnmyanmar.com でご連絡いただけます。",
-      ko: "0951515번으로 전화하시거나 info@lincolnmyanmar.com 으로 이메일을 보내주세요.",
-      th: "คุณสามารถติดต่อเราทางโทรศัพท์ที่ 0951515 หรือทางอีเมลที่ info@lincolnmyanmar.com",
-      my: "သင်သည် 0951515 တွင် ဖုန်းဖြင့် သို့မဟုတ် info@lincolnmyanmar.com သို့ အီးမေးလ်ဖြင့် ဆက်သွယ်နိုင်ပါသည်။",
-    },
+
+  description: {
+    en: "Explore our full range of legal services tailored for your business needs.",
+    fr: "Découvrez notre gamme complète de services juridiques adaptés à vos besoins professionnels.",
+    de: "Entdecken Sie unser umfassendes Angebot an juristischen Dienstleistungen für Ihre geschäftlichen Anforderungen.",
+    es: "Explore nuestra gama completa de servicios legales adaptados a sus necesidades empresariales.",
+    zh: "探索我们为您的业务需求量身定制的全面法律服务。",
+    ja: "ビジネスニーズに合わせた幅広い法務サービスをご覧ください。",
+    ko: "귀사의 비즈니스 요구에 맞춘 다양한 법률 서비스를 확인해보세요.",
+    th: "สำรวจบริการทางกฎหมายที่หลากหลายซึ่งปรับให้เหมาะกับความต้องการทางธุรกิจของคุณ",
+    my: "သင့်လုပ်ငန်းအတွက်သင့်လျော်သော ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုအမျိုးမျိုးကို လေ့လာပါ။",
   },
+
+  items: [
+    {
+      title: {
+        en: "Corporate Law",
+        fr: "Droit des sociétés",
+        de: "Gesellschaftsrecht",
+        es: "Derecho corporativo",
+        zh: "公司法",
+        ja: "企業法",
+        ko: "기업법",
+        th: "กฎหมายบริษัท",
+        my: "ကုမ္ပဏီဥပဒေ",
+      },
+      description: {
+        en: "Expert legal guidance on business formations, contracts, and compliance.",
+        fr: "Conseils juridiques d'experts sur la création d'entreprises, les contrats et la conformité.",
+        de: "Fachkundige rechtliche Beratung zu Unternehmensgründungen, Verträgen und Compliance.",
+        es: "Asesoramiento legal experto en la formación de empresas, contratos y cumplimiento.",
+        zh: "为企业组建、合同及合规提供专业法律指导。",
+        ja: "企業の設立、契約、およびコンプライアンスに関する専門的な法的ガイダンス",
+        ko: "기업 설립, 계약 및 규정 준수에 대한 전문적인 법률 지침",
+        th: "คำแนะนำทางกฎหมายโดยผู้เชี่ยวชาญด้านการจัดตั้งธุรกิจ สัญญา และการปฏิบัติตามข้อกำหนด",
+        my: "စီးပွားရေးဖွဲ့စည်းပုံများ၊ စာချုပ်များနှင့်လိုက်နာမှုအတွက် ကျွမ်းကျင်သောဥပဒေညွှန်ကြားမှု။",
+      },
+      icon: "BankOutlined",
+      iconColor: "#1890ff",
+    },
+  ],
+};
+
+export const aboutUsTranslations = {
+  title: {
+    en: "About Our Firm",
+    fr: "À propos de notre cabinet",
+    de: "Über unsere Kanzlei",
+    es: "Sobre nuestro bufete",
+    zh: "关于我们律所",
+    ja: "当法律事務所について",
+    ko: "우리 로펌 소개",
+    th: "เกี่ยวกับสำนักงานกฎหมายของเรา",
+    my: "ကျွန်ုပ်တို့၏ ဥပဒေရုံးအကြောင်း",
+  },
+  description: {
+    en: "We are a team of experienced legal professionals committed to excellence.",
+    fr: "Nous sommes une équipe de professionnels juridiques expérimentés engagés envers l'excellence.",
+    de: "Wir sind ein Team erfahrener Juristen, das sich der Exzellenz verschrieben hat.",
+    es: "Somos un equipo de profesionales legales experimentados comprometidos con la excelencia.",
+    zh: "我们是一支致力于卓越的经验丰富的法律专业团队。",
+    ja: "私たちは卓越を追求する経験豊富な法務専門家のチームです。",
+    ko: "우리는 탁월함을 추구하는 경험 많은 법률 전문가 팀입니다.",
+    th: "เราคือทีมผู้เชี่ยวชาญด้านกฎหมายที่มีประสบการณ์และมุ่งมั่นสู่ความเป็นเลิศ",
+    my: "ကျွန်ုပ်တို့သည် အတွေ့အကြုံရှိသော ဥပဒေကျွမ်းကျင်သူများဖြစ်ပြီး ထူးခြားမှုအတွက် ကြိုးပမ်းဆောင်ရွက်နေပါသည်။",
+  } as LanguageJson,
+  items: [],
 };
 
 export const teamPageTranslations = {
@@ -482,73 +577,7 @@ export const teamPageTranslations = {
     my: "ကျွန်ုပ်တို့၏အောင်မြင်မှုအတွက်အဖွဲ့၏အကြောင်းကို သိရှိပါ",
   },
 };
-
-export const servicesPageTranslations = {
-  pageContent: {
-    title: {
-      en: "Our Legal Services",
-      fr: "Nos services juridiques",
-      de: "Unsere juristischen Dienstleistungen",
-      es: "Nuestros servicios legales",
-      zh: "我们的法律服务",
-      ja: "私たちの法務サービス",
-      ko: "우리의 법률 서비스",
-      th: "บริการทางกฎหมายของเรา",
-      my: "ကျွန်ုပ်တို့၏ ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုများ",
-    },
-    subtitle: {
-      en: "Tailored Solutions for Your Legal Needs",
-      fr: "Des solutions sur mesure pour vos besoins juridiques",
-      de: "Maßgeschneiderte Lösungen für Ihre rechtlichen Bedürfnisse",
-      es: "Soluciones a medida para sus necesidades legales",
-      zh: "为您的法律需求量身定制的解决方案",
-      ja: "あなたの法的ニーズに合わせたソリューション",
-      ko: "법적 요구에 맞춘 맞춤형 솔루션",
-      th: "โซลูชันที่ปรับแต่งสำหรับความต้องการทางกฎหมายของคุณ",
-      my: "သင့်ဥပဒေလိုအပ်ချက်များအတွက် အထူးသင့်လျှော်သည့် ဖြေရှင်းချက်များ",
-    },
-    description: {
-      en: "Comprehensive legal solutions designed to meet all your needs.",
-      fr: "Des solutions juridiques complètes conçues pour répondre à tous vos besoins.",
-      de: "Umfassende juristische Lösungen, die darauf ausgelegt sind, all Ihre Bedürfnisse zu erfüllen.",
-      es: "Soluciones legales integrales diseñadas para satisfacer todas sus necesidades.",
-      zh: "旨在满足您所有需求的全面法律解决方案。",
-      ja: "あらゆるニーズに応えるために設計された包括的な法務ソリューション",
-      ko: "모든 요구 사항을 충족하도록 설계된 종합 법률 솔루션",
-      th: "โซลูชันทางกฎหมายที่ครอบคลุมซึ่งออกแบบมาเพื่อตอบสนองทุกความต้องการของคุณ",
-      my: "သင့်လိုအပ်ချက်များအတွက် ပြည့်စုံသော ဥပဒေဆိုင်ရာ ဝန်ဆောင်မှုများ။",
-    },
-  },
-  sections: [
-    {
-      title: {
-        en: "Corporate Law",
-        fr: "Droit des sociétés",
-        de: "Gesellschaftsrecht",
-        es: "Derecho corporativo",
-        zh: "公司法",
-        ja: "企業法",
-        ko: "기업법",
-        th: "กฎหมายบริษัท",
-        my: "ကုမ္ပဏီဥပဒေ",
-      },
-      description: {
-        en: "Expert legal guidance on business formations, contracts, and compliance.",
-        fr: "Conseils juridiques d'experts sur la création d'entreprises, les contrats et la conformité.",
-        de: "Fachkundige rechtliche Beratung zu Unternehmensgründungen, Verträgen und Compliance.",
-        es: "Asesoramiento legal experto en la formación de empresas, contratos y cumplimiento.",
-        zh: "为企业组建、合同及合规提供专业法律指导。",
-        ja: "企業の設立、契約、およびコンプライアンスに関する専門的な法的ガイダンス",
-        ko: "기업 설립, 계약 및 규정 준수에 대한 전문적인 법률 지침",
-        th: "คำแนะนำทางกฎหมายโดยผู้เชี่ยวชาญด้านการจัดตั้งธุรกิจ สัญญา และการปฏิบัติตามข้อกำหนด",
-        my: "စီးပွားရေးဖွဲ့စည်းပုံများ၊ စာချုပ်များနှင့်လိုက်နာမှုအတွက် ကျွမ်းကျင်သောဥပဒေညွှန်ကြားမှု။",
-      },
-    },
-  ],
-};
-// src/translations/index.ts
-
-export const newsletterPageTranslations = {
+export const newsletterTranslations = {
   title: {
     en: "Our Newsletters",
     fr: "Nos bulletins d'information",
@@ -560,17 +589,31 @@ export const newsletterPageTranslations = {
     th: "จดหมายข่าวของเรา",
     my: "ကျွန်ုပ်တို့၏သတင်းစာများ",
   },
+
   subtitle: {
-    en: "Stay Updated with Our Latest News",
-    fr: "Restez informé avec nos dernières nouvelles",
-    de: "Bleiben Sie mit unseren neuesten Nachrichten auf dem Laufenden",
-    es: "Manténgase actualizado con nuestras últimas noticias",
-    zh: "随时了解我们的最新消息",
-    ja: "最新のニュースで最新情報を入手",
-    ko: "최신 소식으로 업데이트 상태 유지",
-    th: "อัปเดตข่าวล่าสุดของเรา",
-    my: "နောက်ဆုံးရသတင်းများနှင့်အချက်အလက်များ",
+    en: "Your Source for Legal Updates",
+    fr: "Votre source d'actualités juridiques",
+    de: "Ihre Quelle für rechtliche Neuigkeiten",
+    es: "Tu fuente de actualizaciones legales",
+    zh: "您的法律更新来源",
+    ja: "法務の最新情報をお届け",
+    ko: "법률 업데이트의 출처",
+    th: "แหล่งข้อมูลอัปเดตกฎหมายของคุณ",
+    my: "Sumber untuk Kemaskini Guaman Anda",
   },
+
+  tagline: {
+    en: "Stay Informed, Stay Ahead",
+    fr: "Restez informé, restez en avance",
+    de: "Bleiben Sie informiert, bleiben Sie voraus",
+    es: "Mantente informado, mantente a la vanguardia",
+    zh: "保持知情，走在前沿",
+    ja: "情報をキャッチし、先を行こう",
+    ko: "정보를 유지하고, 앞서 나가세요",
+    th: "รับรู้ข่าวสารและก้าวไปข้างหน้า",
+    my: "Sentiasa Dimaklumkan, Sentiasa Mendahului",
+  },
+
   description: {
     en: "Explore our collection of newsletters for the latest updates.",
     fr: "Découvrez notre collection de bulletins pour les dernières mises à jour.",
@@ -581,5 +624,17 @@ export const newsletterPageTranslations = {
     ko: "최신 업데이트를 위해 뉴스레터 컬렉션을 살펴보세요.",
     th: "สำรวจชุดจดหมายข่าวของเราเพื่อรับการอัปเดตล่าสุด",
     my: "နောက်ဆုံးရသတင်းများကို ရယူရန် ကျွန်ုပ်တို့၏သတင်းစာများကို ကြည့်ရှုပါ",
+  },
+
+  viewAll: {
+    en: "View all newsletters →",
+    fr: "Voir tous les bulletins →",
+    de: "Alle Newsletter anzeigen →",
+    es: "Ver todos los boletines →",
+    zh: "查看所有新闻通讯 →",
+    ja: "すべてのニュースレターを見る →",
+    ko: "모든 뉴스레터 보기 →",
+    th: "ดูจดหมายข่าวทั้งหมด →",
+    my: "သတင်းစာအားလုံးကိုကြည့်ရန် →",
   },
 };

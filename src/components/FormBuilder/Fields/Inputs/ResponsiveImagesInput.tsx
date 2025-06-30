@@ -4,6 +4,7 @@ import { Typography, theme } from "antd";
 import { lighten, darken } from "polished";
 
 import ImageSelector from "./ImageSelector";
+import { defaultCardStyle } from "../../InputStyle";
 
 interface ResponsiveImagesValue {
   desktop?: string;
@@ -66,16 +67,10 @@ const ResponsiveImagesInput: React.FC<ResponsiveImagesInputProps> = ({
   return (
     <div
       style={{
+        ...defaultCardStyle,
         padding: "12px",
-        marginBottom: "16px",
-        border: `2px dashed ${darkShade}`,
-        borderRadius: "10px",
         backgroundColor: lightShade,
-        boxShadow: "0 1px 4px rgba(0, 0, 0, 0.05)",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
+        border: `2px dashed ${darkShade}`,
         ...style,
       }}
     >

@@ -1,6 +1,7 @@
 "use client";
 import React, { CSSProperties } from "react";
-import { Select } from "antd";
+import { Select, theme } from "antd";
+import { lighten } from "polished";
 import { defaultWrapperStyle, defaultSelectStyle } from "../../InputStyle";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
 
@@ -31,58 +32,58 @@ const SupportedLanguageSelector: React.FC<SupportedLanguageSelectorProps> = ({
   style = {},
   inputStyle = {},
 }) => {
+  const { token } = theme.useToken();
+  const lightShade = lighten(0.03, token.colorBgContainer);
+
   // Always ensure 'en' is included
   const selectedLanguages = Array.from(new Set(["en", ...(value || [])]));
 
   const handleChange = (languages: string[]) => {
-    // Prevent removing 'en' (English)
     const updatedLanguages = Array.from(new Set(["en", ...languages]));
     onChange?.(updatedLanguages);
   };
 
   return (
-    <div style={{ ...defaultWrapperStyle, ...style }}>
+    <div
+      style={{
+        ...defaultWrapperStyle,
+        ...style,
+      }}
+    >
       <Select
         mode="multiple"
-        placeholder="Select supported languages"
         value={selectedLanguages}
         onChange={handleChange}
+        placeholder="Select supported languages"
+        style={{
+          ...defaultSelectStyle,
+          ...inputStyle,
+          backgroundColor: token.colorBgElevated,
+          border: `1px solid ${token.colorBorder}`,
+        }}
         optionLabelProp="label"
-        style={{ ...defaultSelectStyle, ...inputStyle }}
       >
         {Object.keys(languageFlags).map((lang) => {
           const countryCode = languageFlags[lang] || "un";
           const flagUrl = getFlagUrl(countryCode, 40);
+          const label = (
+            <span style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={flagUrl}
+                alt={lang}
+                style={{ width: 20, height: 14, marginRight: 8 }}
+              />
+              <span>{lang.toUpperCase()}</span>
+            </span>
+          );
           return (
             <Option
               key={lang}
               value={lang}
               disabled={lang === "en"}
-              label={
-                <span style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={flagUrl}
-                    alt={lang}
-                    style={{ width: 24, height: 16, marginRight: 8 }}
-                  />
-                  <span>{lang.toUpperCase()}</span>
-                </span>
-              }
+              label={label}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "4px 8px",
-                }}
-              >
-                <img
-                  src={flagUrl}
-                  alt={lang}
-                  style={{ width: 24, height: 16, marginRight: 8 }}
-                />
-                <span>{lang.toUpperCase()}</span>
-              </div>
+              {label}
             </Option>
           );
         })}

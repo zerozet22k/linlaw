@@ -81,7 +81,7 @@ const UserSelector: React.FC<Props> = ({
         filterOption={false}
         notFoundContent={loading ? <Spin size="small" /> : "No users"}
         onPopupScroll={onScroll}
-        style={{ ...defaultSelectStyle }}
+        style={defaultSelectStyle}
       >
         {data.map((u) => (
           <Select.Option key={u._id} value={u._id}>

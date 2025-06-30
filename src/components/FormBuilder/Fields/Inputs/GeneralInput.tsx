@@ -23,18 +23,25 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
   options = [],
   style = {},
 }) => {
+  const commonWrapperStyle: CSSProperties = {
+    ...defaultWrapperStyle,
+    ...style,
+  };
+
   switch (formType) {
     case FormType.COLOR:
       return (
-        <div style={{ ...defaultWrapperStyle, ...style }}>
+        <div style={commonWrapperStyle}>
           <Input
             type="color"
             value={value || "#000000"}
             onChange={(e) => onChange(e.target.value)}
             style={{
-              ...defaultInputStyle,
-              width: "50px",
-              height: "36px",
+              width: 40,
+              height: 36,
+              padding: 0,
+              borderRadius: 8,
+              border: "1px solid #ccc",
               cursor: "pointer",
             }}
           />
@@ -44,15 +51,15 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
 
     case FormType.BOOLEAN:
       return (
-        <div style={{ ...defaultWrapperStyle, ...style }}>
+        <div style={commonWrapperStyle}>
           <Switch checked={!!value} onChange={onChange} />
-          <span style={{marginLeft: '10px'}}>{value ? "Enabled" : "Disabled"}</span>
+          <span>{value ? "Enabled" : "Disabled"}</span>
         </div>
       );
 
     case FormType.FILE:
       return (
-        <div style={{ ...defaultWrapperStyle, ...style }}>
+        <div style={commonWrapperStyle}>
           <Upload
             beforeUpload={(file) => {
               onChange(file);
@@ -61,7 +68,7 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
             showUploadList={false}
           >
             <Input
-              addonBefore={<UploadOutlined />}
+              prefix={<UploadOutlined />}
               placeholder={value ? value.name : "Upload a file"}
               readOnly
               style={defaultInputStyle}
@@ -72,12 +79,12 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
 
     case FormType.SELECT:
       return (
-        <div style={{ ...defaultWrapperStyle, ...style }}>
+        <div style={commonWrapperStyle}>
           <Select
             value={value || ""}
             onChange={onChange}
-            style={{ ...defaultSelectStyle }}
             placeholder="Select an option"
+            style={defaultSelectStyle}
           >
             {options.map((opt) => (
               <Select.Option key={opt.value} value={opt.value}>
@@ -90,19 +97,23 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
 
     case FormType.TEXTAREA:
       return (
-        <div style={{ ...defaultWrapperStyle, ...style }}>
+        <div style={commonWrapperStyle}>
           <Input.TextArea
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            rows={4}
-            style={defaultInputStyle}
+            rows={6}
+            style={{
+              ...defaultInputStyle,
+              resize: "vertical",
+              minHeight: "120px",
+            }}
           />
         </div>
       );
 
     default:
       return (
-        <div style={{ ...defaultWrapperStyle, ...style }}>
+        <div style={commonWrapperStyle}>
           <Input
             type={
               formType === FormType.NUMBER

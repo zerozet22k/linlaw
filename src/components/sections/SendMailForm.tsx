@@ -55,7 +55,7 @@ const SendMailForm: React.FC = () => {
           textAlign: "center",
           marginTop: "40px",
           padding: "30px",
-          backgroundColor: "#f4f4f4",
+
           borderRadius: "8px",
         }}
       >

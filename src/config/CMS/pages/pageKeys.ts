@@ -5,12 +5,6 @@ import {
 } from "./keys/HOME_PAGE_SETTINGS";
 
 import {
-  SERVICES_PAGE_SETTINGS_KEYS,
-  SERVICES_PAGE_SETTINGS,
-  SERVICES_PAGE_SETTINGS_TYPES,
-} from "./keys/SERVICES_PAGE_SETTINGS";
-
-import {
   ABOUT_PAGE_SETTINGS_KEYS,
   ABOUT_PAGE_SETTINGS,
   ABOUT_PAGE_SETTINGS_TYPES,
@@ -30,7 +24,6 @@ import {
 
 export const PAGE_SETTINGS_KEYS = {
   ...HOME_PAGE_SETTINGS_KEYS,
-  ...SERVICES_PAGE_SETTINGS_KEYS,
   ...ABOUT_PAGE_SETTINGS_KEYS,
   ...TEAM_PAGE_SETTINGS_KEYS,
   ...NEWSLETTER_PAGE_SETTINGS_KEYS,
@@ -38,14 +31,12 @@ export const PAGE_SETTINGS_KEYS = {
 
 export const PAGE_SETTINGS_GUIDE = {
   ...HOME_PAGE_SETTINGS,
-  ...SERVICES_PAGE_SETTINGS,
   ...ABOUT_PAGE_SETTINGS,
   ...TEAM_PAGE_SETTINGS,
   ...NEWSLETTER_PAGE_SETTINGS,
 } as const;
 
 export type PagesInterface = HOME_PAGE_SETTINGS_TYPES &
-  SERVICES_PAGE_SETTINGS_TYPES &
   ABOUT_PAGE_SETTINGS_TYPES &
   TEAM_PAGE_SETTINGS_TYPES &
   NEWSLETTER_PAGE_SETTINGS_TYPES;
@@ -64,7 +55,6 @@ export type PrivatePageKeys = {
 
 export type ValidPageSettingKey =
   | keyof HOME_PAGE_SETTINGS_TYPES
-  | keyof SERVICES_PAGE_SETTINGS_TYPES
   | keyof ABOUT_PAGE_SETTINGS_TYPES
   | keyof TEAM_PAGE_SETTINGS_TYPES
   | keyof NEWSLETTER_PAGE_SETTINGS_TYPES;
@@ -72,7 +62,6 @@ export type ValidPageSettingKey =
 export const pageGroupedKeys = {
   HomePage: Object.values(HOME_PAGE_SETTINGS_KEYS),
   AboutPage: Object.values(ABOUT_PAGE_SETTINGS_KEYS),
-  ServicesPage: Object.values(SERVICES_PAGE_SETTINGS_KEYS),
   TeamPage: Object.values(TEAM_PAGE_SETTINGS_KEYS),
   NewsletterPage: Object.values(NEWSLETTER_PAGE_SETTINGS_KEYS),
 };
@@ -80,7 +69,6 @@ export const pageGroupedKeys = {
 export const pageTabLabels: Record<string, string> = {
   HomePage: "Home Page",
   AboutPage: "About Page",
-  ServicesPage: "Services Page",
   TeamPage: "Team Page",
   NewsletterPage: "Newsletter Page",
 };

@@ -1,15 +1,16 @@
 export const dynamic = "force-dynamic";
+
 import React from "react";
 import NewsletterContent from "./content";
 import PageService from "@/services/PageService";
 import { NEWSLETTER_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
-import { newsletterPageTranslations } from "@/translations"; // Import centralized texts
+import { newsletterTranslations } from "@/translations"; // ✅ Use merged translations
 
 const getDefaultNewsletterData = () => ({
   [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
-    title: newsletterPageTranslations.title,
-    subtitle: newsletterPageTranslations.subtitle,
-    description: newsletterPageTranslations.description,
+    title: newsletterTranslations.title,
+    subtitle: newsletterTranslations.subtitle,
+    description: newsletterTranslations.description,
     backgroundImage: "https://source.unsplash.com/1600x900/?newsletter",
   },
   [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
@@ -22,8 +23,11 @@ const fetchNewsletterData = async () => {
   const fetchedData = await pageService.getPagesByKeys(
     Object.values(NEWSLETTER_PAGE_SETTINGS_KEYS)
   );
-  const defaultData = getDefaultNewsletterData();
-  return { ...defaultData, ...fetchedData };
+
+  return {
+    ...getDefaultNewsletterData(),
+    ...fetchedData,
+  };
 };
 
 const NewsletterPage = async () => {

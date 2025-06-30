@@ -5,10 +5,12 @@ import { HOME_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/HOME_PAGE_SETTI
 
 // Import our translation objects
 import {
-  homePageHeroTranslations,
+  heroTranslations,
   testimonialTranslations,
-  homePageAdTranslations,
-  homePageFaqTranslations,
+  adTranslations,
+  faqTranslations,
+  servicesTranslations,
+  aboutUsTranslations,
 } from "@/translations";
 
 const getDefaultHomePageData = () => ({
@@ -19,8 +21,8 @@ const getDefaultHomePageData = () => ({
         tablet: "/images/bagan-tablet.jpg",
         mobile: "/images/bagan-mobile.jpg",
       },
-      header: homePageHeroTranslations.header,
-      description: homePageHeroTranslations.description,
+      header: heroTranslations.header,
+      description: heroTranslations.description,
       textAlign: "left",
     },
   ],
@@ -30,31 +32,10 @@ const getDefaultHomePageData = () => ({
     email: "contact@lincolnmyanmar.com",
     mapLink: "https://maps.google.com",
   },
-  [HOME_PAGE_SETTINGS_KEYS.TESTIMONIALS]: [
-    {
-      name: testimonialTranslations.testimonial1.name,
-      comment: testimonialTranslations.testimonial1.comment,
-    },
-  ],
-  [HOME_PAGE_SETTINGS_KEYS.ADS]: [
-    {
-      title: homePageAdTranslations.title,
-      subtitle: homePageAdTranslations.subtitle,
-      description: homePageAdTranslations.description,
-      contacts: [{ name: "Office", number: "+95 9 987654321" }],
-      image: "/images/special-offer.jpg",
-    },
-  ],
-  [HOME_PAGE_SETTINGS_KEYS.FAQS]: [
-    {
-      question: homePageFaqTranslations.faq1.question,
-      answer: homePageFaqTranslations.faq1.answer,
-    },
-    {
-      question: homePageFaqTranslations.faq2.question,
-      answer: homePageFaqTranslations.faq2.answer,
-    },
-  ],
+  [HOME_PAGE_SETTINGS_KEYS.TESTIMONIALS_SECTION]: testimonialTranslations,
+  [HOME_PAGE_SETTINGS_KEYS.FAQS_SECTION]: faqTranslations,
+  [HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION]: servicesTranslations,
+  [HOME_PAGE_SETTINGS_KEYS.ABOUT_US_SECTION]: aboutUsTranslations,
 });
 
 const fetchHomePageData = async () => {

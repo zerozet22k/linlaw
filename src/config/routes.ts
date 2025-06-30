@@ -219,7 +219,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
   },
   [ROUTE_KEYS.ABOUT]: {
     key: ROUTE_KEYS.ABOUT,
-    path: "/about",
+    path: "/#about",
     label: "About",
     icon: "InfoCircleOutlined",
     loginRequired: false,
@@ -227,12 +227,13 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
   },
   [ROUTE_KEYS.SERVICES]: {
     key: ROUTE_KEYS.SERVICES,
-    path: "/services",
+    path: "/#services",
     label: "Services",
     icon: "AppstoreOutlined",
     loginRequired: false,
     showGoTop: true,
   },
+  
   [ROUTE_KEYS.TEAM_MEMBERS]: {
     key: ROUTE_KEYS.TEAM_MEMBERS,
     path: "/team-members",

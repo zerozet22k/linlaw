@@ -29,24 +29,38 @@ const SizeInput: React.FC<TextSizeInputProps> = ({
       : "em"
   );
 
+  const commonHeight = 32; // Assuming a default commonHeight
+
   useEffect(() => {
     onChange?.(`${size}${unit}`);
   }, [size, unit]);
 
   return (
     <div style={{ ...defaultWrapperStyle, ...style }}>
-      <Space>
+      <Space.Compact>
         <InputNumber
           min={0}
           step={0.1}
           value={size}
           onChange={(val) => setSize(val ?? 0)}
-          style={{ width: 100, ...defaultInputStyle, ...inputStyle }}
+          style={{
+            ...defaultInputStyle,
+            ...inputStyle,
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            width: "100%",
+          }}
+          controls={false}
         />
         <Select
           value={unit}
           onChange={(val) => setUnit(val)}
-          style={{ width: 80, ...defaultSelectStyle }}
+          style={{
+            ...defaultSelectStyle,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderLeft: "none",
+          }}
         >
           {unitOptions.map((unit) => (
             <Select.Option key={unit} value={unit}>
@@ -54,7 +68,7 @@ const SizeInput: React.FC<TextSizeInputProps> = ({
             </Select.Option>
           ))}
         </Select>
-      </Space>
+      </Space.Compact>
     </div>
   );
 };

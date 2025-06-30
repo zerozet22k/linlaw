@@ -1,71 +1,71 @@
 "use client";
 
 import React from "react";
-import { Layout, Card, Row, Col, Typography } from "antd";
+import { Layout } from "antd";
 import HeroSliderSection from "@/components/sections/HeroSliderSection";
 import FAQSection from "@/components/sections/FAQSection";
-import InfoCards from "@/components/sections/InfoCards";
 import RelatedBusinesses from "@/components/sections/RelatedBusinesses";
+import ServicesSection from "@/components/sections/ServicesSection";
+import AboutUsSection from "@/components/sections/AboutUsSection";
+import SendMailForm from "@/components/sections/SendMailForm";
+import Testimonials from "@/components/sections/TestimonialsSection";
+import NewsletterSection from "@/components/sections/NewsletterSection";
 import {
   HOME_PAGE_SETTINGS_KEYS,
   HOME_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
-import SendMailForm from "@/components/sections/SendMailForm";
-import Testimonials from "@/components/sections/TestimonialsSection";
-import NewsletterSection from "@/components/sections/NewsletterSection";
+import { useLanguage } from "@/hooks/useLanguage";
+import SectionWrapper from "@/components/sections/SectionWrapper";
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
 
 type HomePageContentProps = {
   data: HOME_PAGE_SETTINGS_TYPES;
 };
 
 const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
-  const heroSlides = data[HOME_PAGE_SETTINGS_KEYS.HERO_BANNER] || [];
+  const { language } = useLanguage();
 
-  const faqs = data[HOME_PAGE_SETTINGS_KEYS.FAQS] || [];
+  const heroSlides = data[HOME_PAGE_SETTINGS_KEYS.HERO_BANNER] || [];
+  const faqSection = data[HOME_PAGE_SETTINGS_KEYS.FAQS_SECTION] || [];
   const ads = data[HOME_PAGE_SETTINGS_KEYS.ADS] || [];
-  const infoCards = data[HOME_PAGE_SETTINGS_KEYS.CARDS] || [];
-  const testimonials = data[HOME_PAGE_SETTINGS_KEYS.TESTIMONIALS] || [];
+  const testimonialSection =
+    data[HOME_PAGE_SETTINGS_KEYS.TESTIMONIALS_SECTION] || [];
+  const services = data[HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION] || [];
+  const aboutUs = data[HOME_PAGE_SETTINGS_KEYS.ABOUT_US_SECTION] ?? [];
+
   return (
-    <Layout style={{ width: "100%", maxWidth: "100%", padding: "0px" }}>
+    <Layout style={{ width: "100%", maxWidth: "100%", padding: 0 }}>
       <Content style={{ margin: 0, minHeight: 380 }}>
         <HeroSliderSection slides={heroSlides} delay={5000} />
-        <div style={{ width: "100%" }}>
-          <InfoCards cards={infoCards} />
-          <RelatedBusinesses cards={ads} />
-          <Row
-            gutter={[16, 16]}
-            justify="center"
-            style={{
-              width: "100%",
-              margin: "0 auto",
-              display: "flex",
-              alignItems: "stretch",
-            }}
-          >
-            <Col
-              xs={24}
-              lg={12}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              <FAQSection faqs={faqs} />
-            </Col>
-            <Col
-              xs={24}
-              lg={12}
-              style={{ display: "flex", flexDirection: "column" }}
-            >
-              <NewsletterSection />
-            </Col>
-          </Row>
 
-          <Testimonials testimonials={testimonials} />
-          <div style={{ width: "100%" }}>
-            <SendMailForm />
-          </div>
-        </div>
+        <SectionWrapper index={0}>
+          <RelatedBusinesses cards={ads} />
+        </SectionWrapper>
+
+        <SectionWrapper index={1}>
+          <ServicesSection section={services} language={language} />
+        </SectionWrapper>
+
+        <SectionWrapper index={2}>
+          <AboutUsSection section={aboutUs} language={language} />
+        </SectionWrapper>
+
+        <SectionWrapper index={3}>
+          <FAQSection section={faqSection} />
+        </SectionWrapper>
+
+        <SectionWrapper index={4}>
+          <NewsletterSection />
+        </SectionWrapper>
+
+        <SectionWrapper index={5}>
+          <Testimonials section={testimonialSection} />
+        </SectionWrapper>
+
+        <SectionWrapper index={6}>
+          <SendMailForm />
+        </SectionWrapper>
       </Content>
     </Layout>
   );

@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import { Input, Typography, theme } from "antd";
+import { Input, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { lighten, darken } from "polished";
-import { defaultWrapperStyle, defaultInputStyle } from "../../InputStyle";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
 import { languageFlags } from "./SupportedLanguageSelector";
+import { languageInputWrapperStyle, defaultInputStyle } from "../../InputStyle";
 
 interface LanguageJsonTextInputProps {
   value?: Record<string, string>;
@@ -20,63 +20,49 @@ const LanguageJsonTextInput: React.FC<LanguageJsonTextInputProps> = ({
   const { token } = theme.useToken();
 
   const baseColor = token.colorBgContainer;
-  const lightShade = lighten(0.05, baseColor);
-  const darkShade = darken(0.1, baseColor);
+  const lightShade = lighten(0.03, baseColor);
+  const darkShade = darken(0.08, baseColor);
 
   const handleChange = (lang: string, text: string) => {
-    const updatedValue = { ...value, [lang]: text };
-    onChange?.(updatedValue);
+    onChange?.({ ...value, [lang]: text });
   };
 
   return (
     <div
       style={{
-        padding: "12px",
-        marginBottom: "16px",
-        border: `2px dashed ${darkShade}`,
-        borderRadius: "10px",
+        ...languageInputWrapperStyle,
         backgroundColor: lightShade,
-        position: "relative",
-        boxShadow: "0 1px 4px rgba(0, 0, 0, 0.05)",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
+        border: `2px dashed ${darkShade}`,
       }}
     >
       {currentSupportedLanguages.map((lang) => {
-        const countryCode = languageFlags[lang] || "un";
-        const flagUrl = getFlagUrl(countryCode, 40);
+        const flagUrl = getFlagUrl(languageFlags[lang] || "un", 40);
 
         return (
-          <div key={lang} style={{ width: "100%" }}>
-            <Input
-              placeholder={`Enter text for ${lang.toUpperCase()}`}
-              value={value[lang] || ""}
-              onChange={(e) => handleChange(lang, e.target.value)}
-              prefix={
-                <img
-                  src={flagUrl}
-                  alt={lang}
-                  style={{
-                    width: 24,
-                    height: 16,
-                    borderRadius: "2px",
-                    objectFit: "cover",
-                  }}
-                />
-              }
-              style={{
-                ...defaultInputStyle,
-                width: "100%",
-                padding: "10px",
-                borderRadius: "8px",
-                border: `1px solid ${token.colorBorder}`,
-                backgroundColor: token.colorBgElevated,
-                minHeight: "40px",
-              }}
-            />
-          </div>
+          <Input
+            key={lang}
+            value={value[lang] || ""}
+            placeholder={`Enter ${lang.toUpperCase()} text`}
+            onChange={(e) => handleChange(lang, e.target.value)}
+            prefix={
+              <img
+                src={flagUrl}
+                alt={lang}
+                style={{
+                  width: 24,
+                  height: 16,
+                  borderRadius: 4,
+                  objectFit: "cover",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                }}
+              />
+            }
+            style={{
+              ...defaultInputStyle,
+              border: `1px solid ${token.colorBorder}`,
+              backgroundColor: token.colorBgElevated,
+            }}
+          />
         );
       })}
     </div>

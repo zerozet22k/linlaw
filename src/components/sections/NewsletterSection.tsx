@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, Typography, Spin, Alert } from "antd";
+import { Typography, Spin, Alert } from "antd";
 import Link from "next/link";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 import { INewsletterAPI } from "@/models/Newsletter";
 import apiClient from "@/utils/api/apiClient";
-import { newsletterTitle, newsletterViewAllTranslations } from "@/translations";
+import { newsletterTranslations } from "@/translations";
 
-const { Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
 
 const NewsletterSection: React.FC = () => {
   const { language } = useLanguage();
@@ -42,68 +42,71 @@ const NewsletterSection: React.FC = () => {
     fetchNewsletters();
   }, []);
 
+  const translatedTitle =
+    getTranslatedText(newsletterTranslations.title, language) ||
+    "Our Newsletters";
+  const translatedSubtitle = getTranslatedText(
+    newsletterTranslations.subtitle,
+    language
+  );
+  const translatedViewAll =
+    getTranslatedText(newsletterTranslations.viewAll, language) ||
+    "View all newsletters";
+
   return (
-    <Card
-      title={getTranslatedText(newsletterTitle, language)}
-      bordered={false}
-      style={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        borderRadius: "10px",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-        padding: 0,
-      }}
-      bodyStyle={{
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-      }}
-    >
+    <section style={{ padding: "60px 20px", width: "100%" }}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <h2 style={{ fontSize: "2.25em", fontWeight: 600, color: "#222" }}>
+          {translatedTitle}
+        </h2>
+        {translatedSubtitle && (
+          <Text type="secondary" style={{ fontSize: 16 }}>
+            {translatedSubtitle}
+          </Text>
+        )}
+      </div>
+
       {loading ? (
         <Spin size="large" style={{ display: "block", margin: "24px auto" }} />
       ) : error ? (
         <Alert message="Error" description={error} type="error" showIcon />
       ) : (
-        <>
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-            }}
-          >
-            {newsletters.map((item) => {
-              const title =
-                typeof item.title === "string"
-                  ? item.title
-                  : item.title[language] || item.title.en || "Untitled";
-              return (
-                <Paragraph
-                  key={item._id}
-                  style={{
-                    marginBottom: 0,
-                    fontSize: 14,
-                    fontWeight: 500,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  <Link href={`/newsletters/${item._id}`}>{title}</Link>
-                </Paragraph>
-              );
-            })}
-          </div>
+        <div
+          style={{
+            maxWidth: 800,
+            margin: "0 auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          {newsletters.map((item) => {
+            const title =
+              typeof item.title === "string"
+                ? item.title
+                : item.title[language] || item.title.en || "Untitled";
+
+            return (
+              <Paragraph
+                key={item._id}
+                style={{
+                  marginBottom: 0,
+                  fontSize: 15,
+                  fontWeight: 500,
+                  lineHeight: 1.6,
+                }}
+              >
+                <Link href={`/newsletters/${item._id}`}>{title}</Link>
+              </Paragraph>
+            );
+          })}
 
           <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
-            <Link href="/newsletters">
-              {getTranslatedText(newsletterViewAllTranslations, language)}
-            </Link>
+            <Link href="/newsletters">{translatedViewAll}</Link>
           </Paragraph>
-        </>
+        </div>
       )}
-    </Card>
+    </section>
   );
 };
 

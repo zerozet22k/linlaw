@@ -25,7 +25,7 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableItem } from "./sortable/SortableTag";
 import apiClient from "@/utils/api/apiClient";
-import { defaultWrapperStyle } from "../../InputStyle";
+import { defaultWrapperStyle, defaultSelectStyle, defaultTagStyle } from "../../InputStyle";
 import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import type { LabeledValue } from "antd/es/select";
 /* ---------- helpers ---------- */
@@ -166,7 +166,7 @@ const UsersSelector: React.FC<Props> = ({
             {selected.map((u) => (
               <SortableItem key={u.id} id={u.id}>
                 <Tag
-                  style={{ cursor: "grab", padding: "6px", fontSize: 14 }}
+                  style={defaultTagStyle}
                   closable
                   closeIcon={
                     <CloseOutlined
@@ -195,13 +195,12 @@ const UsersSelector: React.FC<Props> = ({
         mode="multiple"
         labelInValue
         size="large"
-        // variant="borderless"
         maxTagCount={0}
         tagRender={(_: CustomTagProps) => <></>}
         value={[]}
         placeholder={placeholder}
         disabled={disabled}
-        style={{ width: "100%", minWidth: 160 }}
+        style={defaultSelectStyle}
         loading={loading}
         notFoundContent={loading ? <Spin size="small" /> : "No users"}
         filterOption={false}

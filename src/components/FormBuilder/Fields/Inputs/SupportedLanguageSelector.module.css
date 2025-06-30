@@ -1,0 +1,29 @@
+.ant-select-selector {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  box-shadow: none;
+  padding: 4px 8px;
+  flex: 1;
+}
+
+.ant-select .ant-select-arrow {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lang-selector-dropdown .ant-select-item-option-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-selector-dropdown {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px;
+} 

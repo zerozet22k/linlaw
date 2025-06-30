@@ -5,7 +5,7 @@ import { Card, Typography, Divider } from "antd";
 import { PhoneOutlined } from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
-import { contactsTranslations, noContactsTranslations } from "@/translations";
+import { commonTranslations } from "@/translations";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
@@ -13,10 +13,13 @@ import {
 
 const { Title, Text } = Typography;
 
-const RelatedBusiness: React.FC<{
-  ad: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS][number];
-}> = ({ ad }) => {
+type AdItem =
+  HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS][number];
+
+const RelatedBusiness: React.FC<{ ad: AdItem }> = ({ ad }) => {
   const { language } = useLanguage();
+
+  const hasContacts = Array.isArray(ad.contacts) && ad.contacts.length > 0;
 
   return (
     <div
@@ -27,119 +30,103 @@ const RelatedBusiness: React.FC<{
         borderRadius: 12,
         overflow: "hidden",
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#fff",
       }}
     >
-      {/* Top Banner with Gradient Overlay */}
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          paddingTop: "56.25%",
-          backgroundImage: `url(${ad.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* Gradient overlay at bottom of the banner */}
+      {/* Image Banner */}
+      {ad.image && (
         <div
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
+            position: "relative",
             width: "100%",
-            height: "40%",
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.6), rgba(255,255,255,0))",
+            paddingTop: "56.25%",
+            backgroundImage: `url(${ad.image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
-        />
-      </div>
+        >
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "40%",
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.6), rgba(255,255,255,0))",
+            }}
+          />
+        </div>
+      )}
 
-      {/* Card Content */}
+      {/* Content */}
       <Card
         bordered={false}
-        style={{
-          borderRadius: 0,
-          padding: "16px 20px",
-        }}
-        bodyStyle={{ padding: 0 }}
+        bodyStyle={{ padding: 20 }}
+        style={{ borderRadius: 0 }}
       >
-        <div style={{ marginTop: 16 }}>
-          <Title
-            level={4}
-            style={{
-              margin: 0,
-              fontSize: 20,
-              color: "#333",
-              lineHeight: 1.3,
-            }}
-          >
+        <div style={{ marginBottom: 12 }}>
+          <Title level={4} style={{ fontSize: 20, color: "#222", margin: 0 }}>
             {getTranslatedText(ad.title, language)}
           </Title>
-
-          <Text
-            style={{
-              display: "block",
-              marginTop: 4,
-              fontSize: 14,
-              color: "#666",
-            }}
-          >
-            {getTranslatedText(ad.subtitle, language)}
-          </Text>
-        </div>
-
-        <div style={{ marginTop: 12 }}>
-          <Text style={{ fontSize: 14, lineHeight: 1.5, color: "#444" }}>
-            {getTranslatedText(ad.description, language)}
-          </Text>
-        </div>
-
-        {/* Divider above contacts */}
-        <Divider style={{ margin: "16px 0" }} />
-
-        {/* Contacts Section */}
-        <div style={{ marginBottom: 8 }}>
-          <Title
-            level={5}
-            style={{
-              margin: 0,
-              fontSize: 16,
-              color: "#333",
-            }}
-          >
-            {getTranslatedText(contactsTranslations, language)}
-          </Title>
-
-          {Array.isArray(ad.contacts) && ad.contacts.length > 0 ? (
-            ad.contacts.map((phone, index) => (
-              <div
-                key={index}
-                style={{
-                  marginTop: 8,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <PhoneOutlined style={{ color: "#007bff" }} />
-                <Text style={{ fontSize: 14, color: "#333" }}>
-                  <strong>{phone.name}:</strong>{" "}
-                  <a
-                    href={`tel:${phone.number}`}
-                    style={{ color: "#007bff", textDecoration: "none" }}
-                  >
-                    {phone.number}
-                  </a>
-                </Text>
-              </div>
-            ))
-          ) : (
-            <Text style={{ fontSize: 14, color: "#999" }}>
-              {getTranslatedText(noContactsTranslations, language)}
+          {ad.subtitle && (
+            <Text
+              style={{
+                display: "block",
+                fontSize: 14,
+                color: "#666",
+                marginTop: 4,
+              }}
+            >
+              {getTranslatedText(ad.subtitle, language)}
             </Text>
           )}
         </div>
+
+        {ad.description && (
+          <Text style={{ fontSize: 14, lineHeight: 1.6, color: "#444" }}>
+            {getTranslatedText(ad.description, language)}
+          </Text>
+        )}
+
+        <Divider style={{ margin: "16px 0" }} />
+
+        <Title
+          level={5}
+          style={{ fontSize: 16, color: "#333", marginBottom: 8 }}
+        >
+          {getTranslatedText(commonTranslations.contacts, language)}
+        </Title>
+
+        {hasContacts ? (
+          ad.contacts.map((contact, idx) => (
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              <PhoneOutlined style={{ color: "#007bff" }} />
+              <Text style={{ fontSize: 14, color: "#333" }}>
+                <strong>{contact.name}:</strong>{" "}
+                <a
+                  href={`tel:${contact.number}`}
+                  style={{ color: "#007bff", textDecoration: "none" }}
+                >
+                  {contact.number}
+                </a>
+              </Text>
+            </div>
+          ))
+        ) : (
+          <Text style={{ fontSize: 14, color: "#999" }}>
+            {getTranslatedText(commonTranslations.noContacts, language)}
+          </Text>
+        )}
       </Card>
     </div>
   );

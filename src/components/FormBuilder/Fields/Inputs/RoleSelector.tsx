@@ -94,7 +94,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({
         filterOption={false}
         onSearch={handleSearch}
         onPopupScroll={handlePopupScroll}
-        style={{ ...defaultSelectStyle }}
+        style={defaultSelectStyle}
       >
         <Select.Option value="">Select a role</Select.Option>
         {roles.map((role) => (

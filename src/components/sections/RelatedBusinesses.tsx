@@ -9,10 +9,7 @@ import {
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
-import {
-  relatedBusinessTitleTranslations,
-  noAdsTranslations,
-} from "@/translations";
+import { commonTranslations } from "@/translations";
 
 const RelatedBusinesses: React.FC<{
   cards?: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS];
@@ -20,7 +17,7 @@ const RelatedBusinesses: React.FC<{
   const { language } = useLanguage();
 
   return (
-    <section style={{ padding: "40px 20px", backgroundColor: "#f7f7f7" }}>
+    <section style={{ padding: "40px 20px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <h2
           style={{
@@ -31,7 +28,7 @@ const RelatedBusinesses: React.FC<{
             color: "#333",
           }}
         >
-          {getTranslatedText(relatedBusinessTitleTranslations, language)}
+          {getTranslatedText(commonTranslations.relatedBusinessTitle, language)}
         </h2>
         <Row gutter={[24, 24]} justify="center">
           {cards.length > 0 ? (
@@ -53,7 +50,7 @@ const RelatedBusinesses: React.FC<{
                 justifyContent: "center",
               }}
             >
-              {getTranslatedText(noAdsTranslations, language)}
+              {getTranslatedText(commonTranslations.noAds, language)}
             </div>
           )}
         </Row>

@@ -168,9 +168,7 @@ const TeamMemberPage: React.FC = () => {
             >
               {user.bio || "No biography available."}
             </Paragraph>
-            <Paragraph style={{ fontSize: "16px" }}>
-              <strong>Email:</strong> {user.email}
-            </Paragraph>
+          
           </div>
         </div>
       </div>
