@@ -82,7 +82,6 @@ const SendEmailPage: React.FC = () => {
     }
   };
 
-  // Memoize the debounced function and cancel it on unmount.
   const debouncedSetSearch = useMemo(
     () =>
       debounce((value: string) => {
@@ -103,9 +102,12 @@ const SendEmailPage: React.FC = () => {
 
   const onPopupScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-    if (scrollTop + clientHeight >= scrollHeight - 20 && hasMore && !loadingRef.current) {
+    if (
+      scrollTop + clientHeight >= scrollHeight - 20 &&
+      hasMore &&
+      !loadingRef.current
+    ) {
       loadingRef.current = true;
-      // Implement pagination logic if needed.
     }
   };
 
@@ -115,11 +117,12 @@ const SendEmailPage: React.FC = () => {
       const payload = {
         subject: values.subject,
         message: values.message,
-        userIds: selectedUserIds, // Only selected users will be emailed.
+        userIds: selectedUserIds,
       };
       const response = await apiClient.post("/send-emails", payload);
       if (response.status === 200) message.success("Emails sent successfully.");
-      else if (response.status === 207) message.warning("Emails sent with some errors.");
+      else if (response.status === 207)
+        message.warning("Emails sent with some errors.");
       else message.error("Failed to send emails.");
     } catch (error: any) {
       console.error("Error sending emails:", error);
@@ -138,7 +141,9 @@ const SendEmailPage: React.FC = () => {
         <Col xs={24} md={8}>
           <div style={{ position: "sticky", top: 80 }}>
             <Card size="small" title="Filter Options">
-              <label style={{ display: "block", marginBottom: 6 }}>Include Roles</label>
+              <label style={{ display: "block", marginBottom: 6 }}>
+                Include Roles
+              </label>
               <Select
                 mode="multiple"
                 placeholder="Select roles to include"
@@ -150,7 +155,9 @@ const SendEmailPage: React.FC = () => {
                 <Select.Option value="editor">Editor</Select.Option>
                 <Select.Option value="user">User</Select.Option>
               </Select>
-              <label style={{ display: "block", marginBottom: 6 }}>Exclude Roles</label>
+              <label style={{ display: "block", marginBottom: 6 }}>
+                Exclude Roles
+              </label>
               <Select
                 mode="multiple"
                 placeholder="Select roles to exclude"
@@ -162,22 +169,36 @@ const SendEmailPage: React.FC = () => {
                 <Select.Option value="editor">Editor</Select.Option>
                 <Select.Option value="user">User</Select.Option>
               </Select>
-              <label style={{ display: "block", marginBottom: 6 }}>Search Query</label>
+              <label style={{ display: "block", marginBottom: 6 }}>
+                Search Query
+              </label>
               <Input
                 placeholder="Search users by name or email"
                 onChange={onSearchChange}
                 style={{ marginBottom: 16 }}
               />
-              <Button type="primary" block onClick={loadMatchingUsers} loading={filterLoading}>
+              <Button
+                type="primary"
+                block
+                onClick={loadMatchingUsers}
+                loading={filterLoading}
+              >
                 Load Matching Users
               </Button>
             </Card>
           </div>
         </Col>
         <Col xs={24} md={16}>
-          <Card size="small" title="Matching Users" style={{ marginBottom: 16 }}>
+          <Card
+            size="small"
+            title="Matching Users"
+            style={{ marginBottom: 16 }}
+          >
             {hasLoadedUsers ? (
-              <div style={{ height: 300, overflowY: "auto" }} onScroll={onPopupScroll}>
+              <div
+                style={{ height: 300, overflowY: "auto" }}
+                onScroll={onPopupScroll}
+              >
                 <Table
                   rowKey="_id"
                   columns={columns}
@@ -192,7 +213,8 @@ const SendEmailPage: React.FC = () => {
                 <Spin spinning={filterLoading} />
                 {!filterLoading && (
                   <p style={{ marginTop: 16 }}>
-                    No users loaded yet. Use filters and click &quot;Load Matching Users&quot;.
+                    No users loaded yet. Use filters and click &quot;Load
+                    Matching Users&quot;.
                   </p>
                 )}
               </div>
@@ -203,14 +225,18 @@ const SendEmailPage: React.FC = () => {
               <Form.Item
                 label="Subject"
                 name="subject"
-                rules={[{ required: true, message: "Please input the subject." }]}
+                rules={[
+                  { required: true, message: "Please input the subject." },
+                ]}
               >
                 <Input placeholder="Email subject" />
               </Form.Item>
               <Form.Item
                 label="Message"
                 name="message"
-                rules={[{ required: true, message: "Please input the message." }]}
+                rules={[
+                  { required: true, message: "Please input the message." },
+                ]}
               >
                 <Input.TextArea rows={6} placeholder="Email message" />
               </Form.Item>

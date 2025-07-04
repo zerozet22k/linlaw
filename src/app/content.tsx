@@ -7,7 +7,7 @@ import FAQSection from "@/components/sections/FAQSection";
 import RelatedBusinesses from "@/components/sections/RelatedBusinesses";
 import ServicesSection from "@/components/sections/ServicesSection";
 import AboutUsSection from "@/components/sections/AboutUsSection";
-import SendMailForm from "@/components/sections/SendMailForm";
+import ContactUsForm from "@/components/sections/ContactUsForm";
 import Testimonials from "@/components/sections/TestimonialsSection";
 import NewsletterSection from "@/components/sections/NewsletterSection";
 import {
@@ -28,7 +28,7 @@ const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
 
   const heroSlides = data[HOME_PAGE_SETTINGS_KEYS.HERO_BANNER] || [];
   const faqSection = data[HOME_PAGE_SETTINGS_KEYS.FAQS_SECTION] || [];
-  const ads = data[HOME_PAGE_SETTINGS_KEYS.ADS] || [];
+  const ads = data[HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS] || [];
   const testimonialSection =
     data[HOME_PAGE_SETTINGS_KEYS.TESTIMONIALS_SECTION] || [];
   const services = data[HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION] || [];
@@ -64,7 +64,7 @@ const HomePageContent: React.FC<HomePageContentProps> = ({ data }) => {
         </SectionWrapper>
 
         <SectionWrapper index={6}>
-          <SendMailForm />
+          <ContactUsForm />
         </SectionWrapper>
       </Content>
     </Layout>

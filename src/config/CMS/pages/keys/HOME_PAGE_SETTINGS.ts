@@ -18,7 +18,7 @@ export const HOME_PAGE_SETTINGS_KEYS = {
   HERO_BANNER: `${pageName}-hero-banner`,
   CONTACT_US: `${pageName}-contact-us`,
   TESTIMONIALS_SECTION: `${pageName}-testimonials-section`,
-  ADS: `${pageName}-ads`,
+  RELATED_BUSINESS: `${pageName}-related-business`,
   FAQS_SECTION: `${pageName}-faqs-section`,
   CARDS: `${pageName}-cards`,
   SERVICES_SECTION: `${pageName}-services-section`,
@@ -156,11 +156,10 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
         },
       },
     },
-
-    [HOME_PAGE_SETTINGS_KEYS.ADS]: {
-      label: "Homepage Ads",
+    [HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]: {
+      label: "Related Businesses",
+      keyLabel: "Business",
       type: NestedFieldType.ARRAY,
-      keyLabel: "Ad",
       arrayDesign: ArrayDesign.PARENT,
       arrayFunctionalities: [
         ArrayFunctionality.SORTABLE,
@@ -172,40 +171,127 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
       },
       fields: {
         image: {
-          label: "Ad Image",
-          guide: "Image for the advertisement.",
+          label: "Banner Image",
+          guide:
+            "Main display image for the business (e.g., storefront, logo, banner).",
           formType: FormType.IMAGE_SELECTOR,
         },
         title: {
-          label: "Ad Title",
-          guide: "Title of the advertisement.",
+          label: "Business Name",
+          guide: "Name of the business or brand.",
           formType: FormType.LANGUAGE_JSON_TEXT,
         },
         subtitle: {
-          label: "Ad Subtitle",
-          guide: "Subtitle of the advertisement.",
+          label: "Short Tagline",
+          guide: "Catchy subtitle or motto (1–2 lines max).",
           formType: FormType.LANGUAGE_JSON_TEXT,
         },
         description: {
-          label: "Ad Description",
-          guide: "Description of the advertisement.",
+          label: "Business Description",
+          guide:
+            "Short paragraph describing this business. Avoid excessive text.",
           formType: FormType.LANGUAGE_JSON_TEXT,
+        },
+        website: {
+          label: "Website Link (Optional)",
+          guide: "Link to the official website, if available.",
+          formType: FormType.TEXT,
+        },
+        address: {
+          label: "Address",
+          guide: "Physical address of the business.",
+          formType: FormType.TEXTAREA,
+        },
+        email: {
+          label: "Contact Email",
+          guide: "Email address for enquiries.",
+          formType: FormType.TEXT,
+        },
+        mapLink: {
+          label: "Google Maps Link",
+          guide: "Embed or shareable map link.",
+          formType: FormType.TEXT,
+        },
+        operatingHours: {
+          label: "Operating Hours",
+          keyLabel: "Day",
+          type: NestedFieldType.ARRAY,
+          arrayDesign: ArrayDesign.FLAT_OUTSIDE,
+          fields: {
+            day: {
+              label: "Day of Week",
+              formType: FormType.SELECT,
+              options: [
+                { label: "Monday", value: "Monday" },
+                { label: "Tuesday", value: "Tuesday" },
+                { label: "Wednesday", value: "Wednesday" },
+                { label: "Thursday", value: "Thursday" },
+                { label: "Friday", value: "Friday" },
+                { label: "Saturday", value: "Saturday" },
+                { label: "Sunday", value: "Sunday" },
+              ],
+            },
+            open: {
+              label: "Opens At",
+              formType: FormType.TEXT,
+            },
+            close: {
+              label: "Closes At",
+              formType: FormType.TEXT,
+            },
+          },
         },
         contacts: {
           label: "Contact Numbers",
-          type: NestedFieldType.ARRAY,
           keyLabel: "Contact",
+          type: NestedFieldType.ARRAY,
           arrayDesign: ArrayDesign.FLAT_OUTSIDE,
           arrayFunctionalities: [ArrayFunctionality.SORTABLE],
           fields: {
             name: {
               label: "Contact Name",
-              guide: "Name of the contact for the ad.",
+              guide: "Person or role (e.g., Manager, Receptionist).",
               formType: FormType.TEXT,
             },
             number: {
               label: "Phone Number",
-              guide: "Phone number for the ad contact.",
+              guide: "Direct phone number to reach this contact.",
+              formType: FormType.TEXT,
+            },
+          },
+        },
+        tags: {
+          label: "Tags / Categories",
+          guide: "Add keywords like 'Legal', 'Accounting', 'Real Estate', etc.",
+          type: NestedFieldType.ARRAY,
+          keyLabel: "Tag",
+          arrayDesign: ArrayDesign.FLAT_OUTSIDE,
+          fields: {
+            value: {
+              label: "Tag Name",
+              guide: "Short label for category or tag.",
+              formType: FormType.TEXT,
+            },
+          },
+        },
+        socialLinks: {
+          label: "Social Links",
+          keyLabel: "Link",
+          type: NestedFieldType.ARRAY,
+          arrayDesign: ArrayDesign.FLAT_OUTSIDE,
+          fields: {
+            platform: {
+              label: "Platform",
+              formType: FormType.SELECT,
+              options: [
+                { label: "Facebook", value: "facebook" },
+                { label: "Instagram", value: "instagram" },
+                { label: "Twitter", value: "twitter" },
+                { label: "LinkedIn", value: "linkedin" },
+              ],
+            },
+            url: {
+              label: "URL",
               formType: FormType.TEXT,
             },
           },
@@ -453,16 +539,21 @@ export type HOME_PAGE_SETTINGS_TYPES = {
     }[];
   };
 
-  [HOME_PAGE_SETTINGS_KEYS.ADS]: {
+  [HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]: {
     title: LanguageJson;
-    subtitle: LanguageJson;
-    description: LanguageJson;
-    contacts: {
-      name: string;
-      number: string;
-    }[];
+    subtitle?: LanguageJson;
+    description?: LanguageJson;
     image: string;
+    website?: string;
+    address?: string;
+    email?: string;
+    mapLink?: string;
+    operatingHours?: { day: string; open: string; close: string }[];
+    socialLinks?: { platform: string; url: string }[];
+    contacts: { name: string; number: string }[];
+    tags?: { value: string }[];
   }[];
+
   [HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION]: {
     title: LanguageJson;
     description?: LanguageJson;

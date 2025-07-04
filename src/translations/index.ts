@@ -1,5 +1,4 @@
 import { LanguageJson } from "@/utils/getTranslatedText";
-
 export const commonFormValidations = {
   emailRequired: {
     en: "Please input your email!",
@@ -45,9 +44,31 @@ export const commonFormValidations = {
     th: "โปรดกรอกข้อความของคุณ!",
     my: "Sila masukkan mesej anda!",
   },
+  nameRequired: {
+    en: "Please input your name!",
+    fr: "Veuillez saisir votre nom !",
+    de: "Bitte geben Sie Ihren Namen ein!",
+    es: "¡Por favor ingrese su nombre!",
+    zh: "请输入您的姓名！",
+    ja: "お名前を入力してください！",
+    ko: "이름을 입력하세요!",
+    th: "โปรดกรอกชื่อของคุณ!",
+    my: "Sila masukkan nama anda!",
+  },
+  phoneValid: {
+    en: "Please enter a valid phone number!",
+    fr: "Veuillez saisir un numéro de téléphone valide !",
+    de: "Bitte geben Sie eine gültige Telefonnummer ein!",
+    es: "¡Por favor ingrese un número de teléfono válido!",
+    zh: "请输入有效的电话号码！",
+    ja: "有効な電話番号を入力してください！",
+    ko: "유효한 전화번호를 입력하세요!",
+    th: "โปรดกรอกหมายเลขโทรศัพท์ที่ถูกต้อง!",
+    my: "Sila masukkan nombor telefon yang sah!",
+  },
 };
 
-export const sendMailTranslations = {
+export const contactUsTranslations = {
   header: {
     en: "Need Legal Assistance?",
     fr: "Besoin d'aide juridique ?",
@@ -91,6 +112,28 @@ export const sendMailTranslations = {
     ko: "이메일 보내기",
     th: "ส่งอีเมล",
     my: "Hantar E-mel",
+  },
+  yourName: {
+    en: "Your Name",
+    fr: "Votre nom",
+    de: "Ihr Name",
+    es: "Su nombre",
+    zh: "您的姓名",
+    ja: "あなたの名前",
+    ko: "귀하의 이름",
+    th: "ชื่อของคุณ",
+    my: "Nama anda",
+  },
+  phoneNumber: {
+    en: "Phone Number (Optional)",
+    fr: "Numéro de téléphone (facultatif)",
+    de: "Telefonnummer (optional)",
+    es: "Número de teléfono (opcional)",
+    zh: "电话号码（可选）",
+    ja: "電話番号（任意）",
+    ko: "전화번호 (선택 사항)",
+    th: "เบอร์โทรศัพท์ (ไม่จำเป็น)",
+    my: "Nombor telefon (Pilihan)",
   },
   yourEmail: {
     en: "Your Email",
@@ -136,7 +179,6 @@ export const sendMailTranslations = {
     th: "ส่งอีเมล",
     my: "Hantar E-mel",
   },
-
   notifSuccess: {
     en: "Email sent successfully!",
     fr: "E-mail envoyé avec succès !",
@@ -171,6 +213,7 @@ export const sendMailTranslations = {
     my: "Gagal menghantar e-mel, sila cuba lagi kemudian.",
   },
 };
+
 export const commonTranslations = {
   readMore: {
     en: "Read More",

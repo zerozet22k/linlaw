@@ -2,7 +2,7 @@
 
 import React, { ReactNode, CSSProperties } from "react";
 import { Layout, Typography } from "antd";
-import SendMailForm from "../sections/SendMailForm";
+import ContactUsForm from "../sections/ContactUsForm";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
 
@@ -103,7 +103,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
       </Content>
 
       <div style={{ width: "100%" }}>
-        <SendMailForm />
+        <ContactUsForm />
       </div>
     </Layout>
   );

@@ -5,9 +5,9 @@ import { Button, Modal, Form, Input, notification } from "antd";
 import apiClient from "@/utils/api/apiClient";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
-import { sendMailTranslations, commonFormValidations } from "@/translations";
+import { contactUsTranslations, commonFormValidations } from "@/translations";
 
-const SendMailForm: React.FC = () => {
+const ContactUsForm: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -17,6 +17,8 @@ const SendMailForm: React.FC = () => {
     setLoading(true);
     try {
       const response = await apiClient.post("/contact-us", {
+        name: values.name || "",
+        phone: values.phone || "",
         email: values.email,
         subject: values.subject,
         message: values.message,
@@ -25,7 +27,7 @@ const SendMailForm: React.FC = () => {
       if (response.status === 200) {
         notification.success({
           message: getTranslatedText(
-            sendMailTranslations.notifSuccess,
+            contactUsTranslations.notifSuccess,
             language
           ),
         });
@@ -34,14 +36,17 @@ const SendMailForm: React.FC = () => {
       } else {
         throw new Error(
           response.data.error ||
-            getTranslatedText(sendMailTranslations.notifFailure, language)
+            getTranslatedText(contactUsTranslations.notifFailure, language)
         );
       }
     } catch (error: any) {
       notification.error({
         message:
           error?.message ||
-          getTranslatedText(sendMailTranslations.notifGenericFailure, language),
+          getTranslatedText(
+            contactUsTranslations.notifGenericFailure,
+            language
+          ),
       });
     } finally {
       setLoading(false);
@@ -53,39 +58,75 @@ const SendMailForm: React.FC = () => {
       <div
         style={{
           textAlign: "center",
-          marginTop: "40px",
-          padding: "30px",
-
-          borderRadius: "8px",
+          marginTop: 40,
+          padding: 30,
+          borderRadius: 8,
         }}
       >
-        <h2
-          style={{ fontSize: "26px", fontWeight: "bold", marginBottom: "10px" }}
-        >
-          {getTranslatedText(sendMailTranslations.header, language)}
+        <h2 style={{ fontSize: 26, fontWeight: "bold", marginBottom: 10 }}>
+          {getTranslatedText(contactUsTranslations.header, language)}
         </h2>
-        <p style={{ fontSize: "18px", lineHeight: "1.6", color: "#555" }}>
-          {getTranslatedText(sendMailTranslations.subheader, language)}
+        <p style={{ fontSize: 18, lineHeight: 1.6, color: "#555" }}>
+          {getTranslatedText(contactUsTranslations.subheader, language)}
         </p>
         <Button
           type="primary"
           size="large"
-          style={{ marginTop: "10px", fontSize: "18px" }}
+          style={{ marginTop: 10, fontSize: 18 }}
           onClick={() => setVisible(true)}
         >
-          {getTranslatedText(sendMailTranslations.buttonLabel, language)}
+          {getTranslatedText(contactUsTranslations.buttonLabel, language)}
         </Button>
       </div>
 
       <Modal
-        title={getTranslatedText(sendMailTranslations.modalTitle, language)}
-        visible={visible}
+        title={getTranslatedText(contactUsTranslations.modalTitle, language)}
+        open={visible}
         onCancel={() => setVisible(false)}
         footer={null}
+        destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleSendEmail}>
+          {/* Name (required) */}
           <Form.Item
-            label={getTranslatedText(sendMailTranslations.yourEmail, language)}
+            label={getTranslatedText(contactUsTranslations.yourName, language)}
+            name="name"
+            rules={[
+              {
+                required: true,
+                message: getTranslatedText(
+                  commonFormValidations.nameRequired,
+                  language
+                ),
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          {/* Phone (optional) */}
+          <Form.Item
+            label={getTranslatedText(
+              contactUsTranslations.phoneNumber,
+              language
+            )}
+            name="phone"
+            rules={[
+              {
+                pattern: /^\+?\d{7,15}$/,
+                message: getTranslatedText(
+                  commonFormValidations.phoneValid,
+                  language
+                ),
+              },
+            ]}
+          >
+            <Input placeholder="+66987654321" />
+          </Form.Item>
+
+          {/* Email */}
+          <Form.Item
+            label={getTranslatedText(contactUsTranslations.yourEmail, language)}
             name="email"
             rules={[
               {
@@ -107,8 +148,9 @@ const SendMailForm: React.FC = () => {
             <Input />
           </Form.Item>
 
+          {/* Subject */}
           <Form.Item
-            label={getTranslatedText(sendMailTranslations.subject, language)}
+            label={getTranslatedText(contactUsTranslations.subject, language)}
             name="subject"
             rules={[
               {
@@ -123,8 +165,9 @@ const SendMailForm: React.FC = () => {
             <Input />
           </Form.Item>
 
+          {/* Message */}
           <Form.Item
-            label={getTranslatedText(sendMailTranslations.message, language)}
+            label={getTranslatedText(contactUsTranslations.message, language)}
             name="message"
             rules={[
               {
@@ -141,7 +184,7 @@ const SendMailForm: React.FC = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              {getTranslatedText(sendMailTranslations.sendEmail, language)}
+              {getTranslatedText(contactUsTranslations.sendEmail, language)}
             </Button>
           </Form.Item>
         </Form>
@@ -150,4 +193,4 @@ const SendMailForm: React.FC = () => {
   );
 };
 
-export default SendMailForm;
+export default ContactUsForm;

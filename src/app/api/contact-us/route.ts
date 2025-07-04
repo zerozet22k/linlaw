@@ -1,8 +1,10 @@
+// app/api/contact-us/route.ts  (server handler - Next 13/14 app router)
+
 import { NextResponse } from "next/server";
 import MailService from "@/services/MailService";
 
 const rateLimitMap = new Map<string, number[]>();
-const RATE_LIMIT_WINDOW = 60 * 1000;
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 min
 const MAX_REQUESTS = 5;
 
 export const POST = async (request: Request) => {
@@ -24,18 +26,26 @@ export const POST = async (request: Request) => {
       );
     }
 
+    // Parse body
     const body = await request.json();
-    const { email, subject, message } = body;
-    if (!email || !subject || !message) {
+    const { name = "", phone = "", email, subject, message } = body;
+
+    if (!email || !subject || !message || !name) {
       return NextResponse.json(
-        { error: "Email, subject, and message are required." },
+        { error: "Name, email, subject and message are required." },
         { status: 400 }
       );
     }
 
     const mailService = new MailService();
 
-    const fullMessage = `Sender Email: ${email}\n\n${message}`;
+    const fullMessage = [
+      `Sender Name : ${name}`,
+      `Sender Email: ${email}`,
+      `Phone       : ${phone || "N/A"}`,
+      "",
+      message,
+    ].join("\n");
 
     await mailService.receiveMail(subject, fullMessage);
 

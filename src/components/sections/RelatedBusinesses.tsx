@@ -11,10 +11,18 @@ import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 import { commonTranslations } from "@/translations";
 
-const RelatedBusinesses: React.FC<{
-  cards?: HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.ADS];
-}> = ({ cards = [] }) => {
+type BusinessList =
+  HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS];
+
+const RelatedBusinesses: React.FC<{ cards?: BusinessList }> = ({
+  cards = [],
+}) => {
   const { language } = useLanguage();
+
+  // Filter out any null/undefined entries
+  const validCards = cards.filter((b): b is NonNullable<typeof b> =>
+    Boolean(b)
+  );
 
   return (
     <section style={{ padding: "40px 20px" }}>
@@ -31,10 +39,10 @@ const RelatedBusinesses: React.FC<{
           {getTranslatedText(commonTranslations.relatedBusinessTitle, language)}
         </h2>
         <Row gutter={[24, 24]} justify="center">
-          {cards.length > 0 ? (
-            cards.map((ad, index) => (
+          {validCards.length > 0 ? (
+            validCards.map((business, index) => (
               <Col key={index} xs={24} sm={12} md={8} lg={6}>
-                <RelatedBusiness ad={ad} />
+                <RelatedBusiness business={business} />
               </Col>
             ))
           ) : (
