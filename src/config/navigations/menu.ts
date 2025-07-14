@@ -129,7 +129,6 @@ export const dashboardMenu: NavigationMenuItem[] = [
     access: ROUTES[ROUTE_KEYS.SETTINGS].access,
   },
 ];
-
 export const mainMenu: NavigationMenuItem[] = [
   {
     key: ROUTE_KEYS.HOME,
@@ -149,13 +148,13 @@ export const mainMenu: NavigationMenuItem[] = [
     label: ROUTES[ROUTE_KEYS.SERVICES].label!,
     link: ROUTES[ROUTE_KEYS.SERVICES].path,
   },
+
   {
     key: ROUTE_KEYS.TEAM_MEMBERS,
     icon: ROUTES[ROUTE_KEYS.TEAM_MEMBERS].icon!,
     label: ROUTES[ROUTE_KEYS.TEAM_MEMBERS].label!,
     link: ROUTES[ROUTE_KEYS.TEAM_MEMBERS].path,
   },
-
   {
     key: ROUTE_KEYS.NEWSLETTERS,
     icon: ROUTES[ROUTE_KEYS.NEWSLETTERS].icon!,
