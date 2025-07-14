@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { Spin, Alert, Typography, theme } from "antd";
 import { useParams } from "next/navigation";
@@ -11,33 +12,28 @@ const { useToken } = theme;
 
 const TeamMemberPage: React.FC = () => {
   const [user, setUser] = useState<UserAPI | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const params = useParams();
-  const userId = params?.id as string;
+
+  const params = useParams<{ id: string }>();
+  const userId = params?.id;
 
   const { token } = useToken();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    if (!userId) return;
+
+    (async () => {
       try {
-        const response = await apiClient.get<UserAPI>(`/team/${userId}`);
-        if (response.data) {
-          setUser(response.data);
-        } else {
-          throw new Error("User not found");
-        }
+        const { data } = await apiClient.get<UserAPI>(`/team/${userId}`);
+        setUser(data);
       } catch (err) {
         console.error("Error fetching user:", err);
         setError("Failed to load user.");
       } finally {
         setLoading(false);
       }
-    };
-
-    if (userId) {
-      fetchUser();
-    }
+    })();
   }, [userId]);
 
   if (loading) {
@@ -50,15 +46,15 @@ const TeamMemberPage: React.FC = () => {
     return (
       <Alert
         message="Error"
-        description={error || "User not found"}
+        description={error ?? "User not found"}
         type="error"
         showIcon
-        style={{ margin: "40px" }}
+        style={{ margin: 40 }}
       />
     );
   }
 
-  const glassBackground = rgba(token.colorBgContainer, 0.2);
+  const glass = rgba(token.colorBgContainer, 0.2);
 
   return (
     <div
@@ -78,35 +74,33 @@ const TeamMemberPage: React.FC = () => {
         <path
           fill={token.colorTextBase}
           fillOpacity="0.03"
-          d="M0,224L48,224C96,224,192,224,288,202.7C384,181,480,139,576,138.7C672,139,768,181,864,186.7C960,192,1056,160,1152,165.3C1248,171,1344,213,1392,234.7L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+          d="M0,224L48,224C96,224,192,224,288,202.7C384,181,480,139,576,138.7C672,139,768,181,864,186.7C960,192,1056,160,1152,165.3C1248,171,1344,213,1392,234.7L1440,256V320H0Z"
         />
       </svg>
 
-      {/* Centered Container */}
       <div
         style={{
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px",
+          padding: 20,
           color: token.colorTextBase,
         }}
       >
-        {/* Glassmorphism Card */}
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             width: "90%",
-            maxWidth: "1200px",
-            borderRadius: "20px",
+            maxWidth: 1200,
+            borderRadius: 20,
             overflow: "hidden",
-            backgroundColor: glassBackground,
+            backgroundColor: glass,
             backdropFilter: "blur(10px)",
           }}
         >
-          {/* Portrait Section */}
+          {/* hero / cover */}
           <div
             style={{
               flex: "1 1 40%",
@@ -115,8 +109,8 @@ const TeamMemberPage: React.FC = () => {
             }}
           >
             <img
-              src={user.cover_image || "/images/default-cover.jpg"}
-              alt={`${user.name || user.username} portrait`}
+              src={user.cover_image ?? "/images/default-cover.jpg"}
+              alt={`${user.name ?? user.username} cover`}
               style={{
                 width: "100%",
                 height: "100%",
@@ -132,11 +126,11 @@ const TeamMemberPage: React.FC = () => {
             />
           </div>
 
-          {/* Details Section */}
+          {/* details */}
           <div
             style={{
               flex: "1 1 60%",
-              padding: "40px",
+              padding: 40,
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
@@ -144,31 +138,23 @@ const TeamMemberPage: React.FC = () => {
           >
             <Title
               level={2}
-              style={{ marginBottom: "0.5em", color: token.colorTextHeading }}
+              style={{ marginBottom: 8, color: token.colorTextHeading }}
             >
-              {user.name || user.username}
+              {user.name ?? user.username}
             </Title>
+
             {user.position && (
               <Title
                 level={4}
-                style={{
-                  marginBottom: "1em",
-                  color: token.colorTextDescription,
-                }}
+                style={{ marginBottom: 16, color: token.colorTextDescription }}
               >
                 {user.position}
               </Title>
             )}
-            <Paragraph
-              style={{
-                fontSize: "16px",
-                lineHeight: "1.6",
-                marginBottom: "1.5em",
-              }}
-            >
+
+            <Paragraph style={{ fontSize: 16, lineHeight: 1.6 }}>
               {user.bio || "No biography available."}
             </Paragraph>
-          
           </div>
         </div>
       </div>

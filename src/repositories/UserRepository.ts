@@ -75,6 +75,23 @@ class UserRepository {
       .populate("roles")
       .exec();
   }
+  async findByIdsPreserveOrder(ids: Types.ObjectId[]): Promise<User[]> {
+    if (!ids.length) return [];
+
+    await dbConnect();
+    const users = await this.userModel
+      .find({ _id: { $in: ids } })
+      .select("-hashedPassword -salt -tokens")
+      .populate("roles")
+      .exec();
+
+    const rank = new Map(ids.map((id, i) => [id.toString(), i]));
+    users.sort(
+      (a: User, b: User) =>
+        (rank.get(a._id.toString()) ?? 0) - (rank.get(b._id.toString()) ?? 0)
+    );
+    return users;
+  }
   async findByRole(roleId: Types.ObjectId): Promise<User[]> {
     await dbConnect();
 

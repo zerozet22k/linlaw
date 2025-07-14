@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Typography, Spin, Alert } from "antd";
+import React, { useEffect, useState } from "react";
+import { Spin, Alert, Typography } from "antd";
 import ImageComponent from "@/components/ui/ImageComponent";
 import apiClient from "@/utils/api/apiClient";
 import CustomCarousel from "@/components/sections/CustomCarousel";
@@ -9,60 +9,44 @@ import {
   TEAM_PAGE_SETTINGS_KEYS,
   TEAM_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
+import { UserAPI } from "@/models/UserModel";
+import { TeamBlockAPI } from "@/models/TeamBlock";
 
 const { Title, Text } = Typography;
-
-interface TeamMember {
-  id: number;
-  name: string;
-  bio: string;
-  avatar: string;
-}
 
 type TeamSectionProps = {
   teamSection: TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 };
 
 const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
-  const maxMembersCount = teamSection?.maxMembersCount || 5;
+  const maxMembers = teamSection?.maxMembersCount ?? 5;
 
-  const [teamMembers, setTeamMembers] = React.useState<TeamMember[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [members, setMembers] = useState<UserAPI[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    const fetchTeamMembers = async () => {
+  useEffect(() => {
+    (async () => {
       try {
-        const response = await apiClient.get<TeamMember[]>("/team");
-        if (response.data && Array.isArray(response.data)) {
-          setTeamMembers(response.data.slice(0, maxMembersCount));
-        } else {
-          throw new Error("Unexpected response format");
-        }
-      } catch (err: any) {
+        const { data: blocks } = await apiClient.get<TeamBlockAPI[]>("/team");
+        const flat = blocks.flatMap((b) => b.members);
+        setMembers(maxMembers > 0 ? flat.slice(0, maxMembers) : flat);
+      } catch (err) {
         console.error("Failed to fetch team members:", err);
         setError("Unable to load team members. Please try again later.");
       } finally {
         setLoading(false);
       }
-    };
+    })();
+  }, [maxMembers]);
 
-    fetchTeamMembers();
-  }, [maxMembersCount]);
-
-  if (!loading && !error && teamMembers.length === 0) {
-    return null;
-  }
+  if (!loading && !error && members.length === 0) return null;
 
   return (
-    <div style={{ padding: "60px 0", backgroundColor: "rgb(0, 21, 41)" }}>
+    <section style={{ padding: "60px 0", backgroundColor: "rgb(0, 21, 41)" }}>
       <Title
         level={2}
-        style={{
-          textAlign: "center",
-          color: "white",
-          marginBottom: "40px",
-        }}
+        style={{ textAlign: "center", color: "#fff", marginBottom: 40 }}
       >
         Meet Our Team
       </Title>
@@ -79,63 +63,49 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
         </div>
       )}
 
-      {teamMembers.length > 0 && (
-        <div style={{ margin: "0 auto" }}>
+      {members.length > 0 && (
+        <div style={{ margin: "0 auto", maxWidth: 1200 }}>
           <CustomCarousel autoplay slidesToShow={3} dots infinite>
-            {teamMembers.map((member) => (
+            {members.map((m) => (
               <div
-                key={member.id}
+                key={m._id}
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center",
                   alignItems: "center",
                   textAlign: "center",
-                  padding: "20px",
-                  margin: "0 auto",
-                  height: "300px",
+                  padding: 20,
+                  height: 300,
                 }}
               >
-                <div
+                <ImageComponent
+                  src={m.avatar || "/images/default-avatar.webp"}
+                  alt={m.name || m.username}
+                  width={120}
+                  height={120}
+                  objectFit="cover"
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    borderRadius: "50%",
+                    border: "4px solid #1890ff",
+                    marginBottom: 10,
                   }}
+                  priority
+                />
+                <Title
+                  level={4}
+                  style={{ color: "#fff", margin: "10px 0 5px" }}
                 >
-                  <ImageComponent
-                    src={member.avatar}
-                    alt={member.name}
-                    width={120}
-                    height={120}
-                    objectFit="cover"
-                    style={{
-                      borderRadius: "50%",
-                      border: "4px solid #1890ff",
-                      marginBottom: "10px",
-                    }}
-                    priority
-                  />
-                  <Title
-                    level={4}
-                    style={{
-                      color: "white",
-                      margin: "10px 0 5px",
-                    }}
-                  >
-                    {member.name}
-                  </Title>
-                  <Text style={{ color: "white", fontSize: "14px" }}>
-                    {member.bio}
-                  </Text>
-                </div>
+                  {m.name || m.username}
+                </Title>
+                <Text style={{ color: "#fff", fontSize: 14 }}>
+                  {m.bio || "No bio available."}
+                </Text>
               </div>
             ))}
           </CustomCarousel>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

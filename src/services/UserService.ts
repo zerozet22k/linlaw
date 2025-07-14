@@ -10,6 +10,14 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { APP_PERMISSIONS, GUEST_APP_PERMISSIONS } from "@/config/permissions";
 import { DeviceToken } from "@/models/Users/DeviceToken";
+import {
+  TEAM_PAGE_SETTINGS_KEYS,
+  TEAM_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
+import { TeamBlock } from "@/models/TeamBlock";
+
+type TeamSectionsType =
+  TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 
 class UserService {
   async getAllUsers(
@@ -48,7 +56,67 @@ class UserService {
     const objectIds = userIds.map((id) => toObjectId(id));
     return userRepository.findByIds(objectIds);
   }
+  async getTeamMembersOrdered(
+    sections: TeamSectionsType
+  ): Promise<TeamBlock[]> {
+    const {
+      members,
+      positionOrder = [],
+      intraPositionSort = "manual",
+      maxMembersCount,
+    } = sections;
 
+    if (!members.length) return [];
+
+    /* 1️⃣ picker order */
+    const ids = members.map(toObjectId);
+    const users = await userRepository.findByIdsPreserveOrder(ids);
+
+    /* 2️⃣ bucket by position */
+    const buckets = new Map<string, User[]>();
+    for (const u of users) {
+      const pos = u.position || "Unassigned";
+      if (!buckets.has(pos)) buckets.set(pos, []);
+      buckets.get(pos)!.push(u);
+    }
+
+    /* 3️⃣ sort inside each bucket (if date-based) */
+    if (intraPositionSort !== "manual") {
+      buckets.forEach((arr) => {
+        arr.sort((a: User, b: User) =>
+          intraPositionSort === "createdAsc"
+            ? +a.created_at - +b.created_at
+            : +b.created_at - +a.created_at
+        );
+      });
+    }
+
+    /* 4️⃣ order buckets themselves */
+    const orderIdx = new Map(positionOrder.map((p, i) => [p.value, i]));
+    const orderedBlocks: TeamBlock[] = Array.from(buckets.entries())
+      .sort(
+        ([pA], [pB]) => (orderIdx.get(pA) ?? 1e9) - (orderIdx.get(pB) ?? 1e9)
+      )
+      .map(([position, members]) => ({ position, members }));
+
+    /* 5️⃣ optional global cap  */
+    if (maxMembersCount && maxMembersCount > 0) {
+      let remaining = maxMembersCount;
+      for (const block of orderedBlocks) {
+        if (remaining <= 0) {
+          block.members = [];
+          continue;
+        }
+        if (block.members.length > remaining) {
+          block.members = block.members.slice(0, remaining);
+        }
+        remaining -= block.members.length;
+      }
+      return orderedBlocks.filter((b) => b.members.length); // drop empty
+    }
+
+    return orderedBlocks;
+  }
   async setupDefaultRolesAndSystemUser(userData: Partial<User>): Promise<void> {
     let systemRole = await roleRepository.findByRoleType(RoleType.SYSTEM);
 

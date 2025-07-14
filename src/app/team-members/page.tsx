@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+
 import React from "react";
 import TeamContent from "./content";
 import PageService from "@/services/PageService";
@@ -15,6 +16,8 @@ const getDefaultTeamData = () => ({
   [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxMembersCount: 8,
     members: [],
+    positionOrder: [],
+    intraPositionSort: "manual",
   },
 });
 
@@ -23,12 +26,7 @@ const fetchTeamData = async () => {
   const fetchedData = await pageService.getPagesByKeys(
     Object.values(TEAM_PAGE_SETTINGS_KEYS)
   );
-  const defaultData = getDefaultTeamData();
-  const mergedData = {
-    ...defaultData,
-    ...fetchedData,
-  };
-  return mergedData;
+  return { ...getDefaultTeamData(), ...fetchedData };
 };
 
 const TeamMembersPage = async () => {

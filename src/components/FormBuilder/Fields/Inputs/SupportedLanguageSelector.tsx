@@ -1,18 +1,19 @@
 "use client";
+
 import React, { CSSProperties } from "react";
-import { Select, theme } from "antd";
-import { lighten } from "polished";
+import { Avatar, Select, Tag, theme } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import { defaultWrapperStyle, defaultSelectStyle } from "../../InputStyle";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
 
-interface SupportedLanguageSelectorProps {
+const { Option } = Select;
+
+interface Props {
   value?: string[];
-  onChange?: (languages: string[]) => void;
+  onChange?: (v: string[]) => void;
   style?: CSSProperties;
   inputStyle?: CSSProperties;
 }
-
-const { Option } = Select;
 
 export const languageFlags: Record<string, string> = {
   en: "us",
@@ -26,21 +27,50 @@ export const languageFlags: Record<string, string> = {
   my: "mm",
 };
 
-const SupportedLanguageSelector: React.FC<SupportedLanguageSelectorProps> = ({
+const SupportedLanguageSelector: React.FC<Props> = ({
   value = [],
   onChange,
   style = {},
   inputStyle = {},
 }) => {
   const { token } = theme.useToken();
-  const lightShade = lighten(0.03, token.colorBgContainer);
 
-  // Always ensure 'en' is included
-  const selectedLanguages = Array.from(new Set(["en", ...(value || [])]));
+  const selected = Array.from(new Set(["en", ...value]));
 
-  const handleChange = (languages: string[]) => {
-    const updatedLanguages = Array.from(new Set(["en", ...languages]));
-    onChange?.(updatedLanguages);
+  const handleChange = (langs: string[]) => {
+    onChange?.(Array.from(new Set(["en", ...langs])));
+  };
+
+  const tagRender = (props: any) => {
+    const { value: langValue, closable, onClose } = props;
+    const lang = typeof langValue === "string" ? langValue : "";
+    const flag = getFlagUrl(languageFlags[lang] ?? "un", 20);
+
+    return (
+      <Tag
+        style={{
+          display: "flex",
+          alignItems: "center",
+          paddingInline: 8,
+          paddingBlock: 4,
+          borderRadius: 18,
+          background: token.colorFillSecondary,
+          border: "none",
+          margin: 4,
+        }}
+        closable={closable && lang !== "en"}
+        closeIcon={<CloseOutlined style={{ fontSize: 12, opacity: 0.6 }} />}
+        onClose={onClose}
+      >
+        <Avatar
+          src={flag}
+          size={16}
+          shape="square"
+          style={{ marginRight: 6 }}
+        />
+        {lang.toUpperCase()}
+      </Tag>
+    );
   };
 
   return (
@@ -48,45 +78,36 @@ const SupportedLanguageSelector: React.FC<SupportedLanguageSelectorProps> = ({
       style={{
         ...defaultWrapperStyle,
         ...style,
+        width: "100%",
+        display: "block",
       }}
     >
       <Select
         mode="multiple"
-        value={selectedLanguages}
+        size="large"
+        value={selected}
         onChange={handleChange}
         placeholder="Select supported languages"
+        tagRender={tagRender}
+        popupMatchSelectWidth={false}
         style={{
           ...defaultSelectStyle,
           ...inputStyle,
-          backgroundColor: token.colorBgElevated,
-          border: `1px solid ${token.colorBorder}`,
+          width: "100%",
+          minHeight: 44,
         }}
-        optionLabelProp="label"
       >
-        {Object.keys(languageFlags).map((lang) => {
-          const countryCode = languageFlags[lang] || "un";
-          const flagUrl = getFlagUrl(countryCode, 40);
-          const label = (
-            <span style={{ display: "flex", alignItems: "center" }}>
-              <img
-                src={flagUrl}
-                alt={lang}
-                style={{ width: 20, height: 14, marginRight: 8 }}
-              />
-              <span>{lang.toUpperCase()}</span>
-            </span>
-          );
-          return (
-            <Option
-              key={lang}
-              value={lang}
-              disabled={lang === "en"}
-              label={label}
-            >
-              {label}
-            </Option>
-          );
-        })}
+        {Object.keys(languageFlags).map((lang) => (
+          <Option key={lang} value={lang} disabled={lang === "en"}>
+            <Avatar
+              src={getFlagUrl(languageFlags[lang] ?? "un", 20)}
+              size={16}
+              shape="square"
+              style={{ marginRight: 8 }}
+            />
+            {lang.toUpperCase()}
+          </Option>
+        ))}
       </Select>
     </div>
   );

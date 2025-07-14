@@ -7,7 +7,7 @@ import FieldRow from "./FieldDesigns/FieldRow";
 
 type FieldDesignRendererProps = {
   design: FieldDesign;
-  label?: string; // Optional, but will be checked before rendering
+  label?: string;
   guide?: string;
   renderItem: () => React.ReactNode;
   extra?: React.ReactNode;
