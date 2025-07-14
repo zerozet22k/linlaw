@@ -20,7 +20,6 @@ export const HOME_PAGE_SETTINGS_KEYS = {
   TESTIMONIALS_SECTION: `${pageName}-testimonials-section`,
   RELATED_BUSINESS: `${pageName}-related-business`,
   FAQS_SECTION: `${pageName}-faqs-section`,
-  // CARDS: `${pageName}-cards`,
   SERVICES_SECTION: `${pageName}-services-section`,
   ABOUT_US_SECTION: `${pageName}-about-us-section`,
 } as const;
@@ -298,46 +297,6 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
         },
       },
     },
-
-    // [HOME_PAGE_SETTINGS_KEYS.CARDS]: {
-    //   label: "Info Cards",
-    //   type: NestedFieldType.ARRAY,
-    //   keyLabel: "Card",
-    //   arrayDesign: ArrayDesign.PARENT,
-    //   arrayFunctionalities: [
-    //     ArrayFunctionality.SORTABLE,
-    //     ArrayFunctionality.FILTERABLE,
-    //   ],
-    //   modalBehavior: {
-    //     [ModalBehaviorType.OPEN_IN_MODAL]: false,
-    //     [ModalBehaviorType.ITEM_MODAL]: true,
-    //   },
-    //   fields: {
-    //     title: {
-    //       label: "Card Title",
-    //       guide: "Title for the information card.",
-    //       formType: FormType.LANGUAGE_JSON_TEXT,
-    //     },
-    //     description: {
-    //       label: "Card Description",
-    //       guide: "Short description for the information card.",
-    //       formType: FormType.LANGUAGE_JSON_TEXTAREA,
-    //     },
-    //     images: {
-    //       label: "Card Images",
-    //       type: NestedFieldType.ARRAY,
-    //       keyLabel: "Image",
-    //       arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-    //       fields: {
-    //         imageUrl: {
-    //           label: "Image URL",
-    //           guide: "Image Url for the image",
-    //           formType: FormType.IMAGE_SELECTOR,
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
     [HOME_PAGE_SETTINGS_KEYS.FAQS_SECTION]: {
       label: "FAQ Section",
       type: NestedFieldType.JSON,
@@ -588,11 +547,4 @@ export type HOME_PAGE_SETTINGS_TYPES = {
     }[];
   };
 
-  // [HOME_PAGE_SETTINGS_KEYS.CARDS]: {
-  //   title: LanguageJson;
-  //   description: LanguageJson;
-  //   images: {
-  //     imageUrl: string;
-  //   }[];
-  // }[];
 };
