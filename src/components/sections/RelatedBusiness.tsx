@@ -25,6 +25,7 @@ import {
 } from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
+import { commonTranslations } from "@/translations";
 import {
   HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
@@ -33,7 +34,7 @@ import {
 const { Title, Text, Paragraph } = Typography;
 
 type BusinessItem =
-  HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS][number];
+  HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]["items"][number];
 
 const platformIcons: Record<string, React.ReactNode> = {
   facebook: <FacebookFilled />,
@@ -48,6 +49,14 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   if (!business) return null;
+
+  // Localized static labels
+  const tWebsite = "Website";
+  const tViewDetails =
+    getTranslatedText(commonTranslations.details, language) || "View Details";
+  const tOperatingHours = "Operating Hours";
+  const tSocialLinks = "Social Links";
+  const tMapLocation = "Map Location";
 
   const hasContacts =
     Array.isArray(business.contacts) && business.contacts.length > 0;
@@ -68,7 +77,9 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
               style={{
                 width: "100%",
                 paddingTop: "56.25%",
-                background: `url(${business.image}) center/cover no-repeat`,
+                background: `url(${
+                  business.image ?? ""
+                }) center/cover no-repeat`,
               }}
             />
           )
@@ -76,35 +87,41 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
         style={{ maxWidth: 500, margin: "auto", borderRadius: 12 }}
         bodyStyle={{ padding: 20 }}
       >
-        <Title level={4}>{getTranslatedText(business.title, language)}</Title>
+        <Title level={4}>
+          {getTranslatedText(business.title ?? undefined, language)}
+        </Title>
+
         {business.subtitle && (
           <Text type="secondary">
-            {getTranslatedText(business.subtitle, language)}
+            {getTranslatedText(business.subtitle ?? undefined, language)}
           </Text>
         )}
+
         {Array.isArray(business.tags) && business.tags.length > 0 && (
           <div style={{ margin: "8px 0" }}>
             {business.tags.map((t, i) => (
-              <Tag key={i}>{t.value}</Tag>
+              <Tag key={i}>{t.value ?? ""}</Tag>
             ))}
           </div>
         )}
+
         <Paragraph ellipsis={{ rows: 3 }}>
-          {getTranslatedText(business.description, language)}
+          {getTranslatedText(business.description ?? undefined, language)}
         </Paragraph>
+
         <Space size="middle" style={{ marginTop: 16 }}>
           {business.website && (
             <Button
               type="link"
               icon={<GlobalOutlined />}
-              href={business.website}
+              href={business.website ?? "#"}
               target="_blank"
             >
-              Website
+              {tWebsite}
             </Button>
           )}
           <Button icon={<InfoCircleOutlined />} onClick={() => setOpen(true)}>
-            View Details
+            {tViewDetails}
           </Button>
         </Space>
       </Card>
@@ -117,7 +134,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
         width="100%"
         style={{ top: 0, padding: 0 }}
         bodyStyle={{ padding: 32 }}
-        title={getTranslatedText(business.title, language)}
+        title={getTranslatedText(business?.title ?? undefined, language)}
       >
         <div style={{ maxWidth: 960, margin: "auto" }}>
           {/* Banner */}
@@ -126,7 +143,9 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
               style={{
                 width: "100%",
                 paddingTop: "45%",
-                background: `url(${business.image}) center/cover no-repeat`,
+                background: `url(${
+                  business?.image ?? ""
+                }) center/cover no-repeat`,
                 borderRadius: 8,
                 marginBottom: 24,
               }}
@@ -136,11 +155,11 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
           {/* Basic Info */}
           {business.subtitle && (
             <Title level={5}>
-              {getTranslatedText(business.subtitle, language)}
+              {getTranslatedText(business.subtitle ?? undefined, language)}
             </Title>
           )}
           <Paragraph style={{ fontSize: 16, marginBottom: 24 }}>
-            {getTranslatedText(business.description, language)}
+            {getTranslatedText(business.description ?? undefined, language)}
           </Paragraph>
 
           {/* Contact Info */}
@@ -149,13 +168,13 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
             dataSource={[
               business.address && {
                 icon: <EnvironmentOutlined />,
-                content: <Text>{business.address}</Text>,
+                content: <Text>{business.address ?? ""}</Text>,
               },
               business.email && {
                 icon: <MailOutlined />,
                 content: (
-                  <a href={`mailto:${business.email}`}>
-                    <Text>{business.email}</Text>
+                  <a href={`mailto:${business.email ?? ""}`}>
+                    <Text>{business.email ?? ""}</Text>
                   </a>
                 ),
               },
@@ -163,10 +182,10 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
                 icon: <PhoneOutlined />,
                 content: (
                   <div>
-                    {business.contacts.map((c, i) => (
+                    {business.contacts?.map((c, i) => (
                       <div key={i}>
-                        <Text strong>{c.name}:</Text>{" "}
-                        <a href={`tel:${c.number}`}>{c.number}</a>
+                        <Text strong>{c.name ?? ""}:</Text>{" "}
+                        <a href={`tel:${c.number ?? ""}`}>{c.number ?? ""}</a>
                       </div>
                     ))}
                   </div>
@@ -183,14 +202,14 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
           {/* Operating Hours */}
           {hasHours && (
             <>
-              <Divider>Operating Hours</Divider>
+              <Divider>{tOperatingHours}</Divider>
               <List
-                dataSource={business.operatingHours}
+                dataSource={business.operatingHours ?? []}
                 renderItem={(h) => (
                   <List.Item>
                     <ClockCircleOutlined style={{ marginRight: 8 }} />
                     <Text>
-                      {h.day}: {h.open} – {h.close}
+                      {h.day ?? ""}: {h.open ?? ""} – {h.close ?? ""}
                     </Text>
                   </List.Item>
                 )}
@@ -201,12 +220,17 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
           {/* Social Links */}
           {hasSocial && (
             <>
-              <Divider>Social Links</Divider>
+              <Divider>{tSocialLinks}</Divider>
               <Space size="middle">
                 {business.socialLinks?.map((s, i) => (
-                  <a key={i} href={s.url} target="_blank" rel="noreferrer">
-                    {platformIcons[s.platform] || <GlobalOutlined />}{" "}
-                    <Text>{s.platform}</Text>
+                  <a
+                    key={i}
+                    href={s.url ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {platformIcons[s.platform ?? ""] || <GlobalOutlined />}{" "}
+                    <Text>{s.platform ?? ""}</Text>
                   </a>
                 ))}
               </Space>
@@ -216,9 +240,9 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
           {/* Map */}
           {business.mapLink && (
             <>
-              <Divider>Map Location</Divider>
+              <Divider>{tMapLocation}</Divider>
               <iframe
-                src={business.mapLink}
+                src={business.mapLink ?? ""}
                 style={{ width: "100%", height: 300, border: 0 }}
                 allowFullScreen
                 loading="lazy"

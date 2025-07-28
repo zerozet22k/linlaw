@@ -5,9 +5,9 @@ import { Layout, Drawer, Typography, theme } from "antd";
 import Link from "next/link";
 import { useMediaQuery } from "react-responsive";
 import { useSettings } from "@/hooks/useSettings";
+import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import { SettingsInterface } from "@/config/CMS/settings/settingKeys";
 import UserAvatar from "../components/ui/UserAvatar";
-import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import AppMenu from "@/config/navigations/navigationMenu";
 
 const { Sider, Content, Header, Footer } = Layout;
@@ -23,23 +23,22 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
 
   const handleDrawerToggle = () => setDrawerVisible(!drawerVisible);
 
-  const siteSettings: SettingsInterface[typeof GLOBAL_SETTINGS_KEYS.SITE_SETTINGS] =
-    settings?.[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS] || {
-      siteName: "",
+  const {
+    [GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]: siteSettings = {
+      siteName: "Site Logo",
       siteUrl: "",
+      siteLogo: "/images/logo.svg",
       siteBanner: "",
-      siteLogo: "",
-      businessInfo: {
-        openingHours: "8:30 AM - 6:00 PM",
-        phoneNumber: "+95 9 765432100",
-        email: "contact@myanmarbiz.com",
-      },
-    };
+    },
+  } = settings || ({} as SettingsInterface);
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
   const siteLogo = siteSettings.siteLogo?.trim() || "/images/logo.svg";
   const siteName = siteSettings.siteName?.trim() || "Site Logo";
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {isMobile ? (
@@ -97,7 +96,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
                 alt={siteName}
                 style={{
                   width: "100%",
-                  padding: "20px0",
+                  padding: "20px 0",
                   objectFit: "contain",
                 }}
               />
@@ -111,6 +110,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           />
         </Sider>
       )}
+
       <Layout
         style={{
           marginLeft: isMobile ? 0 : collapsed ? 80 : 220,
@@ -129,15 +129,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           }}
         >
           <div></div>
-          {/* <Text
-            style={{
-              fontSize: "18px",
-              fontWeight: "bold",
-              marginRight: "auto",
-            }}
-          >
-            {siteName}
-          </Text> */}
+          {/* Optionally show siteName here */}
           <UserAvatar isMobile={isMobile} toggleDrawer={handleDrawerToggle} />
         </Header>
 
@@ -150,6 +142,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
         >
           {children}
         </Content>
+
         <Footer style={{ textAlign: "center", padding: "12px 24px" }}>
           <Text>
             {siteName} © {new Date().getFullYear()} All rights reserved.

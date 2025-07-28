@@ -1,141 +1,156 @@
 "use client";
 
 import React from "react";
-import { Form, Input, Button, Typography, Row, Col, message, Card } from "antd";
-import { PagesInterface } from "@/config/CMS/pages/pageKeys";
-import { HOME_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
-import apiClient from "@/utils/api/apiClient";
+import { Row, Col, Typography, Space } from "antd";
+import {
+  EnvironmentOutlined,
+  PhoneOutlined,
+  MailOutlined,
+} from "@ant-design/icons";
+
+import {
+  GLOBAL_SETTINGS_KEYS as GK,
+  GLOBAL_SETTINGS_TYPES,
+} from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
+import { useLanguage } from "@/hooks/useLanguage";
+import { getTranslatedText } from "@/utils/getTranslatedText";
+import { contactTranslations, commonTranslations } from "@/translations";
 
 const { Title, Text } = Typography;
 
-type ContactUsSectionProps = {
-  contactInfo: PagesInterface[typeof HOME_PAGE_SETTINGS_KEYS.CONTACT_US];
-};
+type BusinessInfo = GLOBAL_SETTINGS_TYPES[typeof GK.BUSINESS_INFO];
 
-const ContactUsSection: React.FC<ContactUsSectionProps> = ({ contactInfo }) => {
-  const handleSubmit = async (values: any) => {
-    try {
-      const response = await apiClient.post("/contact-us", values);
+interface Props {
+  contactInfo: BusinessInfo;
+}
 
-      if (response.status === 200) {
-        message.success(response.data.message || "Message sent successfully!");
-      } else {
-        message.error(response.data.error || "Failed to send your message.");
-      }
-    } catch (error) {
-      console.error("Error submitting contact form:", error);
-      message.error("An unexpected error occurred. Please try again later.");
-    }
-  };
+const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
+  const { language } = useLanguage();
+  const [loading, setLoading] = React.useState(false);
+  const [hasData, setHasData] = React.useState(true);
+
+  const {
+    address = "-",
+    phoneNumber: phone = "-",
+    email = "-",
+    mapLink = "",
+  } = contactInfo ?? {};
+
+  const translatedTitle =
+    getTranslatedText(contactTranslations.header, language) ||
+    "Contact Information";
+
+  const translatedAddress =
+    getTranslatedText(contactTranslations.address, language) || "Address";
+  const translatedPhone =
+    getTranslatedText(contactTranslations.phoneNumber, language) ||
+    "Phone Number";
+  const translatedEmail =
+    getTranslatedText(contactTranslations.email, language) || "Email";
+
+  const translatedMapNotice =
+    getTranslatedText(contactTranslations.mapNotice, language) ||
+    "Map will appear here once available.";
+
+  const translatedLoading = getTranslatedText(commonTranslations.loading, language) || "Loading...";
+  const translatedNoData = getTranslatedText(commonTranslations.noData, language) || "No Data";
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: 48 }}>
+        <Text type="secondary">{translatedLoading}</Text>
+      </div>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <div style={{ textAlign: "center", padding: 48 }}>
+        <Text type="secondary">{translatedNoData}</Text>
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        padding: "60px 20px",
-      }}
-    >
-      <Title
-        level={2}
-        style={{
-          textAlign: "center",
-          marginBottom: "40px",
-        }}
-      >
-        Contact Us
-      </Title>
+    <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+      <Row gutter={[48, 32]} align="middle" wrap>
+        <Col xs={24} md={14}>
+          <div style={{ paddingRight: 24 }}>
+            <Title
+              level={2}
+              style={{
+                fontSize: "2.25em",
+                fontWeight: 600,
+                marginBottom: 32,
+                color: "#2c3e50",
+              }}
+            >
+              {translatedTitle}
+            </Title>
 
-      <Row
-        gutter={[40, 40]}
-        justify="center"
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <Col
-          xs={24}
-          md={12}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Card title={"Contact Form"} style={{ height: "100%" }}>
-            <Form layout="vertical" onFinish={handleSubmit}>
-              <Form.Item
-                label="Name"
-                name="name"
-                rules={[{ required: true, message: "Please enter your name" }]}
-              >
-                <Input placeholder="Your Name" />
-              </Form.Item>
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    type: "email",
-                    message: "Please enter a valid email",
-                  },
-                ]}
-              >
-                <Input placeholder="Your Email" />
-              </Form.Item>
-              <Form.Item
-                label="Message"
-                name="message"
-                rules={[
-                  { required: true, message: "Please enter your message" },
-                ]}
-              >
-                <Input.TextArea rows={4} placeholder="Your Message" />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit" block>
-                  Send Message
-                </Button>
-              </Form.Item>
-            </Form>
-          </Card>
+            <Space direction="vertical" size="large" style={{ fontSize: 16 }}>
+              <div>
+                <EnvironmentOutlined
+                  style={{ fontSize: 22, color: "#d4380d", marginRight: 12 }}
+                />
+                <Text strong style={{ fontSize: 16 }}>
+                  {translatedAddress}
+                </Text>
+                <br />
+                <Text style={{ color: "#999", fontSize: 13 }}>{address}</Text>
+              </div>
+
+              <div>
+                <PhoneOutlined
+                  style={{ fontSize: 22, color: "#389e0d", marginRight: 12 }}
+                />
+                <Text strong style={{ fontSize: 16 }}>
+                  {translatedPhone}
+                </Text>
+                <br />
+                <Text style={{ color: "#999", fontSize: 13 }}>{phone}</Text>
+              </div>
+
+              <div>
+                <MailOutlined
+                  style={{ fontSize: 22, color: "#096dd9", marginRight: 12 }}
+                />
+                <Text strong style={{ fontSize: 16 }}>
+                  {translatedEmail}
+                </Text>
+                <br />
+                <Text style={{ color: "#999", fontSize: 13 }}>{email}</Text>
+              </div>
+            </Space>
+          </div>
         </Col>
-        <Col
-          xs={24}
-          md={12}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Card title={"Our Location"} style={{ height: "100%" }}>
-            <Text style={{ display: "block", marginBottom: "10px" }}>
-              Address: {contactInfo.address}
-            </Text>
-            <Text style={{ display: "block", marginBottom: "10px" }}>
-              Phone: {contactInfo.phone}
-            </Text>
-            <Text style={{ display: "block", marginBottom: "20px" }}>
-              Email: {contactInfo.email}
-            </Text>
 
-            {/* Google Maps Embed */}
-            <div style={{ marginTop: "20px" }}>
+        {/* RIGHT SIDE — MAP */}
+        <Col xs={24} md={10}>
+          {mapLink ? (
+            <div
+              style={{
+                width: "100%",
+                height: 360,
+                borderRadius: 12,
+                overflow: "hidden",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
+              }}
+            >
               <iframe
-                src={contactInfo.mapLink}
+                src={mapLink}
                 width="100%"
-                height="400"
-                style={{
-                  border: "none",
-                  borderRadius: "10px",
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                }}
-                allowFullScreen={false}
+                height="100%"
+                style={{ border: "none" }}
                 loading="lazy"
-              ></iframe>
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
-          </Card>
+          ) : (
+            <div style={{ padding: 24, textAlign: "center" }}>
+              <Text type="secondary">{translatedMapNotice}</Text>
+            </div>
+          )}
         </Col>
       </Row>
     </div>

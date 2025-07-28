@@ -47,43 +47,39 @@ export const TEAM_PAGE_SETTINGS: GeneralConfig<typeof TEAM_PAGE_SETTINGS_KEYS> =
       design: JsonDesign.PARENT,
       fields: {
         maxMembersCount: {
-          label: "Max Team Members",
-          guide: "Hard limit after grouping. 0 / empty = no limit.",
+          label: "Max Team Members (total)",
+          guide: "Hard limit across all teams. 0 = no limit.",
           formType: FormType.NUMBER,
         },
 
-        members: {
-          label: "Members",
-          guide: "Pick users (drag = manual order).",
-          formType: FormType.USERS_SELECTOR,
-        },
-
-        positionOrder: {
-          label: "Position Order",
-          keyLabel: "Position",
+        teamGroups: {
+          label: "Teams",
+          keyLabel: "Team",
           type: NestedFieldType.ARRAY,
-          arrayDesign: ArrayDesign.FLAT,
+          arrayDesign: ArrayDesign.CARD,
           arrayFunctionalities: [ArrayFunctionality.SORTABLE],
           fields: {
-            value: {
-              label: "Position Title",
-              guide: "CEO, CTO, Manager, Intern …",
+            teamName: {
+              label: "Team Name",
+              guide: "E.g. Protax, Lawlin",
               formType: FormType.TEXT,
             },
-          },
-        },
-
-        intraPositionSort: {
-          label: "Order Inside Position",
-          formType: FormType.SELECT,
-          options: [
-            { label: "Hire date ↑ (oldest first)", value: "createdAsc" },
-            { label: "Hire date ↓ (newest first)", value: "createdDesc" },
-            {
-              label: "Manual (same order as picker)",
-              value: "manual",
+            members: {
+              label: "Members",
+              guide: "Pick users for this team (drag = manual order)",
+              formType: FormType.USERS_SELECTOR,
             },
-          ],
+            intraSort: {
+              label: "Order Within Team",
+              guide: "How to sort these members",
+              formType: FormType.SELECT,
+              options: [
+                { label: "Manual (picker order)", value: "manual" },
+                { label: "Hire date ↑ (oldest first)", value: "createdAsc" },
+                { label: "Hire date ↓ (newest first)", value: "createdDesc" },
+              ],
+            },
+          },
         },
       },
     },
@@ -95,8 +91,10 @@ export type TEAM_PAGE_SETTINGS_TYPES = {
   [TEAM_PAGE_SETTINGS_KEYS.DESIGN]: SharedPageDesignType;
   [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxMembersCount?: number;
-    members: string[];
-    positionOrder: { value: string }[];
-    intraPositionSort: "createdAsc" | "createdDesc" | "manual";
+    teamGroups: Array<{
+      teamName: string;
+      members: string[];
+      intraSort: "manual" | "createdAsc" | "createdDesc";
+    }>;
   };
 };

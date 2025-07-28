@@ -29,7 +29,7 @@ const SizeInput: React.FC<TextSizeInputProps> = ({
       : "em"
   );
 
-  const commonHeight = 32; // Assuming a default commonHeight
+  const commonHeight = 32;
 
   useEffect(() => {
     onChange?.(`${size}${unit}`);

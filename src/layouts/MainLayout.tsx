@@ -1,100 +1,105 @@
 "use client";
 
 import React, { useState } from "react";
-import { Layout, Drawer, Space, Typography, theme, Button } from "antd";
+import { Layout, Drawer, Space, Typography, Button, theme } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import Link from "next/link";
+
 import { useSettings } from "@/hooks/useSettings";
-import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
-import UserAvatar from "../components/ui/UserAvatar";
-import SocialLinks from "../components/ui/SocialLinks";
-import AppMenu from "@/config/navigations/navigationMenu";
+import {
+  GLOBAL_SETTINGS_KEYS as G,
+  GLOBAL_SETTINGS_TYPES,
+} from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import { RouteConfig } from "@/config/routes";
 import { useLayout } from "@/hooks/useLayout";
-import LanguageSelection from "@/components/inputs/standalone/LanguageSelection";
+
+import UserAvatar from "@/components/ui/UserAvatar";
+import SocialLinks from "@/components/ui/SocialLinks";
+import AppMenu from "@/config/navigations/navigationMenu";
 import OverlayBar from "./OverlayBar";
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
 
-interface MainLayoutProps {
+type SiteSettings = GLOBAL_SETTINGS_TYPES[typeof G.SITE_SETTINGS];
+type BusinessInfo = GLOBAL_SETTINGS_TYPES[typeof G.BUSINESS_INFO];
+
+interface Props {
   children: React.ReactNode;
   routeConfig: RouteConfig | null;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, routeConfig }) => {
+const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
   const { settings } = useSettings();
   const { showGoTop, scrollToTop, isMobile } = useLayout();
-  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const siteSettings = settings?.[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS] || {
-    siteName: "",
+  const siteDefaults: SiteSettings = {
+    siteName: "Site Logo",
     siteUrl: "",
+    siteLogo: "/images/logo.svg",
     siteBanner: "",
-    siteLogo: "",
-    businessInfo: {
-      openingHours: "8:30 AM - 6:00 PM",
-      phoneNumber: "+95 9 765432100",
-      email: "contact@myanmarbiz.com",
-    },
+  };
+
+  const bizDefaults: BusinessInfo = {
+    address: "",
+    mapLink: "",
+    phoneNumber: "+95 9 765432100",
+    email: "contact@example.com",
+    openingHours: [],
+  };
+
+  const s: SiteSettings = {
+    ...siteDefaults,
+    ...((settings?.[G.SITE_SETTINGS] as SiteSettings) ?? {}),
+  };
+
+  const b: BusinessInfo = {
+    ...bizDefaults,
+    ...((settings?.[G.BUSINESS_INFO] as BusinessInfo) ?? {}),
   };
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const siteLogo = siteSettings.siteLogo?.trim() || "/images/logo.svg";
-  const siteName = siteSettings.siteName?.trim() || "Site Logo";
-
-  const toggleDrawer = () => setDrawerVisible(!drawerVisible);
-  const showGoTopButton = routeConfig?.showGoTop && showGoTop;
+  const toggleDrawer = () => setDrawerOpen((o) => !o);
+  const showGoTopBtn = routeConfig?.showGoTop && showGoTop;
 
   return (
     <Layout
       style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
     >
-      <OverlayBar
-        overlayInfo={{
-          openingHours:
-            siteSettings.businessInfo?.openingHours || "8:30 AM - 6:00 PM",
-          phoneNumber:
-            siteSettings.businessInfo?.phoneNumber || "+95 9 765432100",
-          email: siteSettings.businessInfo?.email || "contact@myanmarbiz.com",
-        }}
-      />
+      {/* thin black bar */}
+      <OverlayBar businessInfo={b} />
 
+      {/* sticky header */}
       <Header
-        className="main-header"
         style={{
           position: "sticky",
-          top: "0",
+          top: 0,
           zIndex: 999,
+          height: 90,
+          padding: 10,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          height: "90px",
-          padding: "10px",
-          transition: "background 0.3s ease-in-out",
           background: colorBgContainer,
+          transition: "background 0.3s ease",
         }}
       >
         <Link
           href="/"
-          style={{ height: "80px", display: "flex", alignItems: "center" }}
+          style={{ display: "flex", alignItems: "center", height: 80 }}
         >
-          {false ? (
-            <span style={{ fontSize: "20px", fontWeight: "bold" }}>
-              {siteName}
-            </span>
-          ) : (
+          {s.siteLogo ? (
             <img
-              src={siteLogo}
-              alt={siteName}
-              style={{
-                height: "80px",
-                objectFit: "contain",
-              }}
+              src={s.siteLogo}
+              alt={s.siteName}
+              style={{ height: 80, objectFit: "contain" }}
             />
+          ) : (
+            <span style={{ fontSize: 20, fontWeight: 700 }}>{s.siteName}</span>
           )}
         </Link>
 
@@ -110,6 +115,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, routeConfig }) => {
         </Space>
       </Header>
 
+      {/* main content */}
       <Content
         style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
       >
@@ -117,14 +123,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, routeConfig }) => {
           <Drawer
             title="Menu"
             placement="right"
+            open={drawerOpen}
             onClose={toggleDrawer}
-            open={drawerVisible}
             styles={{ body: { padding: "24px 0" } }}
           >
             <AppMenu
               menuMode="inline"
               isDashboard={false}
-              isMobile={true}
+              isMobile
               onMenuClick={toggleDrawer}
             />
           </Drawer>
@@ -132,26 +138,23 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, routeConfig }) => {
         {children}
       </Content>
 
-      <Footer style={{ textAlign: "center", padding: "20px" }}>
+      {/* footer */}
+      <Footer style={{ textAlign: "center", padding: 20 }}>
         <SocialLinks settings={settings} />
         <Text>
-          {siteName} © {new Date().getFullYear()} All rights reserved.
+          {s.siteName} © {new Date().getFullYear()} — All&nbsp;rights reserved.
         </Text>
       </Footer>
 
-      {showGoTopButton && (
+      {/* back-to-top FAB */}
+      {showGoTopBtn && (
         <Button
           type="primary"
           shape="circle"
           size="large"
           icon={<ArrowUpOutlined />}
           onClick={scrollToTop}
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            right: "20px",
-            zIndex: 14000,
-          }}
+          style={{ position: "fixed", bottom: 20, right: 20, zIndex: 14_000 }}
         />
       )}
     </Layout>

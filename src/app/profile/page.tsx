@@ -6,10 +6,15 @@ import ProfileUpdateForm from "@/components/forms/ProfileUpdateForm";
 import { useRouter } from "next/navigation";
 import SubLoader from "@/components/loaders/SubLoader";
 import { useUser } from "@/hooks/useUser";
+import { useLanguage } from "@/hooks/useLanguage";
+import { getTranslatedText } from "@/utils/getTranslatedText";
+import { commonTranslations } from "@/translations";
+import { contactTranslations } from "@/translations/";
 
 const UserProfile: React.FC = () => {
   const { user, refreshUser, initialLoading } = useUser();
   const router = useRouter();
+  const { language } = useLanguage();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -19,16 +24,37 @@ const UserProfile: React.FC = () => {
     }
   }, [user, initialLoading, router]);
 
+  const tLoading =
+    getTranslatedText(commonTranslations.loading, language) || "Loading...";
+  const tUserNotFound =
+    getTranslatedText(commonTranslations.notFound, language) ||
+    "User Not Found";
+  const tNoData =
+    getTranslatedText(commonTranslations.noData, language) ||
+    "No user data available.";
+  const tEdit =
+    getTranslatedText(commonTranslations.edit, language) || "Edit Profile";
+  const tUserProfile =
+    getTranslatedText(commonTranslations.profile, language) || "User Profile";
+  const tName = getTranslatedText(contactTranslations.name, language) || "Name";
+  const tUsername =
+    getTranslatedText(contactTranslations.username, language) || "Username";
+  const tEmail =
+    getTranslatedText(contactTranslations.email, language) || "Email";
+  const tRoles =
+    getTranslatedText(contactTranslations.roles, language) || "Roles";
+  const tNA = getTranslatedText(commonTranslations.empty, language) || "N/A";
+
   if (initialLoading) {
-    return <SubLoader tip="Loading user profile..." />;
+    return <SubLoader tip={tLoading} />;
   }
 
   if (!user) {
     return (
       <div style={{ maxWidth: 600, margin: "50px auto" }}>
         <Alert
-          message="User Not Found"
-          description="No user data available."
+          message={tUserNotFound}
+          description={tNoData}
           type="warning"
           showIcon
         />
@@ -39,10 +65,10 @@ const UserProfile: React.FC = () => {
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
       <Card
-        title="User Profile"
+        title={tUserProfile}
         extra={
           <Button type="primary" onClick={() => setIsModalVisible(true)}>
-            Edit Profile
+            {tEdit}
           </Button>
         }
         style={{
@@ -51,15 +77,15 @@ const UserProfile: React.FC = () => {
         }}
       >
         <Descriptions column={1} bordered>
-          <Descriptions.Item label="Name">{user.name}</Descriptions.Item>
-          <Descriptions.Item label="Username">
+          <Descriptions.Item label={tName}>{user.name}</Descriptions.Item>
+          <Descriptions.Item label={tUsername}>
             {user.username}
           </Descriptions.Item>
-          <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
-          <Descriptions.Item label="Roles">
+          <Descriptions.Item label={tEmail}>{user.email}</Descriptions.Item>
+          <Descriptions.Item label={tRoles}>
             {user.roles?.length
               ? user.roles.map((role) => role.name).join(", ")
-              : "N/A"}
+              : tNA}
           </Descriptions.Item>
         </Descriptions>
       </Card>

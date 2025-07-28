@@ -5,9 +5,9 @@ import { Button, Modal, Form, Input, notification } from "antd";
 import apiClient from "@/utils/api/apiClient";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
-import { contactUsTranslations, commonFormValidations } from "@/translations";
+import { contactTranslations } from "@/translations";
 
-const ContactUsForm: React.FC = () => {
+const ClickToAction: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -27,7 +27,7 @@ const ContactUsForm: React.FC = () => {
       if (response.status === 200) {
         notification.success({
           message: getTranslatedText(
-            contactUsTranslations.notifSuccess,
+            contactTranslations.notifSuccess,
             language
           ),
         });
@@ -36,17 +36,14 @@ const ContactUsForm: React.FC = () => {
       } else {
         throw new Error(
           response.data.error ||
-            getTranslatedText(contactUsTranslations.notifFailure, language)
+            getTranslatedText(contactTranslations.notifFailure, language)
         );
       }
     } catch (error: any) {
       notification.error({
         message:
           error?.message ||
-          getTranslatedText(
-            contactUsTranslations.notifGenericFailure,
-            language
-          ),
+          getTranslatedText(contactTranslations.notifGenericFailure, language),
       });
     } finally {
       setLoading(false);
@@ -64,10 +61,10 @@ const ContactUsForm: React.FC = () => {
         }}
       >
         <h2 style={{ fontSize: 26, fontWeight: "bold", marginBottom: 10 }}>
-          {getTranslatedText(contactUsTranslations.header, language)}
+          {getTranslatedText(contactTranslations.header, language)}
         </h2>
         <p style={{ fontSize: 18, lineHeight: 1.6, color: "#555" }}>
-          {getTranslatedText(contactUsTranslations.subheader, language)}
+          {getTranslatedText(contactTranslations.subheader, language)}
         </p>
         <Button
           type="primary"
@@ -75,27 +72,27 @@ const ContactUsForm: React.FC = () => {
           style={{ marginTop: 10, fontSize: 18 }}
           onClick={() => setVisible(true)}
         >
-          {getTranslatedText(contactUsTranslations.buttonLabel, language)}
+          {getTranslatedText(contactTranslations.buttonLabel, language)}
         </Button>
       </div>
 
       <Modal
-        title={getTranslatedText(contactUsTranslations.modalTitle, language)}
+        title={getTranslatedText(contactTranslations.modalTitle, language)}
         open={visible}
         onCancel={() => setVisible(false)}
         footer={null}
         destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleSendEmail}>
-          {/* Name (required) */}
+          {/* Your Name (required) */}
           <Form.Item
-            label={getTranslatedText(contactUsTranslations.yourName, language)}
+            label={getTranslatedText(contactTranslations.yourName, language)}
             name="name"
             rules={[
               {
                 required: true,
                 message: getTranslatedText(
-                  commonFormValidations.nameRequired,
+                  contactTranslations.yourNameRequired,
                   language
                 ),
               },
@@ -104,10 +101,10 @@ const ContactUsForm: React.FC = () => {
             <Input />
           </Form.Item>
 
-          {/* Phone (optional) */}
+          {/* Your Phone Number (optional) */}
           <Form.Item
             label={getTranslatedText(
-              contactUsTranslations.phoneNumber,
+              contactTranslations.yourPhoneNumber,
               language
             )}
             name="phone"
@@ -115,7 +112,7 @@ const ContactUsForm: React.FC = () => {
               {
                 pattern: /^\+?\d{7,15}$/,
                 message: getTranslatedText(
-                  commonFormValidations.phoneValid,
+                  contactTranslations.yourPhoneNumberRequired,
                   language
                 ),
               },
@@ -124,22 +121,22 @@ const ContactUsForm: React.FC = () => {
             <Input placeholder="+66987654321" />
           </Form.Item>
 
-          {/* Email */}
+          {/* Your Email (required) */}
           <Form.Item
-            label={getTranslatedText(contactUsTranslations.yourEmail, language)}
+            label={getTranslatedText(contactTranslations.yourEmail, language)}
             name="email"
             rules={[
               {
                 required: true,
                 message: getTranslatedText(
-                  commonFormValidations.emailRequired,
+                  contactTranslations.yourEmailRequired,
                   language
                 ),
               },
               {
                 type: "email",
                 message: getTranslatedText(
-                  commonFormValidations.emailValid,
+                  contactTranslations.yourEmailRequired,
                   language
                 ),
               },
@@ -148,15 +145,15 @@ const ContactUsForm: React.FC = () => {
             <Input />
           </Form.Item>
 
-          {/* Subject */}
+          {/* Subject (required) */}
           <Form.Item
-            label={getTranslatedText(contactUsTranslations.subject, language)}
+            label={getTranslatedText(contactTranslations.subject, language)}
             name="subject"
             rules={[
               {
                 required: true,
                 message: getTranslatedText(
-                  commonFormValidations.subjectRequired,
+                  contactTranslations.subjectRequired,
                   language
                 ),
               },
@@ -165,15 +162,15 @@ const ContactUsForm: React.FC = () => {
             <Input />
           </Form.Item>
 
-          {/* Message */}
+          {/* Message (required) */}
           <Form.Item
-            label={getTranslatedText(contactUsTranslations.message, language)}
+            label={getTranslatedText(contactTranslations.message, language)}
             name="message"
             rules={[
               {
                 required: true,
                 message: getTranslatedText(
-                  commonFormValidations.messageRequired,
+                  contactTranslations.messageRequired,
                   language
                 ),
               },
@@ -184,7 +181,7 @@ const ContactUsForm: React.FC = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              {getTranslatedText(contactUsTranslations.sendEmail, language)}
+              {getTranslatedText(contactTranslations.sendEmail, language)}
             </Button>
           </Form.Item>
         </Form>
@@ -193,4 +190,4 @@ const ContactUsForm: React.FC = () => {
   );
 };
 
-export default ContactUsForm;
+export default ClickToAction;

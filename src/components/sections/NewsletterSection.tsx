@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Typography, Spin, Alert } from "antd";
+import { Typography, Spin, Alert, Empty, Card } from "antd";
 import Link from "next/link";
+import { ArrowRightOutlined } from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 import { INewsletterAPI } from "@/models/Newsletter";
 import apiClient from "@/utils/api/apiClient";
-import { newsletterTranslations } from "@/translations";
+import { commonTranslations, titleTranslations } from "@/translations";
 
-const { Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
 const NewsletterSection: React.FC = () => {
   const { language } = useLanguage();
   const [newsletters, setNewsletters] = useState<INewsletterAPI[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,70 +43,122 @@ const NewsletterSection: React.FC = () => {
     fetchNewsletters();
   }, []);
 
+  // pull in your titles/subtitles
   const translatedTitle =
-    getTranslatedText(newsletterTranslations.title, language) ||
+    getTranslatedText(titleTranslations.newsletterTitle, language) ||
     "Our Newsletters";
-  const translatedSubtitle = getTranslatedText(
-    newsletterTranslations.subtitle,
-    language
-  );
+  const translatedSubtitle =
+    getTranslatedText(titleTranslations.newsletterSubtitle, language) || "";
+
+  // read-more and view-all
+  const translatedReadMore =
+    getTranslatedText(commonTranslations.readMore, language) || "Read More";
   const translatedViewAll =
-    getTranslatedText(newsletterTranslations.viewAll, language) ||
+    getTranslatedText(commonTranslations.viewAll, language) ||
     "View all newsletters";
 
   return (
-    <section style={{ padding: "60px 20px", width: "100%" }}>
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <h2 style={{ fontSize: "2.25em", fontWeight: 600, color: "#222" }}>
-          {translatedTitle}
-        </h2>
-        {translatedSubtitle && (
-          <Text type="secondary" style={{ fontSize: 16 }}>
-            {translatedSubtitle}
-          </Text>
-        )}
-      </div>
+    <section style={{ padding: "60px 20px" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <Title level={2} style={{ fontSize: "2.25em", marginBottom: 8 }}>
+            {translatedTitle}
+          </Title>
+          {translatedSubtitle && (
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              {translatedSubtitle}
+            </Text>
+          )}
+        </div>
 
-      {loading ? (
-        <Spin size="large" style={{ display: "block", margin: "24px auto" }} />
-      ) : error ? (
-        <Alert message="Error" description={error} type="error" showIcon />
-      ) : (
-        <div
-          style={{
-            maxWidth: 800,
-            margin: "0 auto",
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-          }}
-        >
-          {newsletters.map((item) => {
-            const title =
-              typeof item.title === "string"
-                ? item.title
-                : item.title[language] || item.title.en || "Untitled";
+        {loading ? (
+          <Spin
+            size="large"
+            style={{ display: "block", margin: "40px auto" }}
+          />
+        ) : error ? (
+          <Alert
+            message="Error"
+            description={error}
+            type="error"
+            showIcon
+            style={{ maxWidth: 600, margin: "0 auto" }}
+          />
+        ) : newsletters.length === 0 ? (
+          <Empty
+            description="No newsletters found."
+            style={{ marginTop: 40 }}
+          />
+        ) : (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                gap: 20,
+              }}
+            >
+              {newsletters.map((item) => {
+                const title =
+                  typeof item.title === "string"
+                    ? item.title
+                    : item.title[language] || item.title.en || "Untitled";
 
-            return (
-              <Paragraph
-                key={item._id}
+                return (
+                  <Link
+                    key={item._id}
+                    href={`/newsletters/${item._id}`}
+                    passHref
+                  >
+                    <Card
+                      hoverable
+                      bordered={false}
+                      style={{
+                        borderRadius: 10,
+                        boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
+                        padding: 16,
+                        height: "100%",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      <Title
+                        level={5}
+                        style={{
+                          marginBottom: 12,
+                          fontSize: "1.1em",
+                          color: "#222",
+                        }}
+                      >
+                        {title}
+                      </Title>
+                      <Text type="secondary" style={{ fontSize: 14 }}>
+                        {translatedReadMore} <ArrowRightOutlined />
+                      </Text>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div style={{ textAlign: "center", marginTop: 40 }}>
+              <Link
+                href="/newsletters"
                 style={{
-                  marginBottom: 0,
-                  fontSize: 15,
                   fontWeight: 500,
-                  lineHeight: 1.6,
+                  fontSize: 16,
+                  color: "#1677ff",
+                  textDecoration: "none",
                 }}
               >
-                <Link href={`/newsletters/${item._id}`}>{title}</Link>
-              </Paragraph>
-            );
-          })}
-
-          <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
-            <Link href="/newsletters">{translatedViewAll}</Link>
-          </Paragraph>
-        </div>
-      )}
+                <span style={{ borderBottom: "1px solid transparent" }}>
+                  {translatedViewAll}
+                </span>
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
     </section>
   );
 };

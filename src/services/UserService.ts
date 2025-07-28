@@ -59,50 +59,34 @@ class UserService {
   async getTeamMembersOrdered(
     sections: TeamSectionsType
   ): Promise<TeamBlock[]> {
-    const {
-      members,
-      positionOrder = [],
-      intraPositionSort = "manual",
-      maxMembersCount,
-    } = sections;
+    const { maxMembersCount, teamGroups = [] } = sections;
+    const result: TeamBlock[] = [];
 
-    if (!members.length) return [];
+    // 1️⃣ build each team block
+    for (const group of teamGroups) {
+      if (!group.members.length) continue;
 
-    /* 1️⃣ picker order */
-    const ids = members.map(toObjectId);
-    const users = await userRepository.findByIdsPreserveOrder(ids);
+      // preserve picker order
+      const ids = group.members.map(toObjectId);
+      let users = await userRepository.findByIdsPreserveOrder(ids);
 
-    /* 2️⃣ bucket by position */
-    const buckets = new Map<string, User[]>();
-    for (const u of users) {
-      const pos = u.position || "Unassigned";
-      if (!buckets.has(pos)) buckets.set(pos, []);
-      buckets.get(pos)!.push(u);
-    }
+      // 2️⃣ optional intra‑team sort
+      if (group.intraSort === "createdAsc") {
+        users.sort((a, b) => +a.created_at - +b.created_at);
+      } else if (group.intraSort === "createdDesc") {
+        users.sort((a, b) => +b.created_at - +a.created_at);
+      }
 
-    /* 3️⃣ sort inside each bucket (if date-based) */
-    if (intraPositionSort !== "manual") {
-      buckets.forEach((arr) => {
-        arr.sort((a: User, b: User) =>
-          intraPositionSort === "createdAsc"
-            ? +a.created_at - +b.created_at
-            : +b.created_at - +a.created_at
-        );
+      result.push({
+        teamName: group.teamName,
+        members: users,
       });
     }
 
-    /* 4️⃣ order buckets themselves */
-    const orderIdx = new Map(positionOrder.map((p, i) => [p.value, i]));
-    const orderedBlocks: TeamBlock[] = Array.from(buckets.entries())
-      .sort(
-        ([pA], [pB]) => (orderIdx.get(pA) ?? 1e9) - (orderIdx.get(pB) ?? 1e9)
-      )
-      .map(([position, members]) => ({ position, members }));
-
-    /* 5️⃣ optional global cap  */
+    // 3️⃣ global cap
     if (maxMembersCount && maxMembersCount > 0) {
       let remaining = maxMembersCount;
-      for (const block of orderedBlocks) {
+      for (const block of result) {
         if (remaining <= 0) {
           block.members = [];
           continue;
@@ -112,10 +96,10 @@ class UserService {
         }
         remaining -= block.members.length;
       }
-      return orderedBlocks.filter((b) => b.members.length); // drop empty
+      return result.filter((b) => b.members.length);
     }
 
-    return orderedBlocks;
+    return result;
   }
   async setupDefaultRolesAndSystemUser(userData: Partial<User>): Promise<void> {
     let systemRole = await roleRepository.findByRoleType(RoleType.SYSTEM);

@@ -15,6 +15,9 @@ import {
 } from "antd";
 import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
+import { useLanguage } from "@/hooks/useLanguage";
+import { getTranslatedText } from "@/utils/getTranslatedText";
+import { commonTranslations } from "@/translations";
 
 const { Paragraph } = Typography;
 
@@ -96,11 +99,26 @@ const AttachmentList: React.FC<AttachmentListProps> = ({
 const NewsletterDetail: React.FC = () => {
   const router = useRouter();
   const { id } = useParams();
+  const { language } = useLanguage();
   const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAttachment, setSelectedAttachment] =
     useState<Attachment | null>(null);
+
+  const translatedLoading =
+    getTranslatedText(commonTranslations.loading, language) || "Loading...";
+  const translatedError =
+    getTranslatedText(commonTranslations.error, language) || "Error";
+  const translatedNoData =
+    getTranslatedText(commonTranslations.noData, language) || "No Data";
+  const translatedBack =
+    getTranslatedText(commonTranslations.back, language) || "Back";
+  const translatedDownload =
+    getTranslatedText(commonTranslations.download, language) || "Download";
+  const translatedNoAttachments =
+    getTranslatedText(commonTranslations.empty, language) ||
+    "No attachments available.";
 
   const fetchNewsletter = useCallback(async () => {
     if (!id) return;
@@ -132,14 +150,18 @@ const NewsletterDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <Spin size="large" style={{ display: "block", margin: "40px auto" }} />
+      <Spin
+        tip={translatedLoading}
+        size="large"
+        style={{ display: "block", margin: "40px auto" }}
+      />
     );
   }
 
   if (error) {
     return (
       <Alert
-        message="Error"
+        message={translatedError}
         description={error}
         type="error"
         showIcon
@@ -150,9 +172,7 @@ const NewsletterDetail: React.FC = () => {
 
   if (!newsletter) {
     return (
-      <Paragraph style={{ textAlign: "center" }}>
-        No newsletter found.
-      </Paragraph>
+      <Paragraph style={{ textAlign: "center" }}>{translatedNoData}</Paragraph>
     );
   }
 
@@ -173,7 +193,7 @@ const NewsletterDetail: React.FC = () => {
                 style={{ height: "100%" }}
                 extra={
                   <Button type="primary" onClick={() => router.back()}>
-                    Back
+                    {translatedBack}
                   </Button>
                 }
               >
@@ -195,7 +215,7 @@ const NewsletterDetail: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Download
+                      {translatedDownload}
                     </Button>
                   )
                 }
@@ -218,7 +238,7 @@ const NewsletterDetail: React.FC = () => {
                 </Button>
               }
             >
-              <Paragraph>No attachments available.</Paragraph>
+              <Paragraph>{translatedNoAttachments}</Paragraph>
             </Card>
           </Col>
         )}

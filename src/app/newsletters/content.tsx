@@ -11,6 +11,8 @@ import {
   NEWSLETTER_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 import { INewsletterAPI } from "@/models/Newsletter";
+import { commonTranslations } from "@/translations";
+import { getTranslatedText } from "@/utils/getTranslatedText";
 
 const { Title, Paragraph } = Typography;
 const { Search } = Input;
@@ -67,7 +69,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
 
   useEffect(() => {
     fetchNewsletters(true);
-  }, [searchText]);
+  }, [searchText, fetchNewsletters]);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -76,6 +78,17 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const loadMore = () => {
     fetchNewsletters();
   };
+
+  // Translated labels
+  const tSearch = getTranslatedText(commonTranslations.search, language);
+  const tClickToView = getTranslatedText(
+    commonTranslations.clickToView,
+    language
+  );
+  const tLoadMore = getTranslatedText(commonTranslations.loadMore, language);
+  const tLoading = getTranslatedText(commonTranslations.loading, language) || "Loading...";
+  const tError = getTranslatedText(commonTranslations.error, language) || "Error";
+  const tNoData = getTranslatedText(commonTranslations.noData, language) || "No Data";
 
   return (
     <PageWrapper pageContent={pageContent}>
@@ -87,8 +100,8 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
         }}
       >
         <Search
-          placeholder="Search newsletters..."
-          enterButton="Search"
+          placeholder={tSearch}
+          enterButton={tSearch}
           size="large"
           onSearch={handleSearch}
           style={{
@@ -101,22 +114,20 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
         {loading && newsletters.length === 0 ? (
           <Spin
             size="large"
+            tip={tLoading}
             style={{ display: "block", margin: "40px auto" }}
           />
         ) : error ? (
           <Alert
-            message="Error"
+            message={tError}
             description={error}
-            type="error"
-            showIcon
-            style={{ marginBottom: "40px" }}
           />
         ) : (
           <>
             <List
               grid={{ gutter: 24, column: 1 }}
               dataSource={newsletters}
-              renderItem={(newsletter: INewsletterAPI) => {
+              renderItem={(newsletter) => {
                 const title =
                   typeof newsletter.title === "string"
                     ? newsletter.title
@@ -141,7 +152,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
                         </Link>
                       </Title>
                       <Paragraph style={{ color: token.colorTextSecondary }}>
-                        Click to view newsletter details.
+                        {tClickToView}
                       </Paragraph>
                     </div>
                   </List.Item>
@@ -149,10 +160,13 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
               }}
             />
 
+            {newsletters.length === 0 && !loading && !error && (
+              <Paragraph style={{ textAlign: "center", marginTop: 32 }}>{tNoData}</Paragraph>
+            )}
             {hasMore && (
               <div style={{ textAlign: "center", marginTop: 32 }}>
                 <Button type="primary" onClick={loadMore} disabled={loading}>
-                  {loading ? "Loading..." : "Load More"}
+                  {loading ? tLoading : tLoadMore}
                 </Button>
               </div>
             )}

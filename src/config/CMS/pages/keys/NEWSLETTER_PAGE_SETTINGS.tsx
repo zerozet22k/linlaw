@@ -5,12 +5,15 @@ import {
   NestedFieldType,
   JsonDesign,
 } from "../../settings";
-import { LanguageJson } from "@/utils/getTranslatedText";
+
 import {
   SHARED_PAGE_CONTENT_FIELDS,
   SHARED_PAGE_DESIGN_FIELDS,
 } from "./shared/sharedPageConfig";
-import { SharedPageContentType, SharedPageDesignType } from "./shared/sharedPageTypes";
+import {
+  SharedPageContentType,
+  SharedPageDesignType,
+} from "./shared/sharedPageTypes";
 
 const pageName = "Newsletter";
 

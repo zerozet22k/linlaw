@@ -19,20 +19,39 @@ type TeamSectionProps = {
 };
 
 const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
-  const maxMembers = teamSection?.maxMembersCount ?? 5;
+  const maxMembers = teamSection.maxMembersCount ?? 0; // 0 = no cap
 
-  const [members, setMembers] = useState<UserAPI[]>([]);
+  const [blocks, setBlocks] = useState<TeamBlockAPI[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const { data: blocks } = await apiClient.get<TeamBlockAPI[]>("/team");
-        const flat = blocks.flatMap((b) => b.members);
-        setMembers(maxMembers > 0 ? flat.slice(0, maxMembers) : flat);
+        const { data: apiBlocks } = await apiClient.get<TeamBlockAPI[]>(
+          "/team"
+        );
+
+        if (maxMembers > 0) {
+          let remaining = maxMembers;
+          const cappedBlocks: TeamBlockAPI[] = [];
+
+          for (const blk of apiBlocks) {
+            if (remaining <= 0) break;
+            const take = Math.min(blk.members.length, remaining);
+            cappedBlocks.push({
+              ...blk,
+              members: blk.members.slice(0, take),
+            });
+            remaining -= take;
+          }
+
+          setBlocks(cappedBlocks);
+        } else {
+          setBlocks(apiBlocks);
+        }
       } catch (err) {
-        console.error("Failed to fetch team members:", err);
+        console.error("Failed to fetch team blocks:", err);
         setError("Unable to load team members. Please try again later.");
       } finally {
         setLoading(false);
@@ -40,7 +59,23 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
     })();
   }, [maxMembers]);
 
-  if (!loading && !error && members.length === 0) return null;
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: 60 }}>
+        <Spin size="large" tip="Loading team members..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: "60px 20px" }}>
+        <Alert message="Error" description={error} type="error" showIcon />
+      </div>
+    );
+  }
+
+  if (blocks.length === 0) return null;
 
   return (
     <section style={{ padding: "60px 0", backgroundColor: "rgb(0, 21, 41)" }}>
@@ -51,60 +86,69 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
         Meet Our Team
       </Title>
 
-      {loading && (
-        <div style={{ textAlign: "center", margin: "20px 0" }}>
-          <Spin size="large" tip="Loading team members..." />
-        </div>
-      )}
+      {blocks.map((block) => (
+        <div key={block.teamName} style={{ marginBottom: 64 }}>
+          {/* Team name sub‑heading */}
+          <Title
+            level={3}
+            style={{ textAlign: "center", color: "#fff", marginBottom: 24 }}
+          >
+            {block.teamName}
+          </Title>
 
-      {error && (
-        <div style={{ padding: "60px 20px" }}>
-          <Alert message="Error" description={error} type="error" showIcon />
-        </div>
-      )}
-
-      {members.length > 0 && (
-        <div style={{ margin: "0 auto", maxWidth: 1200 }}>
-          <CustomCarousel autoplay slidesToShow={3} dots infinite>
-            {members.map((m) => (
-              <div
-                key={m._id}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  padding: 20,
-                  height: 300,
-                }}
-              >
-                <ImageComponent
-                  src={m.avatar || "/images/default-avatar.webp"}
-                  alt={m.name || m.username}
-                  width={120}
-                  height={120}
-                  objectFit="cover"
+          <div style={{ margin: "0 auto", maxWidth: 1200 }}>
+            <CustomCarousel autoplay slidesToShow={3} dots infinite>
+              {block.members.map((m) => (
+                <div
+                  key={m._id}
                   style={{
-                    borderRadius: "50%",
-                    border: "4px solid #1890ff",
-                    marginBottom: 10,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    padding: 20,
+                    height: 300,
                   }}
-                  priority
-                />
-                <Title
-                  level={4}
-                  style={{ color: "#fff", margin: "10px 0 5px" }}
                 >
-                  {m.name || m.username}
-                </Title>
-                <Text style={{ color: "#fff", fontSize: 14 }}>
-                  {m.bio || "No bio available."}
-                </Text>
-              </div>
-            ))}
-          </CustomCarousel>
+                  <ImageComponent
+                    src={m.avatar || "/images/default-avatar.webp"}
+                    alt={m.name || m.username}
+                    width={120}
+                    height={120}
+                    objectFit="cover"
+                    style={{
+                      borderRadius: "50%",
+                      border: "4px solid #1890ff",
+                      marginBottom: 10,
+                    }}
+                    priority
+                  />
+
+                  <Title
+                    level={4}
+                    style={{ color: "#fff", margin: "10px 0 5px" }}
+                  >
+                    {m.name || m.username}
+                  </Title>
+
+                  {/* Still show their position */}
+                  {m.position && (
+                    <Text
+                      style={{ color: "#ccc", fontSize: 12, marginBottom: 8 }}
+                    >
+                      {m.position}
+                    </Text>
+                  )}
+
+                  <Text style={{ color: "#fff", fontSize: 14 }}>
+                    {m.bio || "No bio available."}
+                  </Text>
+                </div>
+              ))}
+            </CustomCarousel>
+          </div>
         </div>
-      )}
+      ))}
     </section>
   );
 };

@@ -11,17 +11,20 @@ import {
 } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 import { TeamBlockAPI } from "@/models/TeamBlock";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/hooks/useLanguage";
+import { getTranslatedText } from "@/utils/getTranslatedText";
+import { commonTranslations } from "@/translations";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
-type TeamContentProps = { data: TEAM_PAGE_SETTINGS_TYPES };
+type TeamContentProps = {
+  data: TEAM_PAGE_SETTINGS_TYPES;
+};
 
 const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
-  /* CMS options */
   const pageContent = data[TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT];
   const teamSection = data[TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 
-  /* theming */
   const { token } = theme.useToken();
   const cardRadius = data[TEAM_PAGE_SETTINGS_KEYS.DESIGN]?.borderRadius ?? 16;
   const gridGutter = parseInt(
@@ -29,12 +32,18 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
     10
   );
 
-  /* state */
+  const { language } = useLanguage();
+  const tLoading =
+    getTranslatedText(commonTranslations.loading, language) || "Loading...";
+  const tError =
+    getTranslatedText(commonTranslations.error, language) || "Error";
+  const tNoData =
+    getTranslatedText(commonTranslations.noData, language) || "No Data";
+
   const [blocks, setBlocks] = useState<TeamBlockAPI[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /* fetch */
   useEffect(() => {
     (async () => {
       try {
@@ -67,13 +76,11 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
     })();
   }, [teamSection.maxMembersCount]);
 
-  /* animation variants */
   const variants = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
   };
 
-  /* styles */
   const overlayGradient =
     "linear-gradient(to top, rgba(0,0,0,0.65) 30%, rgba(0,0,0,0.0) 100%)";
   const placeholder = "/images/default-avatar.webp";
@@ -91,13 +98,14 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
         {loading && (
           <Spin
             size="large"
+            tip={tLoading}
             style={{ display: "block", margin: "40px auto" }}
           />
         )}
 
         {error && (
           <Alert
-            message="Error"
+            message={tError}
             description={error}
             type="error"
             showIcon
@@ -105,9 +113,14 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
           />
         )}
 
-        {/*  grouped rendering  */}
+        {!loading && !error && blocks.length === 0 && (
+          <Typography.Paragraph style={{ textAlign: "center", marginTop: 32 }}>
+            {tNoData}
+          </Typography.Paragraph>
+        )}
+
         {blocks.map((block) => (
-          <section key={block.position} style={{ marginBottom: 64 }}>
+          <section key={block.teamName} style={{ marginBottom: 64 }}>
             <Title
               level={2}
               style={{
@@ -116,7 +129,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                 position: "relative",
               }}
             >
-              {block.position}
+              {block.teamName}
               <span
                 style={{
                   content: "''",
@@ -157,7 +170,6 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                                 }}
                               />
 
-                              {/* overlay */}
                               <div
                                 style={{
                                   position: "absolute",
@@ -170,7 +182,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                                   borderBottomRightRadius: cardRadius,
                                 }}
                               />
-                              {/* name / position */}
+
                               <div
                                 style={{
                                   position: "absolute",
@@ -194,15 +206,17 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                                 >
                                   {member.name}
                                 </div>
-                                <div
-                                  style={{
-                                    fontSize: 14,
-                                    opacity: 0.85,
-                                    textShadow: "0 1px 3px rgba(0,0,0,0.6)",
-                                  }}
-                                >
-                                  {member.position}
-                                </div>
+                                {member.position && (
+                                  <div
+                                    style={{
+                                      fontSize: 14,
+                                      opacity: 0.85,
+                                      textShadow: "0 1px 3px rgba(0,0,0,0.6)",
+                                    }}
+                                  >
+                                    {member.position}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           }
@@ -216,7 +230,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                                 ? "0 6px 16px rgba(0,0,0,0.15)"
                                 : "none",
                           }}
-                          bodyStyle={{ display: "none" }} // hide default padding
+                          bodyStyle={{ display: "none" }}
                         />
                       </motion.div>
                     </a>
