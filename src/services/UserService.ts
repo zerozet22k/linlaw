@@ -68,7 +68,7 @@ class UserService {
 
       // preserve picker order
       const ids = group.members.map(toObjectId);
-      let users = await userRepository.findByIdsPreserveOrder(ids);
+      const users = await userRepository.findByIdsPreserveOrder(ids);
 
       // 2️⃣ optional intra‑team sort
       if (group.intraSort === "createdAsc") {
