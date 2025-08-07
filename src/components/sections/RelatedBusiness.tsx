@@ -6,10 +6,9 @@ import {
   Typography,
   Tag,
   Button,
-  Modal,
-  Space,
   List,
   Divider,
+  Space,
 } from "antd";
 import {
   PhoneOutlined,
@@ -22,7 +21,9 @@ import {
   InstagramFilled,
   TwitterCircleFilled,
   LinkedinFilled,
+  CloseOutlined,
 } from "@ant-design/icons";
+import { createPortal } from "react-dom";
 
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -34,7 +35,7 @@ import {
 
 const { Title, Text, Paragraph } = Typography;
 
-/* ───────── types ───────── */
+/* ───────── Types ───────── */
 type BusinessItem =
   HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]["items"][number];
 
@@ -45,7 +46,19 @@ const platformIcons: Record<string, React.ReactNode> = {
   linkedin:  <LinkedinFilled />,
 };
 
-/* ────────────────────────────────────────────────────────────── */
+/* ───────── Lock body scroll while overlay is open ───────── */
+const useBodyLock = (locked: boolean) => {
+  React.useEffect(() => {
+    if (!locked) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [locked]);
+};
+
+/* ───────────────── Component ───────────────── */
 const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) => {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -63,7 +76,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) =>
   const hasHours    = Array.isArray(business.operatingHours) && business.operatingHours.length > 0;
   const hasSocial   = Array.isArray(business.socialLinks)    && business.socialLinks.length    > 0;
 
-  /* contact array ready for <List> */
+  /* contacts list */
   const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] = [];
   if (business.address)
     contactItems.push({ icon: <EnvironmentOutlined />, content: business.address });
@@ -87,182 +100,211 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) =>
       ),
     });
 
-  /* ───────────────────────── UI ───────────────────────── */
-  return (
-    <>
-      {/* ── Compact card on the page ─────────────────── */}
-      <Card
-        hoverable
-        cover={
-          business.image && (
-            <div
-              style={{
-                width: "100%",
-                paddingTop: "56.25%",              /* 16 : 9 */
-                background: `url(${business.image}) center/cover no-repeat`,
-                borderTopLeftRadius: 12,
-                borderTopRightRadius: 12,
-              }}
-            />
-          )
-        }
-        style={{ maxWidth: 500, margin: "auto", borderRadius: 12 }}
-        bodyStyle={{ padding: 20 }}
-      >
-        <Title level={4}>{getTranslatedText(business.title, language)}</Title>
+  /* ───────── Compact card (homepage) ───────── */
+  const card = (
+    <Card
+      hoverable
+      cover={
+        business.image && (
+          <div
+            style={{
+              width: "100%",
+              paddingTop: "56.25%", /* 16:9 */
+              background: `url(${business.image}) center/cover no-repeat`,
+              borderTopLeftRadius: 12,
+              borderTopRightRadius: 12,
+            }}
+          />
+        )
+      }
+      style={{ maxWidth: 500, margin: "auto", borderRadius: 12 }}
+      bodyStyle={{ padding: 20 }}
+    >
+      <Title level={4}>{getTranslatedText(business.title, language)}</Title>
 
-        {business.subtitle && (
-          <Text type="secondary">
-            {getTranslatedText(business.subtitle, language)}
-          </Text>
-        )}
+      {business.subtitle && (
+        <Text type="secondary">
+          {getTranslatedText(business.subtitle, language)}
+        </Text>
+      )}
 
-        {Array.isArray(business.tags) && business.tags.length > 0 && (
-          <div style={{ margin: "8px 0 12px" }}>
-            {business.tags.map((t, i) => (
-              <Tag key={i}>{t.value}</Tag>
-            ))}
-          </div>
-        )}
+      {Array.isArray(business.tags) && business.tags.length > 0 && (
+        <div style={{ margin: "8px 0 12px" }}>
+          {business.tags.map((t, i) => (
+            <Tag key={i}>{t.value}</Tag>
+          ))}
+        </div>
+      )}
 
-        <Paragraph ellipsis={{ rows: 3 }}>
-          {getTranslatedText(business.description, language)}
-        </Paragraph>
+      <Paragraph ellipsis={{ rows: 3 }}>
+        {getTranslatedText(business.description, language)}
+      </Paragraph>
 
-        <Space size="middle">
-          {business.website && (
-            <Button
-              type="link"
-              icon={<GlobalOutlined />}
-              href={business.website}
-              target="_blank"
-            >
-              {tWebsite}
-            </Button>
-          )}
-          <Button icon={<InfoCircleOutlined />} onClick={() => setOpen(true)}>
-            {tViewDetails}
+      <Space size="middle">
+        {business.website && (
+          <Button
+            type="link"
+            icon={<GlobalOutlined />}
+            href={business.website}
+            target="_blank"
+          >
+            {tWebsite}
           </Button>
-        </Space>
-      </Card>
+        )}
+        <Button icon={<InfoCircleOutlined />} onClick={() => setOpen(true)}>
+          {tViewDetails}
+        </Button>
+      </Space>
+    </Card>
+  );
 
-      {/* ── FULL-SCREEN OVERLAY ─────────────────────── */}
-      <Modal
-        open={open}
-        onCancel={() => setOpen(false)}
-        footer={null}
-        width="100vw"
-        centered={false}
-        style={{ top: 0, padding: 0 }}                 /* no offset, no side-gutter */
-        bodyStyle={{ padding: 0 }}
-        title={getTranslatedText(business.title, language)}
-      >
-        {/* single scroll zone */}
+  /* ───────── Full-page overlay ───────── */
+  const overlay = open
+    ? createPortal(
         <div
           style={{
-            height: "calc(100vh - 100px)",             /* 55 ≈ header height */
-            overflowY: "auto",
-            WebkitOverflowScrolling: "touch",
+            position: "fixed",
+            inset: 0,
+            zIndex: 1300,
+            background: "#fff",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          {/* banner/logo full-width */}
-          {business.image && (
-            <div
-              style={{
-                width: "100%",
-                paddingTop: "56%",
-                background: `url(${business.image}) center/contain no-repeat`,
-              }}
-            />
-          )}
+          {/* Close button */}
+          <Button
+            shape="circle"
+            icon={<CloseOutlined />}
+            onClick={() => setOpen(false)}
+            style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}
+          />
 
-          {/* content column */}
-          <div style={{ maxWidth: 960, margin: "0 auto", padding: 32 }}>
-            {business.subtitle && (
-              <Title level={5}>
-                {getTranslatedText(business.subtitle, language)}
-              </Title>
-            )}
-
-            <Paragraph style={{ fontSize: 16 }}>
-              {getTranslatedText(business.description, language)}
-            </Paragraph>
-
-            {/* contacts */}
-            {contactItems.length > 0 && (
-              <List
-                itemLayout="horizontal"
-                dataSource={contactItems}
-                renderItem={(item) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={item.icon}
-                      description={item.content}
-                    />
-                  </List.Item>
-                )}
+          {/* Scrollable content */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              overflowX: "hidden",               /* ← fixes viewport widen */
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {/* Banner */}
+            {business.image && (
+              <div
+                style={{
+                  width: "100%",
+                  maxHeight: 500,
+                  paddingTop: "56%",
+                  background: `url(${business.image}) center/contain no-repeat`,
+                }}
               />
             )}
 
-            {/* hours */}
-            {hasHours && (
-              <>
-                <Divider>{tOperatingHrs}</Divider>
+            {/* Content column */}
+            <div
+              style={{
+                maxWidth: 960,
+                margin: "0 auto",
+                padding: "24px 16px 40px",
+                boxSizing: "border-box",          /* ← padding counts inside width */
+              }}
+            >
+              {business.subtitle && (
+                <Title level={5}>
+                  {getTranslatedText(business.subtitle, language)}
+                </Title>
+              )}
+
+              <Paragraph style={{ fontSize: 16 }}>
+                {getTranslatedText(business.description, language)}
+              </Paragraph>
+
+              {contactItems.length > 0 && (
                 <List
-                  dataSource={business.operatingHours}
-                  renderItem={(h) => (
+                  itemLayout="horizontal"
+                  dataSource={contactItems}
+                  renderItem={(item) => (
                     <List.Item>
-                      <ClockCircleOutlined style={{ marginRight: 8 }} />
-                      <Text>
-                        {h.day}: {h.open} – {h.close}
-                      </Text>
+                      <List.Item.Meta
+                        avatar={item.icon}
+                        description={item.content}
+                      />
                     </List.Item>
                   )}
                 />
-              </>
-            )}
+              )}
 
-            {/* socials */}
-            {hasSocial && (
-              <>
-                <Divider>{tSocialLinks}</Divider>
-                <Space size="large" wrap>
-                  {business.socialLinks!.map((s, i) => (
-                    <a
-                      key={i}
-                      href={s.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ display: "flex", alignItems: "center", gap: 8 }}
-                    >
-                      {platformIcons[s.platform] || <GlobalOutlined />}
-                      <span>{s.platform}</span>
-                    </a>
-                  ))}
-                </Space>
-              </>
-            )}
+              {hasHours && (
+                <>
+                  <Divider>{tOperatingHrs}</Divider>
+                  <List
+                    dataSource={business.operatingHours}
+                    renderItem={(h) => (
+                      <List.Item>
+                        <ClockCircleOutlined style={{ marginRight: 8 }} />
+                        <Text>
+                          {h.day}: {h.open} – {h.close}
+                        </Text>
+                      </List.Item>
+                    )}
+                  />
+                </>
+              )}
 
-            {/* map */}
-            {business.mapLink && (
-              <>
-                <Divider>{tMapLocation}</Divider>
-                <iframe
-                  src={business.mapLink}
-                  style={{
-                    width: "100%",
-                    height: 320,
-                    border: 0,
-                    borderRadius: 8,
-                  }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </>
-            )}
+              {hasSocial && (
+                <>
+                  <Divider>{tSocialLinks}</Divider>
+                  <Space size="large" wrap>
+                    {business.socialLinks!.map((s) => (
+                      <a
+                        key={s.platform}
+                        href={s.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        {platformIcons[s.platform] || <GlobalOutlined />}
+                        <span>{s.platform}</span>
+                      </a>
+                    ))}
+                  </Space>
+                </>
+              )}
+
+              {business.mapLink && (
+                <>
+                  <Divider>{tMapLocation}</Divider>
+                  <iframe
+                    src={business.mapLink}
+                    style={{
+                      width: "100%",
+                      height: 320,
+                      border: 0,
+                      borderRadius: 8,
+                    }}
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </Modal>
+        </div>,
+        document.body
+      )
+    : null;
+
+  /* lock body when overlay open */
+  useBodyLock(open);
+
+  return (
+    <>
+      {card}
+      {overlay}
     </>
   );
 };
