@@ -4,12 +4,12 @@ import React, { useState } from "react";
 import {
   Card,
   Typography,
-  Divider,
   Tag,
   Button,
   Modal,
   Space,
   List,
+  Divider,
 } from "antd";
 import {
   PhoneOutlined,
@@ -23,52 +23,74 @@ import {
   TwitterCircleFilled,
   LinkedinFilled,
 } from "@ant-design/icons";
+
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 import { commonTranslations } from "@/translations";
 import {
-  HOME_PAGE_SETTINGS_TYPES,
   HOME_PAGE_SETTINGS_KEYS,
+  HOME_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 const { Title, Text, Paragraph } = Typography;
 
+/* ───────── types ───────── */
 type BusinessItem =
   HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]["items"][number];
 
 const platformIcons: Record<string, React.ReactNode> = {
-  facebook: <FacebookFilled />,
+  facebook:  <FacebookFilled />,
   instagram: <InstagramFilled />,
-  twitter: <TwitterCircleFilled />,
-  linkedin: <LinkedinFilled />,
+  twitter:   <TwitterCircleFilled />,
+  linkedin:  <LinkedinFilled />,
 };
 
-const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
-  business,
-}) => {
+/* ────────────────────────────────────────────────────────────── */
+const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) => {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   if (!business) return null;
 
-  // Localized static labels
-  const tWebsite = "Website";
-  const tViewDetails =
-    getTranslatedText(commonTranslations.details, language) || "View Details";
-  const tOperatingHours = "Operating Hours";
-  const tSocialLinks = "Social Links";
-  const tMapLocation = "Map Location";
+  /* i18n labels */
+  const tWebsite      = "Website";
+  const tViewDetails  = getTranslatedText(commonTranslations.details, language) || "View Details";
+  const tOperatingHrs = "Operating Hours";
+  const tSocialLinks  = "Social Links";
+  const tMapLocation  = "Map Location";
 
-  const hasContacts =
-    Array.isArray(business.contacts) && business.contacts.length > 0;
-  const hasHours =
-    Array.isArray(business.operatingHours) &&
-    business.operatingHours.length > 0;
-  const hasSocial =
-    Array.isArray(business.socialLinks) && business.socialLinks.length > 0;
+  /* helpers */
+  const hasContacts = Array.isArray(business.contacts)       && business.contacts.length       > 0;
+  const hasHours    = Array.isArray(business.operatingHours) && business.operatingHours.length > 0;
+  const hasSocial   = Array.isArray(business.socialLinks)    && business.socialLinks.length    > 0;
 
+  /* contact array ready for <List> */
+  const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] = [];
+  if (business.address)
+    contactItems.push({ icon: <EnvironmentOutlined />, content: business.address });
+  if (business.email)
+    contactItems.push({
+      icon: <MailOutlined />,
+      content: <a href={`mailto:${business.email}`}>{business.email}</a>,
+    });
+  if (hasContacts)
+    contactItems.push({
+      icon: <PhoneOutlined />,
+      content: (
+        <>
+          {business.contacts!.map((c, i) => (
+            <div key={i}>
+              <Text strong>{c.name}: </Text>
+              <a href={`tel:${c.number}`}>{c.number}</a>
+            </div>
+          ))}
+        </>
+      ),
+    });
+
+  /* ───────────────────────── UI ───────────────────────── */
   return (
     <>
-      {/* Compact Card */}
+      {/* ── Compact card on the page ─────────────────── */}
       <Card
         hoverable
         cover={
@@ -76,10 +98,10 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
             <div
               style={{
                 width: "100%",
-                paddingTop: "56.25%",
-                background: `url(${
-                  business.image ?? ""
-                }) center/cover no-repeat`,
+                paddingTop: "56.25%",              /* 16 : 9 */
+                background: `url(${business.image}) center/cover no-repeat`,
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
               }}
             />
           )
@@ -87,34 +109,32 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
         style={{ maxWidth: 500, margin: "auto", borderRadius: 12 }}
         bodyStyle={{ padding: 20 }}
       >
-        <Title level={4}>
-          {getTranslatedText(business.title ?? undefined, language)}
-        </Title>
+        <Title level={4}>{getTranslatedText(business.title, language)}</Title>
 
         {business.subtitle && (
           <Text type="secondary">
-            {getTranslatedText(business.subtitle ?? undefined, language)}
+            {getTranslatedText(business.subtitle, language)}
           </Text>
         )}
 
         {Array.isArray(business.tags) && business.tags.length > 0 && (
-          <div style={{ margin: "8px 0" }}>
+          <div style={{ margin: "8px 0 12px" }}>
             {business.tags.map((t, i) => (
-              <Tag key={i}>{t.value ?? ""}</Tag>
+              <Tag key={i}>{t.value}</Tag>
             ))}
           </div>
         )}
 
         <Paragraph ellipsis={{ rows: 3 }}>
-          {getTranslatedText(business.description ?? undefined, language)}
+          {getTranslatedText(business.description, language)}
         </Paragraph>
 
-        <Space size="middle" style={{ marginTop: 16 }}>
+        <Space size="middle">
           {business.website && (
             <Button
               type="link"
               icon={<GlobalOutlined />}
-              href={business.website ?? "#"}
+              href={business.website}
               target="_blank"
             >
               {tWebsite}
@@ -126,129 +146,121 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
         </Space>
       </Card>
 
-      {/* Full-Screen Modal */}
+      {/* ── FULL-SCREEN OVERLAY ─────────────────────── */}
       <Modal
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        width="100%"
-        style={{ top: 0, padding: 0 }}
-        bodyStyle={{ padding: 32 }}
-        title={getTranslatedText(business?.title ?? undefined, language)}
+        width="100vw"
+        centered={false}
+        style={{ top: 0, padding: 0 }}                 /* no offset, no side-gutter */
+        bodyStyle={{ padding: 0 }}
+        title={getTranslatedText(business.title, language)}
       >
-        <div style={{ maxWidth: 960, margin: "auto" }}>
-          {/* Banner */}
+        {/* single scroll zone */}
+        <div
+          style={{
+            height: "calc(100vh - 100px)",             /* 55 ≈ header height */
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          {/* banner/logo full-width */}
           {business.image && (
             <div
               style={{
                 width: "100%",
-                paddingTop: "45%",
-                background: `url(${
-                  business?.image ?? ""
-                }) center/cover no-repeat`,
-                borderRadius: 8,
-                marginBottom: 24,
+                paddingTop: "56%",
+                background: `url(${business.image}) center/contain no-repeat`,
               }}
             />
           )}
 
-          {/* Basic Info */}
-          {business.subtitle && (
-            <Title level={5}>
-              {getTranslatedText(business.subtitle ?? undefined, language)}
-            </Title>
-          )}
-          <Paragraph style={{ fontSize: 16, marginBottom: 24 }}>
-            {getTranslatedText(business.description ?? undefined, language)}
-          </Paragraph>
-
-          {/* Contact Info */}
-          <List
-            itemLayout="horizontal"
-            dataSource={[
-              business.address && {
-                icon: <EnvironmentOutlined />,
-                content: <Text>{business.address ?? ""}</Text>,
-              },
-              business.email && {
-                icon: <MailOutlined />,
-                content: (
-                  <a href={`mailto:${business.email ?? ""}`}>
-                    <Text>{business.email ?? ""}</Text>
-                  </a>
-                ),
-              },
-              hasContacts && {
-                icon: <PhoneOutlined />,
-                content: (
-                  <div>
-                    {business.contacts?.map((c, i) => (
-                      <div key={i}>
-                        <Text strong>{c.name ?? ""}:</Text>{" "}
-                        <a href={`tel:${c.number ?? ""}`}>{c.number ?? ""}</a>
-                      </div>
-                    ))}
-                  </div>
-                ),
-              },
-            ].filter(Boolean)}
-            renderItem={(item: any) => (
-              <List.Item>
-                <List.Item.Meta avatar={item.icon} description={item.content} />
-              </List.Item>
+          {/* content column */}
+          <div style={{ maxWidth: 960, margin: "0 auto", padding: 32 }}>
+            {business.subtitle && (
+              <Title level={5}>
+                {getTranslatedText(business.subtitle, language)}
+              </Title>
             )}
-          />
 
-          {/* Operating Hours */}
-          {hasHours && (
-            <>
-              <Divider>{tOperatingHours}</Divider>
+            <Paragraph style={{ fontSize: 16 }}>
+              {getTranslatedText(business.description, language)}
+            </Paragraph>
+
+            {/* contacts */}
+            {contactItems.length > 0 && (
               <List
-                dataSource={business.operatingHours ?? []}
-                renderItem={(h) => (
+                itemLayout="horizontal"
+                dataSource={contactItems}
+                renderItem={(item) => (
                   <List.Item>
-                    <ClockCircleOutlined style={{ marginRight: 8 }} />
-                    <Text>
-                      {h.day ?? ""}: {h.open ?? ""} – {h.close ?? ""}
-                    </Text>
+                    <List.Item.Meta
+                      avatar={item.icon}
+                      description={item.content}
+                    />
                   </List.Item>
                 )}
               />
-            </>
-          )}
+            )}
 
-          {/* Social Links */}
-          {hasSocial && (
-            <>
-              <Divider>{tSocialLinks}</Divider>
-              <Space size="middle">
-                {business.socialLinks?.map((s, i) => (
-                  <a
-                    key={i}
-                    href={s.url ?? "#"}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {platformIcons[s.platform ?? ""] || <GlobalOutlined />}{" "}
-                    <Text>{s.platform ?? ""}</Text>
-                  </a>
-                ))}
-              </Space>
-            </>
-          )}
+            {/* hours */}
+            {hasHours && (
+              <>
+                <Divider>{tOperatingHrs}</Divider>
+                <List
+                  dataSource={business.operatingHours}
+                  renderItem={(h) => (
+                    <List.Item>
+                      <ClockCircleOutlined style={{ marginRight: 8 }} />
+                      <Text>
+                        {h.day}: {h.open} – {h.close}
+                      </Text>
+                    </List.Item>
+                  )}
+                />
+              </>
+            )}
 
-          {/* Map */}
-          {business.mapLink && (
-            <>
-              <Divider>{tMapLocation}</Divider>
-              <iframe
-                src={business.mapLink ?? ""}
-                style={{ width: "100%", height: 300, border: 0 }}
-                allowFullScreen
-                loading="lazy"
-              />
-            </>
-          )}
+            {/* socials */}
+            {hasSocial && (
+              <>
+                <Divider>{tSocialLinks}</Divider>
+                <Space size="large" wrap>
+                  {business.socialLinks!.map((s, i) => (
+                    <a
+                      key={i}
+                      href={s.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
+                      {platformIcons[s.platform] || <GlobalOutlined />}
+                      <span>{s.platform}</span>
+                    </a>
+                  ))}
+                </Space>
+              </>
+            )}
+
+            {/* map */}
+            {business.mapLink && (
+              <>
+                <Divider>{tMapLocation}</Divider>
+                <iframe
+                  src={business.mapLink}
+                  style={{
+                    width: "100%",
+                    height: 320,
+                    border: 0,
+                    borderRadius: 8,
+                  }}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </>
+            )}
+          </div>
         </div>
       </Modal>
     </>
