@@ -1,0 +1,89 @@
+/*  ─────────────────  base layout ─────────────────  */
+.tm-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.tm-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: -1;
+}
+
+.tm-card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+/*  image  */
+.tm-cover {
+  flex: 1 1 40%;
+  position: relative;
+  overflow: hidden;
+}
+.tm-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.tm-cover img:hover {
+  transform: scale(1.05);
+}
+
+/*  details  */
+.tm-details {
+  flex: 1 1 60%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/*  ─────────────────  break-point: < 992px (lg→md) ─────────────────  */
+@media (max-width: 991.98px) {
+  .tm-details {
+    padding: 32px;
+  }
+}
+
+/*  ─────────────────  break-point: < 768px (tablet / md→sm) ─────────────────  */
+@media (max-width: 767.98px) {
+  .tm-page {
+    padding: 16px;
+  }
+  .tm-card {
+    flex-direction: column;
+  }
+  .tm-cover {
+    flex: 0 0 auto;
+    height: 120vw;
+  } /* tall portrait */
+  .tm-details {
+    padding: 24px;
+    text-align: center;
+  }
+}
+
+/*  ─────────────────  break-point: < 576px (phone / xs) ─────────────────  */
+@media (max-width: 575.98px) {
+  .tm-cover {
+    height: 150vw;
+  } /* extra tall on small phones */
+  .tm-details {
+    padding: 20px;
+  }
+}
