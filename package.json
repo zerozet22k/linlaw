@@ -1,13 +1,33 @@
 {
-  "name": "honestonlinelearning",
-  "version": "0.1.0",
+  "name": "linlaw",
+  "version": "1.1.0",
   "private": true,
+  "description": "LinLaw Web (Next.js 14 app)",
+  "author": "LinLaw",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zerozet22k/linlaw.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zerozet22k/linlaw/issues"
+  },
+  "homepage": "https://github.com/zerozet22k/linlaw#readme",
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
+    "start:standalone": "cross-env NODE_ENV=production PORT=3000 HOSTNAME=127.0.0.1 node .next/standalone/server.js",
+    "clean": "rimraf .next .turbo",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "next lint",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write .",
     "git-push": "git add . && git commit -m \"Auto: Committing changes\" && git push origin master && git push clone master"
   },
   "dependencies": {
@@ -49,10 +69,32 @@
     "@types/react-dom": "^18",
     "@types/react-window": "^1.8.8",
     "@types/react-world-flags": "^1.6.0",
+    "concurrently": "^9.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
+    "rimraf": "^5.0.10",
     "tailwindcss": "^3.4.13",
     "typescript": "^5"
-  }
+  },
+  "browserslist": {
+    "production": [
+      "last 3 Chrome versions",
+      "last 3 Firefox versions",
+      "last 2 Safari versions",
+      "Edge >= 114",
+      "not dead"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintIgnore": [
+    ".next",
+    "node_modules"
+  ]
 }
