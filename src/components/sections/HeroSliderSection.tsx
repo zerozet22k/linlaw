@@ -23,60 +23,121 @@ export interface Slide {
   header: LanguageJson;
   description?: LanguageJson;
   textAlign: TextAlign;
+  alt?: string;
 }
 
 interface HeroSliderProps {
   slides: Slide[];
   delay: number;
+  /** Optional responsive sizes; defaults assume full-width slides */
+  sizes?: {
+    desktop?: string; // e.g. "100vw" or "1200px"
+    tablet?: string; // e.g. "100vw" or "768px"
+    mobile?: string; // e.g. "100vw" or "375px"
+  };
 }
 
-const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay }) => {
+const HeroSliderSection: React.FC<HeroSliderProps> = ({
+  slides,
+  delay,
+  sizes,
+}) => {
   const { language } = useLanguage();
+
+  // Default sizes; adjust if your slide container isn’t full width
+  const desktopSize = sizes?.desktop ?? "100vw";
+  const tabletSize = sizes?.tablet ?? "100vw";
+  const mobileSize = sizes?.mobile ?? "100vw";
+
+  // Fallback chain helper: pick the first defined image
+  const pick = (...candidates: Array<string | undefined>) =>
+    candidates.find(Boolean) ?? "";
+
+  // Combined sizes string for <img> fallback
+  const sizesAttr = `(min-width: 1024px) ${desktopSize}, (min-width: 768px) ${tabletSize}, ${mobileSize}`;
 
   return (
     <div className="swiper-wrapper no-select">
       <Swiper
-        grabCursor={true}
-        centeredSlides={true}
+        grabCursor
+        centeredSlides
         slidesPerView={1}
-        autoplay={{ delay: delay, disableOnInteraction: false }}
-        loop={true}
+        autoplay={{ delay, disableOnInteraction: false }}
+        loop
         navigation
         pagination={{ clickable: true }}
         modules={[EffectCube, Navigation, Pagination, Autoplay]}
         className="swiper-container"
+        // Uncomment if you actually want the cube effect:
+        // effect="cube"
       >
-        {slides.map((slide, index) => (
-          <SwiperSlide key={index}>
-            <div className="slide-content">
-              <picture>
-                <source
-                  media="(min-width: 1024px)"
-                  srcSet={slide.images.desktop}
-                />
-                <source
-                  media="(min-width: 768px)"
-                  srcSet={slide.images.tablet}
-                />
-                <source
-                  media="(max-width: 767px)"
-                  srcSet={slide.images.mobile}
-                />
-                <img
-                  src={slide.images.mobile}
-                  alt={`Slide Index`}
-                  className="slide-image"
-                />
-              </picture>
-              <div className={`slide-info ${slide.textAlign}`}>
-                <h2>{getTranslatedText(slide.header, language)}</h2>
-                {slide.description && (
-                  <p>{getTranslatedText(slide.description, language)}</p>
-                )}
+        {slides.map((slide, index) => {
+          const isFirst = index === 0;
+
+          // Resolve the three breakpoints with fallbacks
+          const desktopSrc = pick(
+            slide.images.desktop,
+            slide.images.tablet,
+            slide.images.mobile
+          );
+          const tabletSrc = pick(
+            slide.images.tablet,
+            slide.images.desktop,
+            slide.images.mobile
+          );
+          const mobileSrc = pick(
+            slide.images.mobile,
+            slide.images.tablet,
+            slide.images.desktop
+          );
+
+          const altText =
+            slide.alt ??
+            (typeof slide.header === "string"
+              ? slide.header
+              : getTranslatedText(slide.header, language));
+
+          return (
+            <SwiperSlide key={index}>
+              <div className="slide-content">
+                <picture>
+                  <source
+                    media="(min-width: 1024px)"
+                    srcSet={desktopSrc}
+                    sizes={desktopSize}
+                  />
+                  <source
+                    media="(min-width: 768px)"
+                    srcSet={tabletSrc}
+                    sizes={tabletSize}
+                  />
+                  <source
+                    media="(max-width: 767px)"
+                    srcSet={mobileSrc}
+                    sizes={mobileSize}
+                  />
+                  {/* Fallback <img>. Keep sizes for correct selection if UA ignores <source> */}
+                  <img
+                    src={mobileSrc}
+                    alt={String(altText ?? `Slide ${index + 1}`)}
+                    className="slide-image"
+                    loading={isFirst ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={isFirst ? "high" : "auto"}
+                    sizes={sizesAttr}
+                  />
+                </picture>
+
+                <div className={`slide-info ${slide.textAlign}`}>
+                  <h2>{getTranslatedText(slide.header, language)}</h2>
+                  {slide.description && (
+                    <p>{getTranslatedText(slide.description, language)}</p>
+                  )}
+                </div>
               </div>
-            </div>
-          </SwiperSlide>
-        ))}
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
     </div>
   );

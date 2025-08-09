@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Card,
-  Typography,
-  Tag,
-  Button,
-  List,
-  Divider,
-  Space,
-} from "antd";
+import { Card, Typography, Tag, Button, List, Divider, Space } from "antd";
 import {
   PhoneOutlined,
   GlobalOutlined,
@@ -40,10 +32,10 @@ type BusinessItem =
   HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]["items"][number];
 
 const platformIcons: Record<string, React.ReactNode> = {
-  facebook:  <FacebookFilled />,
+  facebook: <FacebookFilled />,
   instagram: <InstagramFilled />,
-  twitter:   <TwitterCircleFilled />,
-  linkedin:  <LinkedinFilled />,
+  twitter: <TwitterCircleFilled />,
+  linkedin: <LinkedinFilled />,
 };
 
 /* ───────── Lock body scroll while overlay is open ───────── */
@@ -59,27 +51,38 @@ const useBodyLock = (locked: boolean) => {
 };
 
 /* ───────────────── Component ───────────────── */
-const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) => {
+const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
+  business,
+}) => {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   if (!business) return null;
 
   /* i18n labels */
-  const tWebsite      = "Website";
-  const tViewDetails  = getTranslatedText(commonTranslations.details, language) || "View Details";
+  const tWebsite = "Website";
+  const tViewDetails =
+    getTranslatedText(commonTranslations.details, language) || "View Details";
   const tOperatingHrs = "Operating Hours";
-  const tSocialLinks  = "Social Links";
-  const tMapLocation  = "Map Location";
+  const tSocialLinks = "Social Links";
+  const tMapLocation = "Map Location";
 
   /* helpers */
-  const hasContacts = Array.isArray(business.contacts)       && business.contacts.length       > 0;
-  const hasHours    = Array.isArray(business.operatingHours) && business.operatingHours.length > 0;
-  const hasSocial   = Array.isArray(business.socialLinks)    && business.socialLinks.length    > 0;
+  const hasContacts =
+    Array.isArray(business.contacts) && business.contacts.length > 0;
+  const hasHours =
+    Array.isArray(business.operatingHours) &&
+    business.operatingHours.length > 0;
+  const hasSocial =
+    Array.isArray(business.socialLinks) && business.socialLinks.length > 0;
 
   /* contacts list */
-  const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] = [];
+  const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] =
+    [];
   if (business.address)
-    contactItems.push({ icon: <EnvironmentOutlined />, content: business.address });
+    contactItems.push({
+      icon: <EnvironmentOutlined />,
+      content: business.address,
+    });
   if (business.email)
     contactItems.push({
       icon: <MailOutlined />,
@@ -109,7 +112,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) =>
           <div
             style={{
               width: "100%",
-              paddingTop: "56.25%", /* 16:9 */
+              paddingTop: "56.25%" /* 16:9 */,
               background: `url(${business.image}) center/cover no-repeat`,
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
@@ -163,6 +166,10 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) =>
     ? createPortal(
         <div
           style={{
+            width: "100vw",
+            height: "100vh",
+            margin: 0,
+            padding: 0,
             position: "fixed",
             inset: 0,
             zIndex: 1300,
@@ -184,7 +191,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) =>
             style={{
               flex: 1,
               overflowY: "auto",
-              overflowX: "hidden",               /* ← fixes viewport widen */
+              overflowX: "hidden" /* ← fixes viewport widen */,
               WebkitOverflowScrolling: "touch",
             }}
           >
@@ -206,7 +213,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) =>
                 maxWidth: 960,
                 margin: "0 auto",
                 padding: "24px 16px 40px",
-                boxSizing: "border-box",          /* ← padding counts inside width */
+                boxSizing: "border-box" /* ← padding counts inside width */,
               }}
             >
               {business.subtitle && (

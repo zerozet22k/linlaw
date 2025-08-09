@@ -26,8 +26,8 @@ interface Props {
 
 const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
   const { language } = useLanguage();
-  const [loading, setLoading] = React.useState(false);
-  const [hasData, setHasData] = React.useState(true);
+  const [loading] = React.useState(false);
+  const [hasData] = React.useState(true);
 
   const {
     address = "-",
@@ -52,8 +52,10 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
     getTranslatedText(contactTranslations.mapNotice, language) ||
     "Map will appear here once available.";
 
-  const translatedLoading = getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const translatedNoData = getTranslatedText(commonTranslations.noData, language) || "No Data";
+  const translatedLoading =
+    getTranslatedText(commonTranslations.loading, language) || "Loading...";
+  const translatedNoData =
+    getTranslatedText(commonTranslations.noData, language) || "No Data";
 
   if (loading) {
     return (
@@ -72,9 +74,18 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
-      <Row gutter={[48, 32]} align="middle" wrap>
-        <Col xs={24} md={14}>
+    <div
+      style={{
+        maxWidth: 1200,
+        margin: "0 auto",
+        width: "100%",
+        paddingInline: 24,
+        overflowX: "hidden",
+        boxSizing: "border-box",
+      }}
+    >
+      <Row gutter={[{ xs: 24, sm: 24, md: 48 }, 32]} align="middle" wrap>
+        <Col xs={24} md={14} style={{ minWidth: 0 }}>
           <div style={{ paddingRight: 24 }}>
             <Title
               level={2}
@@ -126,7 +137,7 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
         </Col>
 
         {/* RIGHT SIDE — MAP */}
-        <Col xs={24} md={10}>
+        <Col xs={24} md={10} style={{ minWidth: 0 }}>
           {mapLink ? (
             <div
               style={{
@@ -141,9 +152,10 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
                 src={mapLink}
                 width="100%"
                 height="100%"
-                style={{ border: "none" }}
+                style={{ border: "none", display: "block" }}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
+                title="Location map"
               />
             </div>
           ) : (
