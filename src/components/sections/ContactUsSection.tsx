@@ -31,6 +31,41 @@ interface Props {
   contactInfo: BusinessInfo;
 }
 
+// Try to produce an embeddable map src.
+// - If the link already looks like an embed, pass it through.
+// - If it's a normal Google Maps URL, fallback to a query embed using the address.
+// - Otherwise return null and let UI show a placeholder with an external link.
+function resolveEmbedSrc(mapLink: string, address: string) {
+  const trimmed = (mapLink || "").trim();
+
+  // Already an embed link (Google Maps)
+  if (/google\.[^/]+\/maps\/embed/i.test(trimmed)) {
+    return { embedSrc: trimmed, externalHref: trimmed };
+  }
+
+  // Some third-party embed providers allow direct iframe (OpenStreetMap, etc.)
+  if (/openstreetmap\.org\/export\/embed\.html/i.test(trimmed)) {
+    return { embedSrc: trimmed, externalHref: trimmed };
+  }
+
+  // If it’s a standard Google Maps URL (share link, place link, etc.), use a query-based embed.
+  // This works without an API key for basic maps.
+  const isGoogleMaps =
+    /google\.[^/]+\/maps/i.test(trimmed) ||
+    /goo\.gl\/maps/i.test(trimmed) ||
+    /maps\.app\.goo\.gl/i.test(trimmed);
+
+  if (isGoogleMaps || address) {
+    const q = encodeURIComponent(address || trimmed);
+    const embedSrc = `https://www.google.com/maps?q=${q}&output=embed`;
+    const externalHref = trimmed || `https://www.google.com/maps?q=${q}`;
+    return { embedSrc, externalHref };
+  }
+
+  // Nothing we can embed
+  return { embedSrc: null as string | null, externalHref: trimmed || null };
+}
+
 const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
   const { language } = useLanguage();
 
@@ -54,13 +89,12 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
   const translatedMapNotice =
     getTranslatedText(contactTranslations.mapNotice, language) ||
     "Map will appear here once available.";
-  const translatedLoading =
-    getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const translatedNoData =
-    getTranslatedText(commonTranslations.noData, language) || "No Data";
 
-  // shared responsive height for both columns on md+ so vertical centering lines up with the map
   const colMinHeight = "clamp(240px, 32vw, 420px)";
+  const { embedSrc, externalHref } = resolveEmbedSrc(
+    mapLink,
+    address === "-" ? "" : address
+  );
 
   return (
     <section style={sectionOuterStyle}>
@@ -74,7 +108,7 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
           boxSizing: "border-box",
         }}
       >
-        {/* Header on top */}
+        {/* Header */}
         <div style={sectionWrapperStyle}>
           <Title
             level={2}
@@ -90,15 +124,14 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
         </div>
 
         <Row gutter={[{ xs: 16, sm: 20, md: 48 }, 24]} align="stretch" wrap>
-          {/* LEFT: details, vertically centered to map on md+ */}
+          {/* LEFT: details (vertically centered) */}
           <Col xs={24} md={12} style={{ minWidth: 0 }}>
             <div
               style={{
-                // match map height so we can center vertically
                 minHeight: colMinHeight,
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center", // vertical centering
+                justifyContent: "center",
                 gap: 18,
               }}
             >
@@ -195,13 +228,12 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
             </div>
           </Col>
 
-          {/* RIGHT: map (or placeholder) */}
+          {/* RIGHT: map or placeholder with external link */}
           <Col xs={24} md={12} style={{ minWidth: 0 }}>
-            {mapLink ? (
+            {embedSrc ? (
               <div
                 style={{
                   width: "100%",
-                  // use same responsive height as left col
                   minHeight: colMinHeight,
                   borderRadius: 12,
                   overflow: "hidden",
@@ -211,7 +243,7 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
                 }}
               >
                 <iframe
-                  src={mapLink}
+                  src={embedSrc}
                   style={{ border: "none", flex: 1, display: "block" }}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -242,11 +274,21 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
                     style={{
                       marginTop: 8,
                       ...sectionDescriptionStyle,
-                      marginBottom: 0,
+                      marginBottom: 12,
                     }}
                   >
                     {translatedMapNotice}
                   </div>
+                  {externalHref ? (
+                    <a
+                      href={externalHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#1677ff", fontSize: 14 }}
+                    >
+                      Open in Maps
+                    </a>
+                  ) : null}
                 </div>
               </div>
             )}
