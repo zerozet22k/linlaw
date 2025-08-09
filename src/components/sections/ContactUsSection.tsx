@@ -14,7 +14,7 @@ import {
 } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
-import { contactTranslations, commonTranslations } from "@/translations";
+import { contactTranslations } from "@/translations";
 
 import {
   sectionOuterStyle,
@@ -31,25 +31,13 @@ interface Props {
   contactInfo: BusinessInfo;
 }
 
-// Try to produce an embeddable map src.
-// - If the link already looks like an embed, pass it through.
-// - If it's a normal Google Maps URL, fallback to a query embed using the address.
-// - Otherwise return null and let UI show a placeholder with an external link.
 function resolveEmbedSrc(mapLink: string, address: string) {
   const trimmed = (mapLink || "").trim();
-
-  // Already an embed link (Google Maps)
-  if (/google\.[^/]+\/maps\/embed/i.test(trimmed)) {
+  if (/google\.[^/]+\/maps\/embed/i.test(trimmed))
     return { embedSrc: trimmed, externalHref: trimmed };
-  }
-
-  // Some third-party embed providers allow direct iframe (OpenStreetMap, etc.)
-  if (/openstreetmap\.org\/export\/embed\.html/i.test(trimmed)) {
+  if (/openstreetmap\.org\/export\/embed\.html/i.test(trimmed))
     return { embedSrc: trimmed, externalHref: trimmed };
-  }
 
-  // If it’s a standard Google Maps URL (share link, place link, etc.), use a query-based embed.
-  // This works without an API key for basic maps.
   const isGoogleMaps =
     /google\.[^/]+\/maps/i.test(trimmed) ||
     /goo\.gl\/maps/i.test(trimmed) ||
@@ -57,12 +45,11 @@ function resolveEmbedSrc(mapLink: string, address: string) {
 
   if (isGoogleMaps || address) {
     const q = encodeURIComponent(address || trimmed);
-    const embedSrc = `https://www.google.com/maps?q=${q}&output=embed`;
-    const externalHref = trimmed || `https://www.google.com/maps?q=${q}`;
-    return { embedSrc, externalHref };
+    return {
+      embedSrc: `https://www.google.com/maps?q=${q}&output=embed`,
+      externalHref: trimmed || `https://www.google.com/maps?q=${q}`,
+    };
   }
-
-  // Nothing we can embed
   return { embedSrc: null as string | null, externalHref: trimmed || null };
 }
 
@@ -90,11 +77,13 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
     getTranslatedText(contactTranslations.mapNotice, language) ||
     "Map will appear here once available.";
 
-  const colMinHeight = "clamp(240px, 32vw, 420px)";
   const { embedSrc, externalHref } = resolveEmbedSrc(
     mapLink,
     address === "-" ? "" : address
   );
+
+  // shared responsive height (md+) so the two columns feel balanced
+  const colMinHeight = "clamp(240px, 32vw, 420px)";
 
   return (
     <section style={sectionOuterStyle}>
@@ -104,7 +93,6 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
           margin: "0 auto",
           width: "100%",
           paddingInline: 24,
-          overflowX: "hidden",
           boxSizing: "border-box",
         }}
       >
@@ -123,9 +111,9 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
           </Title>
         </div>
 
-        <Row gutter={[{ xs: 16, sm: 20, md: 48 }, 24]} align="stretch" wrap>
-          {/* LEFT: details (vertically centered) */}
-          <Col xs={24} md={12} style={{ minWidth: 0 }}>
+        <Row gutter={[{ xs: 16, sm: 20, md: 24 }, 24]} align="stretch" wrap>
+          {/* LEFT: details — left aligned, but hugged toward the center on md+ */}
+          <Col xs={24} md={13} style={{ minWidth: 0 }}>
             <div
               style={{
                 minHeight: colMinHeight,
@@ -133,6 +121,9 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
                 flexDirection: "column",
                 justifyContent: "center",
                 gap: 18,
+                maxWidth: 460, // readable line length
+                marginLeft: "auto", // push block to column's right edge (toward center seam)
+                textAlign: "left",
               }}
             >
               {/* Address */}
@@ -228,20 +219,22 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
             </div>
           </Col>
 
-          {/* RIGHT: map or placeholder with external link */}
-          <Col xs={24} md={12} style={{ minWidth: 0 }}>
-            {embedSrc ? (
-              <div
-                style={{
-                  width: "100%",
-                  minHeight: colMinHeight,
-                  borderRadius: 12,
-                  overflow: "hidden",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
-                  background: "#f5f5f5",
-                  display: "flex",
-                }}
-              >
+          {/* RIGHT: map — stays right, but hugged toward the center on md+ */}
+          <Col xs={24} md={11} style={{ minWidth: 0 }}>
+            <div
+              style={{
+                width: "100%",
+                minHeight: colMinHeight,
+                borderRadius: 12,
+                overflow: "hidden",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
+                background: "#f5f5f5",
+                display: "flex",
+                marginRight: "auto", // pull to column's left edge (toward center seam)
+                maxWidth: 600, // keep a nice balance with the text block
+              }}
+            >
+              {embedSrc ? (
                 <iframe
                   src={embedSrc}
                   style={{ border: "none", flex: 1, display: "block" }}
@@ -249,49 +242,46 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Location map"
                 />
-              </div>
-            ) : (
-              <div
-                style={{
-                  width: "100%",
-                  minHeight: colMinHeight,
-                  borderRadius: 12,
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
-                  background: "linear-gradient(180deg, #fafafa, #f0f0f0)",
-                  border: "1px dashed #d9d9d9",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  padding: 16,
-                }}
-              >
-                <div>
-                  <EnvironmentOutlined
-                    style={{ fontSize: 28, color: "#8c8c8c" }}
-                  />
-                  <div
-                    style={{
-                      marginTop: 8,
-                      ...sectionDescriptionStyle,
-                      marginBottom: 12,
-                    }}
-                  >
-                    {translatedMapNotice}
-                  </div>
-                  {externalHref ? (
-                    <a
-                      href={externalHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: "#1677ff", fontSize: 14 }}
+              ) : (
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    padding: 16,
+                    background: "linear-gradient(180deg, #fafafa, #f0f0f0)",
+                    border: "1px dashed #d9d9d9",
+                  }}
+                >
+                  <div>
+                    <EnvironmentOutlined
+                      style={{ fontSize: 28, color: "#8c8c8c" }}
+                    />
+                    <div
+                      style={{
+                        marginTop: 8,
+                        ...sectionDescriptionStyle,
+                        marginBottom: 12,
+                      }}
                     >
-                      Open in Maps
-                    </a>
-                  ) : null}
+                      {translatedMapNotice}
+                    </div>
+                    {externalHref ? (
+                      <a
+                        href={externalHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: "#1677ff", fontSize: 14 }}
+                      >
+                        Open in Maps
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </Col>
         </Row>
       </div>
