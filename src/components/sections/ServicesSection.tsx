@@ -5,6 +5,12 @@ import { Row, Col, Card } from "antd";
 import { motion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
 import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
+import {
+  sectionTitleStyle,
+  sectionDescriptionStyle,
+  sectionWrapperStyle,
+  sectionOuterStyle,
+} from "./sectionStyles";
 
 type ServiceItem = {
   title: LanguageJson;
@@ -39,21 +45,11 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
   const translatedDescription = getTranslatedText(description, language);
 
   return (
-    <section style={{ padding: "60px 20px", width: "100%" }}>
-      <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <h2
-          style={{
-            fontSize: "2.25em",
-            fontWeight: 600,
-            color: "#222",
-          }}
-        >
-          {translatedTitle}
-        </h2>
+    <section style={sectionOuterStyle}>
+      <div style={sectionWrapperStyle}>
+        <h2 style={sectionTitleStyle}>{translatedTitle}</h2>
         {translatedDescription && (
-          <p style={{ fontSize: 16, color: "#555", marginTop: 8 }}>
-            {translatedDescription}
-          </p>
+          <p style={sectionDescriptionStyle}>{translatedDescription}</p>
         )}
       </div>
 

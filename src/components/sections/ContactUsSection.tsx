@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Row, Col, Typography, Space } from "antd";
+import { Row, Col, Typography } from "antd";
 import {
   EnvironmentOutlined,
   PhoneOutlined,
@@ -16,6 +16,13 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { contactTranslations, commonTranslations } from "@/translations";
 
+import {
+  sectionOuterStyle,
+  sectionWrapperStyle,
+  sectionTitleStyle,
+  sectionDescriptionStyle,
+} from "./sectionStyles";
+
 const { Title, Text } = Typography;
 
 type BusinessInfo = GLOBAL_SETTINGS_TYPES[typeof GK.BUSINESS_INFO];
@@ -26,8 +33,6 @@ interface Props {
 
 const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
   const { language } = useLanguage();
-  const [loading] = React.useState(false);
-  const [hasData] = React.useState(true);
 
   const {
     address = "-",
@@ -39,7 +44,6 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
   const translatedTitle =
     getTranslatedText(contactTranslations.header, language) ||
     "Contact Information";
-
   const translatedAddress =
     getTranslatedText(contactTranslations.address, language) || "Address";
   const translatedPhone =
@@ -47,125 +51,209 @@ const ContactUsSection: React.FC<Props> = ({ contactInfo }) => {
     "Phone Number";
   const translatedEmail =
     getTranslatedText(contactTranslations.email, language) || "Email";
-
   const translatedMapNotice =
     getTranslatedText(contactTranslations.mapNotice, language) ||
     "Map will appear here once available.";
-
   const translatedLoading =
     getTranslatedText(commonTranslations.loading, language) || "Loading...";
   const translatedNoData =
     getTranslatedText(commonTranslations.noData, language) || "No Data";
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: 48 }}>
-        <Text type="secondary">{translatedLoading}</Text>
-      </div>
-    );
-  }
-
-  if (!hasData) {
-    return (
-      <div style={{ textAlign: "center", padding: 48 }}>
-        <Text type="secondary">{translatedNoData}</Text>
-      </div>
-    );
-  }
+  // shared responsive height for both columns on md+ so vertical centering lines up with the map
+  const colMinHeight = "clamp(240px, 32vw, 420px)";
 
   return (
-    <div
-      style={{
-        maxWidth: 1200,
-        margin: "0 auto",
-        width: "100%",
-        paddingInline: 24,
-        overflowX: "hidden",
-        boxSizing: "border-box",
-      }}
-    >
-      <Row gutter={[{ xs: 24, sm: 24, md: 48 }, 32]} align="middle" wrap>
-        <Col xs={24} md={14} style={{ minWidth: 0 }}>
-          <div style={{ paddingRight: 24 }}>
-            <Title
-              level={2}
-              style={{
-                fontSize: "2.25em",
-                fontWeight: 600,
-                marginBottom: 32,
-                color: "#2c3e50",
-              }}
-            >
-              {translatedTitle}
-            </Title>
+    <section style={sectionOuterStyle}>
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          width: "100%",
+          paddingInline: 24,
+          overflowX: "hidden",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* Header on top */}
+        <div style={sectionWrapperStyle}>
+          <Title
+            level={2}
+            style={{
+              ...sectionTitleStyle,
+              fontSize: "clamp(1.6em, 5vw, 2.25em)",
+              color: "#2c3e50",
+              marginBottom: 0,
+            }}
+          >
+            {translatedTitle}
+          </Title>
+        </div>
 
-            <Space direction="vertical" size="large" style={{ fontSize: 16 }}>
-              <div>
-                <EnvironmentOutlined
-                  style={{ fontSize: 22, color: "#d4380d", marginRight: 12 }}
-                />
-                <Text strong style={{ fontSize: 16 }}>
-                  {translatedAddress}
-                </Text>
-                <br />
-                <Text style={{ color: "#999", fontSize: 13 }}>{address}</Text>
-              </div>
-
-              <div>
-                <PhoneOutlined
-                  style={{ fontSize: 22, color: "#389e0d", marginRight: 12 }}
-                />
-                <Text strong style={{ fontSize: 16 }}>
-                  {translatedPhone}
-                </Text>
-                <br />
-                <Text style={{ color: "#999", fontSize: 13 }}>{phone}</Text>
-              </div>
-
-              <div>
-                <MailOutlined
-                  style={{ fontSize: 22, color: "#096dd9", marginRight: 12 }}
-                />
-                <Text strong style={{ fontSize: 16 }}>
-                  {translatedEmail}
-                </Text>
-                <br />
-                <Text style={{ color: "#999", fontSize: 13 }}>{email}</Text>
-              </div>
-            </Space>
-          </div>
-        </Col>
-
-        {/* RIGHT SIDE — MAP */}
-        <Col xs={24} md={10} style={{ minWidth: 0 }}>
-          {mapLink ? (
+        <Row gutter={[{ xs: 16, sm: 20, md: 48 }, 24]} align="stretch" wrap>
+          {/* LEFT: details, vertically centered to map on md+ */}
+          <Col xs={24} md={12} style={{ minWidth: 0 }}>
             <div
               style={{
-                width: "100%",
-                height: 360,
-                borderRadius: 12,
-                overflow: "hidden",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
+                // match map height so we can center vertically
+                minHeight: colMinHeight,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center", // vertical centering
+                gap: 18,
               }}
             >
-              <iframe
-                src={mapLink}
-                width="100%"
-                height="100%"
-                style={{ border: "none", display: "block" }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Location map"
-              />
+              {/* Address */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <EnvironmentOutlined
+                    style={{ fontSize: 22, color: "#d4380d" }}
+                  />
+                  <Text strong style={{ fontSize: 16 }}>
+                    {translatedAddress}
+                  </Text>
+                </div>
+                <Text
+                  style={{
+                    color: "#666",
+                    fontSize: 14,
+                    display: "block",
+                    marginTop: 6,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {address}
+                </Text>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <PhoneOutlined style={{ fontSize: 22, color: "#389e0d" }} />
+                  <Text strong style={{ fontSize: 16 }}>
+                    {translatedPhone}
+                  </Text>
+                </div>
+                {phone && phone !== "-" ? (
+                  <a
+                    href={`tel:${phone.replace(/\s+/g, "")}`}
+                    style={{
+                      color: "#1677ff",
+                      fontSize: 14,
+                      display: "inline-block",
+                      marginTop: 6,
+                    }}
+                  >
+                    {phone}
+                  </a>
+                ) : (
+                  <Text
+                    style={{
+                      color: "#666",
+                      fontSize: 14,
+                      display: "block",
+                      marginTop: 6,
+                    }}
+                  >
+                    {phone}
+                  </Text>
+                )}
+              </div>
+
+              {/* Email */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <MailOutlined style={{ fontSize: 22, color: "#096dd9" }} />
+                  <Text strong style={{ fontSize: 16 }}>
+                    {translatedEmail}
+                  </Text>
+                </div>
+                {email && email !== "-" ? (
+                  <a
+                    href={`mailto:${email}`}
+                    style={{
+                      color: "#1677ff",
+                      fontSize: 14,
+                      display: "inline-block",
+                      marginTop: 6,
+                    }}
+                  >
+                    {email}
+                  </a>
+                ) : (
+                  <Text
+                    style={{
+                      color: "#666",
+                      fontSize: 14,
+                      display: "block",
+                      marginTop: 6,
+                    }}
+                  >
+                    {email}
+                  </Text>
+                )}
+              </div>
             </div>
-          ) : (
-            <div style={{ padding: 24, textAlign: "center" }}>
-              <Text type="secondary">{translatedMapNotice}</Text>
-            </div>
-          )}
-        </Col>
-      </Row>
-    </div>
+          </Col>
+
+          {/* RIGHT: map (or placeholder) */}
+          <Col xs={24} md={12} style={{ minWidth: 0 }}>
+            {mapLink ? (
+              <div
+                style={{
+                  width: "100%",
+                  // use same responsive height as left col
+                  minHeight: colMinHeight,
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
+                  background: "#f5f5f5",
+                  display: "flex",
+                }}
+              >
+                <iframe
+                  src={mapLink}
+                  style={{ border: "none", flex: 1, display: "block" }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Location map"
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  minHeight: colMinHeight,
+                  borderRadius: 12,
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.07)",
+                  background: "linear-gradient(180deg, #fafafa, #f0f0f0)",
+                  border: "1px dashed #d9d9d9",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  padding: 16,
+                }}
+              >
+                <div>
+                  <EnvironmentOutlined
+                    style={{ fontSize: 28, color: "#8c8c8c" }}
+                  />
+                  <div
+                    style={{
+                      marginTop: 8,
+                      ...sectionDescriptionStyle,
+                      marginBottom: 0,
+                    }}
+                  >
+                    {translatedMapNotice}
+                  </div>
+                </div>
+              </div>
+            )}
+          </Col>
+        </Row>
+      </div>
+    </section>
   );
 };
 

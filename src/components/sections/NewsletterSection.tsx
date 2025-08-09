@@ -9,6 +9,12 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { INewsletterAPI } from "@/models/Newsletter";
 import apiClient from "@/utils/api/apiClient";
 import { commonTranslations, titleTranslations } from "@/translations";
+import {
+  sectionDescriptionStyle,
+  sectionOuterStyle,
+  sectionTitleStyle,
+  sectionWrapperStyle,
+} from "./sectionStyles";
 
 const { Title, Text } = Typography;
 
@@ -43,14 +49,12 @@ const NewsletterSection: React.FC = () => {
     fetchNewsletters();
   }, []);
 
-  // pull in your titles/subtitles
   const translatedTitle =
     getTranslatedText(titleTranslations.newsletterTitle, language) ||
     "Our Newsletters";
   const translatedSubtitle =
     getTranslatedText(titleTranslations.newsletterSubtitle, language) || "";
 
-  // read-more and view-all
   const translatedReadMore =
     getTranslatedText(commonTranslations.readMore, language) || "Read More";
   const translatedViewAll =
@@ -58,14 +62,14 @@ const NewsletterSection: React.FC = () => {
     "View all newsletters";
 
   return (
-    <section style={{ padding: "60px 20px" }}>
+    <section style={sectionOuterStyle}>
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <Title level={2} style={{ fontSize: "2.25em", marginBottom: 8 }}>
+        <div style={sectionWrapperStyle}>
+          <Title level={2} style={sectionTitleStyle}>
             {translatedTitle}
           </Title>
           {translatedSubtitle && (
-            <Text type="secondary" style={{ fontSize: 16 }}>
+            <Text type="secondary" style={sectionDescriptionStyle}>
               {translatedSubtitle}
             </Text>
           )}

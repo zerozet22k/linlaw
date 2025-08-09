@@ -5,6 +5,12 @@ import { Row, Col, Card } from "antd";
 import { motion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
 import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
+import {
+  sectionTitleStyle,
+  sectionDescriptionStyle,
+  sectionWrapperStyle,
+  sectionOuterStyle,
+} from "./sectionStyles";
 
 export type AboutUsSectionItem = {
   title: LanguageJson;
@@ -26,10 +32,6 @@ const variants = {
   animate: { opacity: 1, y: 0 },
 };
 
-/**
- * If you have 3 or fewer cards, split them evenly.
- * Otherwise fall back to your original length-based sizing.
- */
 const getColSpan = (descLen: number, totalItems: number) => {
   if (totalItems <= 3) {
     const span = Math.floor(24 / totalItems);
@@ -48,31 +50,18 @@ const AboutUsSection: React.FC<AboutUsSectionProps> = ({
   if (!items.length) return null;
 
   const title = getTranslatedText(section.title, language) || "About Us";
-  const description =
-    getTranslatedText(section.description, language) || "";
+  const description = getTranslatedText(section.description, language) || "";
 
   return (
-    <section style={{ padding: "60px 20px", background: "#fff" }}>
-      <div
-        style={{
-          textAlign: "center",
-          marginBottom: 40,
-          maxWidth: 960,
-          margin: "0 auto",
-        }}
-      >
-        <h2 style={{ fontSize: "2.25em", fontWeight: 600, color: "#222" }}>
-          {title}
-        </h2>
+    <section style={sectionOuterStyle}>
+      <div style={sectionWrapperStyle}>
+        <h2 style={sectionTitleStyle}>{title}</h2>
         {description && (
           <p
             style={{
-              fontSize: 16,
-              color: "#555",
-              marginTop: 8,
+              ...sectionDescriptionStyle,
               maxWidth: 720,
               margin: "0 auto",
-              lineHeight: 1.7,
             }}
           >
             {description}
@@ -83,8 +72,7 @@ const AboutUsSection: React.FC<AboutUsSectionProps> = ({
       <Row gutter={[24, 24]} justify="start" align="top">
         {items.map((item, idx) => {
           const desc = getTranslatedText(item.description, language) || "";
-          const titleText =
-            getTranslatedText(item.title, language) || "";
+          const titleText = getTranslatedText(item.title, language) || "";
           const colSpan = getColSpan(desc.length, items.length);
 
           return (

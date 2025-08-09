@@ -11,6 +11,13 @@ import {
   HOME_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
+import {
+  sectionOuterStyle,
+  sectionWrapperStyle,
+  sectionTitleStyle,
+  sectionDescriptionStyle,
+} from "./sectionStyles";
+
 type RelatedBusinessSection =
   HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS];
 
@@ -29,30 +36,23 @@ const RelatedBusinesses: React.FC<RelatedBusinessesProps> = ({ section }) => {
   const title =
     getTranslatedText(section.title ?? undefined, language) ||
     "Related Businesses";
-  const description = getTranslatedText(
-    section.description ?? undefined,
-    language
-  );
+  const description =
+    getTranslatedText(section.description ?? undefined, language) || "";
   const items = Array.isArray(section.items) ? section.items : [];
 
   if (items.length === 0) return null;
 
   return (
-    <section style={{ padding: "60px 20px", width: "100%" }}>
+    <section style={sectionOuterStyle}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <h2 style={{ fontSize: "2.25em", fontWeight: 600, color: "#222" }}>
-            {title}
-          </h2>
+        <div style={sectionWrapperStyle}>
+          <h2 style={sectionTitleStyle}>{title}</h2>
           {description && (
             <p
               style={{
-                fontSize: 16,
-                color: "#555",
-                marginTop: 8,
+                ...sectionDescriptionStyle,
                 maxWidth: 720,
                 margin: "0 auto",
-                lineHeight: 1.7,
               }}
             >
               {description}
