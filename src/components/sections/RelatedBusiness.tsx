@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Typography, Tag, Button, List, Divider, Space } from "antd";
 import {
   PhoneOutlined,
@@ -27,7 +27,6 @@ import {
 
 const { Title, Text, Paragraph } = Typography;
 
-/* ───────── Types ───────── */
 type BusinessItem =
   HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]["items"][number];
 
@@ -38,27 +37,28 @@ const platformIcons: Record<string, React.ReactNode> = {
   linkedin: <LinkedinFilled />,
 };
 
-/* ───────── Lock body scroll while overlay is open ───────── */
 const useBodyLock = (locked: boolean) => {
-  React.useEffect(() => {
-    if (!locked) return;
+  useEffect(() => {
     const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    if (locked) document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = original;
     };
   }, [locked]);
 };
 
-/* ───────────────── Component ───────────────── */
 const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
   business,
 }) => {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useBodyLock(open);
+  useEffect(() => setMounted(true), []);
+
   if (!business) return null;
 
-  /* i18n labels */
   const tWebsite = "Website";
   const tViewDetails =
     getTranslatedText(commonTranslations.details, language) || "View Details";
@@ -66,7 +66,6 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
   const tSocialLinks = "Social Links";
   const tMapLocation = "Map Location";
 
-  /* helpers */
   const hasContacts =
     Array.isArray(business.contacts) && business.contacts.length > 0;
   const hasHours =
@@ -75,7 +74,6 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
   const hasSocial =
     Array.isArray(business.socialLinks) && business.socialLinks.length > 0;
 
-  /* contacts list */
   const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] =
     [];
   if (business.address)
@@ -103,7 +101,6 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
       ),
     });
 
-  /* ───────── Compact card (homepage) ───────── */
   const card = (
     <Card
       hoverable
@@ -112,7 +109,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
           <div
             style={{
               width: "100%",
-              paddingTop: "56.25%" /* 16:9 */,
+              paddingTop: "56.25%",
               background: `url(${business.image}) center/cover no-repeat`,
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
@@ -161,152 +158,143 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
     </Card>
   );
 
-  /* ───────── Full-page overlay ───────── */
-  const overlay = open
-    ? createPortal(
-        <div
-          style={{
-            width: "100vw",
-            height: "100vh",
-            margin: 0,
-            padding: 0,
-            position: "fixed",
-            inset: 0,
-            zIndex: 1300,
-            background: "#fff",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* Close button */}
-          <Button
-            shape="circle"
-            icon={<CloseOutlined />}
-            onClick={() => setOpen(false)}
-            style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}
-          />
-
-          {/* Scrollable content */}
+  const overlay =
+    open && mounted
+      ? createPortal(
           <div
             style={{
-              flex: 1,
-              overflowY: "auto",
-              overflowX: "hidden" /* ← fixes viewport widen */,
-              WebkitOverflowScrolling: "touch",
+              width: "100vw",
+              height: "100vh",
+              position: "fixed",
+              inset: 0,
+              zIndex: 1300,
+              background: "#fff",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            {/* Banner */}
-            {business.image && (
-              <div
-                style={{
-                  width: "100%",
-                  maxHeight: 500,
-                  paddingTop: "56%",
-                  background: `url(${business.image}) center/contain no-repeat`,
-                }}
-              />
-            )}
+            <Button
+              shape="circle"
+              icon={<CloseOutlined />}
+              onClick={() => setOpen(false)}
+              style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}
+            />
 
-            {/* Content column */}
             <div
               style={{
-                maxWidth: 960,
-                margin: "0 auto",
-                padding: "24px 16px 40px",
-                boxSizing: "border-box" /* ← padding counts inside width */,
+                flex: 1,
+                overflowY: "auto",
+                overflowX: "hidden",
+                WebkitOverflowScrolling: "touch",
               }}
             >
-              {business.subtitle && (
-                <Title level={5}>
-                  {getTranslatedText(business.subtitle, language)}
-                </Title>
-              )}
-
-              <Paragraph style={{ fontSize: 16 }}>
-                {getTranslatedText(business.description, language)}
-              </Paragraph>
-
-              {contactItems.length > 0 && (
-                <List
-                  itemLayout="horizontal"
-                  dataSource={contactItems}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={item.icon}
-                        description={item.content}
-                      />
-                    </List.Item>
-                  )}
+              {business.image && (
+                <div
+                  style={{
+                    width: "100%",
+                    maxHeight: 500,
+                    paddingTop: "56%",
+                    background: `url(${business.image}) center/contain no-repeat`,
+                  }}
                 />
               )}
 
-              {hasHours && (
-                <>
-                  <Divider>{tOperatingHrs}</Divider>
+              <div
+                style={{
+                  maxWidth: 960,
+                  margin: "0 auto",
+                  padding: "24px 16px 40px",
+                  boxSizing: "border-box",
+                }}
+              >
+                {business.subtitle && (
+                  <Title level={5}>
+                    {getTranslatedText(business.subtitle, language)}
+                  </Title>
+                )}
+
+                <Paragraph style={{ fontSize: 16 }}>
+                  {getTranslatedText(business.description, language)}
+                </Paragraph>
+
+                {contactItems.length > 0 && (
                   <List
-                    dataSource={business.operatingHours}
-                    renderItem={(h) => (
+                    itemLayout="horizontal"
+                    dataSource={contactItems}
+                    renderItem={(item) => (
                       <List.Item>
-                        <ClockCircleOutlined style={{ marginRight: 8 }} />
-                        <Text>
-                          {h.day}: {h.open} – {h.close}
-                        </Text>
+                        <List.Item.Meta
+                          avatar={item.icon}
+                          description={item.content}
+                        />
                       </List.Item>
                     )}
                   />
-                </>
-              )}
+                )}
 
-              {hasSocial && (
-                <>
-                  <Divider>{tSocialLinks}</Divider>
-                  <Space size="large" wrap>
-                    {business.socialLinks!.map((s) => (
-                      <a
-                        key={s.platform}
-                        href={s.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        {platformIcons[s.platform] || <GlobalOutlined />}
-                        <span>{s.platform}</span>
-                      </a>
-                    ))}
-                  </Space>
-                </>
-              )}
+                {hasHours && (
+                  <>
+                    <Divider>{tOperatingHrs}</Divider>
+                    <List
+                      dataSource={business.operatingHours}
+                      renderItem={(h) => (
+                        <List.Item>
+                          <ClockCircleOutlined style={{ marginRight: 8 }} />
+                          <Text>
+                            {h.day}: {h.open} – {h.close}
+                          </Text>
+                        </List.Item>
+                      )}
+                    />
+                  </>
+                )}
 
-              {business.mapLink && (
-                <>
-                  <Divider>{tMapLocation}</Divider>
-                  <iframe
-                    src={business.mapLink}
-                    style={{
-                      width: "100%",
-                      height: 320,
-                      border: 0,
-                      borderRadius: 8,
-                    }}
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </>
-              )}
+                {hasSocial && (
+                  <>
+                    <Divider>{tSocialLinks}</Divider>
+                    <Space size="large" wrap>
+                      {business.socialLinks!.map((s) => (
+                        <a
+                          key={s.platform}
+                          href={s.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          {platformIcons[s.platform] || <GlobalOutlined />}
+                          <span>{s.platform}</span>
+                        </a>
+                      ))}
+                    </Space>
+                  </>
+                )}
+
+                {business.mapLink && (
+                  <>
+                    <Divider>{tMapLocation}</Divider>
+                    <iframe
+                      src={business.mapLink}
+                      style={{
+                        width: "100%",
+                        height: 320,
+                        border: 0,
+                        borderRadius: 8,
+                      }}
+                      allowFullScreen
+                      loading="lazy"
+                    />
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )
-    : null;
-
-  /* lock body when overlay open */
-  useBodyLock(open);
+          </div>,
+          document.body
+        )
+      : null;
 
   return (
     <>
