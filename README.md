@@ -1,23 +1,13 @@
-# LinLaw
+# Linlaw
 
-A modern **Next.js 14** application for the LinLaw platform.  
-Built with **TypeScript**, **TailwindCSS**, **Ant Design**, and **MongoDB**.
+**⚠ Proprietary Project — Not for Public Use**
 
----
-
-## 🚀 Features
-
-- **Next.js 14** with App Router
-- **TypeScript** for type safety
-- **TailwindCSS** + **Ant Design** UI
-- **MongoDB (Mongoose)** integration
-- **Framer Motion** animations
-- **Pusher** real-time updates
-- **Firebase** for auth / storage
-- **Responsive** & mobile-friendly
-- **ESLint + Prettier** code linting & formatting
+This repository contains the source code for the Linlaw web application.  
+It is a **sold and licensed project** intended for internal or client use only.
 
 ---
 
-## 📂 Project Structure
+## License
 
+All rights reserved © 2025.  
+Reproduction, modification, or distribution of this repository’s code — in whole or in part — without prior written consent is strictly forbidden.
