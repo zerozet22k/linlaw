@@ -27,6 +27,9 @@ import {
   FileTypeWithEmpty,
 } from "@/models/FileModel";
 import { SearchState } from "@/contexts/FileContext";
+import { useUser } from "@/hooks/useUser";
+import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
+
 const { Text } = Typography;
 
 const ALLOW_LOCAL_DELETE = false;
@@ -56,11 +59,14 @@ const FileListPage: React.FC = () => {
     searchState,
   } = useFile();
 
+  const { user } = useUser();
+  const canDeleteFiles = hasPermission(user, [APP_PERMISSIONS.DELETE_FILE]);
+  const canSyncFiles = hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]); 
+
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   const disableIndividualDelete = selectedFiles.size > 0;
-
   const [localSearchState, setLocalSearchState] =
     useState<SearchState>(searchState);
 
@@ -123,9 +129,9 @@ const FileListPage: React.FC = () => {
   };
 
   const toggleFileSelection = (fileId: string, fileService: string) => {
-    if (fileService === STORAGE_SERVICES.LOCAL && !ALLOW_LOCAL_DELETE) {
-      return;
-    }
+    if (!canDeleteFiles) return; 
+    if (fileService === STORAGE_SERVICES.LOCAL && !ALLOW_LOCAL_DELETE) return;
+
     setSelectedFiles((prev) => {
       const newSelection = new Set(prev);
       if (newSelection.has(fileId)) {
@@ -138,6 +144,7 @@ const FileListPage: React.FC = () => {
   };
 
   const handleDeleteFiles = async () => {
+    if (!canDeleteFiles) return; 
     await deleteFile(Array.from(selectedFiles));
     setSelectedFiles(new Set());
   };
@@ -159,7 +166,7 @@ const FileListPage: React.FC = () => {
           onClick={() => toggleFileSelection(file._id, file.service)}
           style={{
             position: "relative",
-            cursor: "pointer",
+            cursor: canDeleteFiles ? "pointer" : "default",
             transition: "all 0.2s ease-in-out",
             border: isSelected ? "2px solid #1890ff" : undefined,
             opacity: isSelected ? 0.8 : 1,
@@ -177,7 +184,8 @@ const FileListPage: React.FC = () => {
               />
             </Tooltip>,
 
-            (ALLOW_LOCAL_DELETE || file.service !== STORAGE_SERVICES.LOCAL) &&
+            canDeleteFiles &&
+              (ALLOW_LOCAL_DELETE || file.service !== STORAGE_SERVICES.LOCAL) &&
               !disableIndividualDelete && (
                 <Popconfirm
                   title="Are you sure you want to delete this file?"
@@ -254,16 +262,18 @@ const FileListPage: React.FC = () => {
           }}
           options={fileTypeOptions}
         />
-        <Tooltip title="Sync Files">
-          <Button
-            icon={<SyncOutlined spin={syncing} />}
-            onClick={syncFiles}
-            loading={syncing}
-            size="large"
-            style={{ height: 40 }}
-          />
-        </Tooltip>
-        {selectedFiles.size > 0 && (
+        {canSyncFiles && (
+          <Tooltip title="Sync Files">
+            <Button
+              icon={<SyncOutlined spin={syncing} />}
+              onClick={syncFiles}
+              loading={syncing}
+              size="large"
+              style={{ height: 40 }}
+            />
+          </Tooltip>
+        )}
+        {canDeleteFiles && selectedFiles.size > 0 && (
           <Popconfirm
             title={`Delete ${selectedFiles.size} files?`}
             onConfirm={handleDeleteFiles}
