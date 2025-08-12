@@ -20,7 +20,7 @@ const buildMenu = (
   const filterNavigationMenuItems = (
     menu: NavigationMenuItem
   ): NavigationMenuItem | null => {
-    if (menu.access && !hasPermission(user, menu.access)) return null;
+    if (menu.access && !hasPermission(user, menu.access, true)) return null;
     if (menu.children) {
       const filteredChildren = menu.children
         .map(filterNavigationMenuItems)

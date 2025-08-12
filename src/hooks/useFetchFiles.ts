@@ -5,6 +5,7 @@ import { FileDataAPI } from "@/models/FileModel";
 import { SearchState } from "@/contexts/FileContext";
 import { message } from "antd";
 import { useUser } from "@/hooks/useUser";
+import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
 
 export const useFetchFiles = () => {
   const { user, initialLoading: userInitialLoading } = useUser();
@@ -19,14 +20,22 @@ export const useFetchFiles = () => {
     type: "",
   });
 
+  const canViewFiles =
+    !!user && hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]); // ANY by default
+
   useEffect(() => {
     if (userInitialLoading) return;
-    if (!user) {
+
+    // 🚫 If not logged in or lacks permission, clear and stop.
+    if (!canViewFiles) {
       setFiles([]);
+      setHasMore(false);
       return;
     }
+
     fetchFiles(searchState);
-  }, [user, userInitialLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, userInitialLoading, canViewFiles]);
 
   const debouncedFetchFiles = useMemo(
     () =>
@@ -39,6 +48,15 @@ export const useFetchFiles = () => {
   const fetchFiles = useCallback(
     (searchStateData: SearchState) => {
       if (!user) return;
+
+      if (!hasPermission(user, [APP_PERMISSIONS.VIEW_FILES])) {
+        // Optional UX hint; server will still enforce.
+        message.warning("You do not have permission to view files.");
+        setFiles([]);
+        setHasMore(false);
+        return;
+      }
+
       setLoading(true);
       setSearchState(searchStateData);
 
@@ -60,14 +78,22 @@ export const useFetchFiles = () => {
         page: searchStateData.page,
         limit: 12,
       });
+
       setFiles((prev) =>
         searchStateData.page === 1
           ? response.data.items
           : [...prev, ...response.data.items]
       );
       setHasMore(response.data.hasMore);
-    } catch (error) {
-      message.error("Failed to fetch files.");
+    } catch (error: any) {
+      // If backend 403s, reflect that cleanly
+      if (error?.response?.status === 403) {
+        message.warning("You do not have permission to view files.");
+        setFiles([]);
+        setHasMore(false);
+      } else {
+        message.error("Failed to fetch files.");
+      }
       console.error("fetchFilesInternal error:", error);
     } finally {
       setLoading(false);
@@ -95,6 +121,12 @@ export const useFetchFiles = () => {
 
   const syncFiles = useCallback(async () => {
     if (!user) return;
+
+    if (!hasPermission(user, [APP_PERMISSIONS.VIEW_FILES])) {
+      message.warning("You do not have permission to sync files.");
+      return;
+    }
+
     setSyncing(true);
     try {
       await apiClient.post("/files/sync");

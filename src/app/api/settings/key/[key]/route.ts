@@ -34,5 +34,5 @@ export const GET = async (
   withAuthMiddleware(
     (req, user) => handleGetSettingByKey(req, context.params),
     true,
-    [APP_PERMISSIONS.EDIT_SETTINGS]
+    [APP_PERMISSIONS.ADMIN]
   )(request);

@@ -9,7 +9,7 @@ export const useFirebaseConfig = () => {
   const [firebaseReady, setFirebaseReady] = useState(false);
 
   const fetchFirebaseConfig = async () => {
-    // Only attempt to fetch settings if the user is logged in.
+    
     if (!user) {
       setFirebaseLoading(false);
       setFirebaseReady(false);
@@ -34,7 +34,7 @@ export const useFirebaseConfig = () => {
   };
 
   useEffect(() => {
-    // Wait for the user state to settle before fetching.
+    
     if (!userInitialLoading) {
       fetchFirebaseConfig();
     }

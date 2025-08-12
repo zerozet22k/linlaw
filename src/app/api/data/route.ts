@@ -3,14 +3,14 @@ import UserService from "@/services/UserService";
 import RoleService from "@/services/RoleService";
 import FileService from "@/services/FileService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
-import { APP_PERMISSIONS } from "@/config/permissions";
-import { toObjectId } from "@/repositories";
+import { APP_PERMISSIONS, checkPermission } from "@/config/permissions";
+import { User } from "@/models/UserModel";
 
 const userService = new UserService();
 const roleService = new RoleService();
 const fileService = new FileService();
 
-async function handlePublicRequest(request: Request) {
+async function handlePublicRequest(request: Request, user: User) {
   try {
     const body = await request.json();
     const {
@@ -30,34 +30,48 @@ async function handlePublicRequest(request: Request) {
       );
     }
 
-    let items: any[] = [];
-    let hasMore = false;
-
+    
     switch (type) {
       case "users": {
-        const { users, hasMore: moreUsers } = await userService.getAllUsers(
+        if (!checkPermission(user, [APP_PERMISSIONS.VIEW_USERS], true)) {
+          return NextResponse.json(
+            { error: "Forbidden: Insufficient permissions" },
+            { status: 403 }
+          );
+        }
+        const { users, hasMore } = await userService.getAllUsers(
           searchQuery,
           page,
           limit,
           selected
         );
-        items = users;
-        hasMore = moreUsers;
-        break;
+        return NextResponse.json({ items: users, hasMore }, { status: 200 });
       }
+
       case "roles": {
-        const { roles, hasMore: moreRoles } = await roleService.getAllRoles(
+        if (!checkPermission(user, [APP_PERMISSIONS.VIEW_ROLES], true)) {
+          return NextResponse.json(
+            { error: "Forbidden: Insufficient permissions" },
+            { status: 403 }
+          );
+        }
+        const { roles, hasMore } = await roleService.getAllRoles(
           searchQuery,
           page,
           limit,
           selected
         );
-        items = roles;
-        hasMore = moreRoles;
-        break;
+        return NextResponse.json({ items: roles, hasMore }, { status: 200 });
       }
+
       case "files": {
-        const { files, hasMore: moreFiles } = await fileService.getAllFiles(
+        if (!checkPermission(user, [APP_PERMISSIONS.VIEW_FILES], true)) {
+          return NextResponse.json(
+            { error: "Forbidden: Insufficient permissions" },
+            { status: 403 }
+          );
+        }
+        const { files, hasMore } = await fileService.getAllFiles(
           searchQuery ?? undefined,
           fileType ?? undefined,
           uploadedByUserId ?? undefined,
@@ -65,18 +79,15 @@ async function handlePublicRequest(request: Request) {
           limit,
           selected
         );
-        items = files;
-        hasMore = moreFiles;
-        break;
+        return NextResponse.json({ items: files, hasMore }, { status: 200 });
       }
+
       default:
         return NextResponse.json(
           { error: "Invalid type parameter" },
           { status: 400 }
         );
     }
-
-    return NextResponse.json({ items, hasMore }, { status: 200 });
   } catch (error) {
     console.error("❌ Error in handlePublicRequest:", error);
     return NextResponse.json(
@@ -86,15 +97,10 @@ async function handlePublicRequest(request: Request) {
   }
 }
 
+
+
 export const POST = async (request: Request) =>
   withAuthMiddleware(
-    async (req) => {
-      return await handlePublicRequest(req);
-    },
-    true,
-    [
-      APP_PERMISSIONS.VIEW_USERS,
-      APP_PERMISSIONS.VIEW_ROLES,
-      APP_PERMISSIONS.VIEW_FILES,
-    ]
+    async (req, user) => handlePublicRequest(req, user), 
+    true 
   )(request);

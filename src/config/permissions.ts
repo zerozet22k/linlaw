@@ -35,6 +35,7 @@ export const APP_PERMISSIONS = {
   UPLOAD_NEWSLETTER_ATTACHMENT: "upload_newsletter_attachment",
   DELETE_NEWSLETTER_ATTACHMENT: "delete_newsletter_attachment",
   EDIT_NEWSLETTER_ATTACHMENT: "edit_newsletter_attachment",
+  SEND_EMAIL: "send_email",
 } as const;
 
 export type AppPermissionType =
@@ -142,6 +143,7 @@ export const PERMISSION_GUIDE: Record<AppPermissionType, string> = {
     "Allows deleting newsletter attachments.",
   [APP_PERMISSIONS.EDIT_NEWSLETTER_ATTACHMENT]:
     "Allows editing newsletter attachment details.",
+  [APP_PERMISSIONS.SEND_EMAIL]: "Allows sending emails.",
 };
 
 export const checkPermission = (
@@ -159,16 +161,20 @@ export const checkPermission = (
         user.roles.some((role) => role.permissions.includes(perm))
       );
 };
-
 export const hasPermission = (
-  user: User | UserAPI | null,
-  requiredPermissions: AppPermissionType[]
+  user: User | UserAPI | null | undefined,
+  requiredPermissions: AppPermissionType[],
+  checkAll: boolean = false
 ): boolean => {
   if (!user?.roles?.length) return false;
 
-  return requiredPermissions.some((perm) =>
-    user.roles.some((role) => role.permissions.includes(perm))
-  );
+  return checkAll
+    ? requiredPermissions.every((perm) =>
+        user.roles.some((role) => role.permissions.includes(perm))
+      )
+    : requiredPermissions.some((perm) =>
+        user.roles.some((role) => role.permissions.includes(perm))
+      );
 };
 
 export const hasGroupPermission = (

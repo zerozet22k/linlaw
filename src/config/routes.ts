@@ -187,7 +187,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     path: `${dashboardRoute}/send-emails`,
     label: "Send Emails",
     icon: "MailOutlined",
-    access: [APP_PERMISSIONS.ADMIN],
+    access: [APP_PERMISSIONS.ADMIN, APP_PERMISSIONS.SEND_EMAIL],
     loginRequired: true,
     IfNotLoggedInRedirectUrl: "/login?redirect=/dashboard/send-emails",
     noAccessMessage: "You do not have permission to send emails.",

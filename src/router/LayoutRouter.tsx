@@ -49,7 +49,7 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   const hasAccess = useMemo(() => {
     if (!routeConfig) return true;
     if (!routeConfig.access && !routeConfig.loginRequired) return true;
-    return hasPermission(user, routeConfig.access || []);
+    return hasPermission(user, routeConfig.access || [], true);
   }, [user, routeConfig, pathname]);
 
   useEffect(() => {
