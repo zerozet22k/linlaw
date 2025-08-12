@@ -144,7 +144,7 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
           label: "Businesses",
           keyLabel: "Business",
           type: NestedFieldType.ARRAY,
-          arrayDesign: ArrayDesign.PARENT,
+          arrayDesign: ArrayDesign.FLAT,
           arrayFunctionalities: [
             ArrayFunctionality.SORTABLE,
             ArrayFunctionality.FILTERABLE,
