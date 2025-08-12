@@ -20,19 +20,15 @@ export const useFetchFiles = () => {
     type: "",
   });
 
-  const canViewFiles =
-    !!user && hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]); // ANY by default
+  const canViewFiles = !!user && hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]);
 
   useEffect(() => {
     if (userInitialLoading) return;
-
-    // 🚫 If not logged in or lacks permission, clear and stop.
-    if (!canViewFiles) {
+    if (!user || !canViewFiles) {
       setFiles([]);
       setHasMore(false);
       return;
     }
-
     fetchFiles(searchState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, userInitialLoading, canViewFiles]);
@@ -50,7 +46,6 @@ export const useFetchFiles = () => {
       if (!user) return;
 
       if (!hasPermission(user, [APP_PERMISSIONS.VIEW_FILES])) {
-        // Optional UX hint; server will still enforce.
         message.warning("You do not have permission to view files.");
         setFiles([]);
         setHasMore(false);
@@ -78,7 +73,6 @@ export const useFetchFiles = () => {
         page: searchStateData.page,
         limit: 12,
       });
-
       setFiles((prev) =>
         searchStateData.page === 1
           ? response.data.items
@@ -86,7 +80,6 @@ export const useFetchFiles = () => {
       );
       setHasMore(response.data.hasMore);
     } catch (error: any) {
-      // If backend 403s, reflect that cleanly
       if (error?.response?.status === 403) {
         message.warning("You do not have permission to view files.");
         setFiles([]);
@@ -106,23 +99,84 @@ export const useFetchFiles = () => {
     setSearchState({ search: "", page: 1, type: "" });
   }, []);
 
-  const deleteFile = useCallback(async (fileIds: string[]) => {
-    try {
-      await Promise.all(
-        fileIds.map((fileId) => apiClient.delete(`/files/${fileId}`))
-      );
-      setFiles((prev) => prev.filter((file) => !fileIds.includes(file._id)));
-      message.success(`Deleted ${fileIds.length} file(s) successfully.`);
-    } catch (error) {
-      message.error("Failed to delete files.");
-      console.error("deleteFile error:", error);
+  /**
+   * Delete files with a single progress toast showing counts (e.g., "Deleting 2/5…").
+   * Sequential for accurate progress. Updates local state for successful deletions.
+   * Signature unchanged: Promise<void>.
+   */
+  const deleteFile = useCallback(async (fileIds: string[]): Promise<void> => {
+    if (!user || !hasPermission(user, [APP_PERMISSIONS.DELETE_FILE])) {
+      message.warning("You do not have permission to delete files.");
+      return;
     }
-  }, []);
+
+    const total = fileIds?.length || 0;
+    if (!total) return;
+
+    const key = `delete-progress-${Date.now()}`;
+    const okIds: string[] = [];
+    const failIds: string[] = [];
+
+    message.open({
+      key,
+      type: "loading",
+      duration: 0,
+      content: `Deleting 0/${total}…`,
+    });
+
+    let done = 0;
+    for (const id of fileIds) {
+      try {
+        await apiClient.delete(`/files/${id}`);
+        okIds.push(id);
+      } catch (err) {
+        console.error("deleteFile error for id:", id, err);
+        failIds.push(id);
+      } finally {
+        done += 1;
+        message.open({
+          key,
+          type: "loading",
+          duration: 0,
+          content: `Deleting ${done}/${total}…`,
+        });
+      }
+    }
+
+    if (okIds.length) {
+      setFiles((prev) => prev.filter((f) => !okIds.includes(f._id)));
+    }
+
+    if (failIds.length === 0) {
+      message.open({
+        key,
+        type: "success",
+        content: `Deleted ${okIds.length}/${total} file(s).`,
+      });
+    } else if (okIds.length === 0) {
+      message.open({
+        key,
+        type: "error",
+        content: `Failed to delete ${failIds.length}/${total} file(s).`,
+      });
+    } else {
+      message.open({
+        key,
+        type: "warning",
+        content: `Deleted ${okIds.length}/${total} file(s). ${failIds.length} failed.`,
+      });
+    }
+  }, [user]);
 
   const syncFiles = useCallback(async () => {
     if (!user) return;
 
-    if (!hasPermission(user, [APP_PERMISSIONS.VIEW_FILES])) {
+    // Prefer SYNC_FILES if you have it; fall back to VIEW_FILES if your UI logic expects that.
+    const canSync =
+      hasPermission(user, [APP_PERMISSIONS.SYNC_FILES]) ||
+      hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]);
+
+    if (!canSync) {
       message.warning("You do not have permission to sync files.");
       return;
     }

@@ -147,10 +147,6 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
       setUploading(false);
     }
   };
-
-  /**
-   * Deletes an existing attachment.
-   */
   const handleDeleteAttachment = async (attachmentId: string) => {
     if (!currentNewsletter?._id) return;
     if (deletingAttachmentIds.includes(attachmentId)) return;

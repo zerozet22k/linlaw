@@ -60,8 +60,10 @@ const FileListPage: React.FC = () => {
   } = useFile();
 
   const { user } = useUser();
+  const canViewFiles = hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]);
+  const canSyncFiles =
+    hasPermission(user, [APP_PERMISSIONS.SYNC_FILES]) || canViewFiles;
   const canDeleteFiles = hasPermission(user, [APP_PERMISSIONS.DELETE_FILE]);
-  const canSyncFiles = hasPermission(user, [APP_PERMISSIONS.VIEW_FILES]); 
 
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -74,7 +76,7 @@ const FileListPage: React.FC = () => {
     debounce(() => {
       fetchFiles(localSearchState);
     }, 300),
-    [localSearchState]
+    [localSearchState, fetchFiles]
   );
 
   useEffect(() => {
@@ -129,7 +131,7 @@ const FileListPage: React.FC = () => {
   };
 
   const toggleFileSelection = (fileId: string, fileService: string) => {
-    if (!canDeleteFiles) return; 
+    if (!canDeleteFiles) return;
     if (fileService === STORAGE_SERVICES.LOCAL && !ALLOW_LOCAL_DELETE) return;
 
     setSelectedFiles((prev) => {
@@ -143,9 +145,19 @@ const FileListPage: React.FC = () => {
     });
   };
 
+  const handleDeleteSingle = async (id: string) => {
+    if (!canDeleteFiles) return;
+    await deleteFile([id]); // hook shows progress + success/fail
+    setSelectedFiles((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
+
   const handleDeleteFiles = async () => {
-    if (!canDeleteFiles) return; 
-    await deleteFile(Array.from(selectedFiles));
+    if (!canDeleteFiles) return;
+    await deleteFile(Array.from(selectedFiles)); // hook shows progress + success/fail
     setSelectedFiles(new Set());
   };
 
@@ -189,7 +201,11 @@ const FileListPage: React.FC = () => {
               !disableIndividualDelete && (
                 <Popconfirm
                   title="Are you sure you want to delete this file?"
-                  onConfirm={() => deleteFile([file._id])}
+                  onConfirm={(e) => {
+                    e?.stopPropagation();
+                    void handleDeleteSingle(file._id);
+                  }}
+                  onCancel={(e) => e?.stopPropagation()}
                   okText="Yes"
                   cancelText="No"
                   key="delete"
@@ -241,6 +257,7 @@ const FileListPage: React.FC = () => {
           alignItems: "center",
           gap: "8px",
           marginBottom: "16px",
+          flexWrap: "wrap",
         }}
       >
         <Input
@@ -248,7 +265,7 @@ const FileListPage: React.FC = () => {
           value={localSearchState.search}
           onChange={handleSearchChange}
           size="large"
-          style={{ flex: 1, height: 40 }}
+          style={{ flex: 1, minWidth: 220, height: 40 }}
         />
         <Select
           value={localSearchState.type}
@@ -275,7 +292,7 @@ const FileListPage: React.FC = () => {
         )}
         {canDeleteFiles && selectedFiles.size > 0 && (
           <Popconfirm
-            title={`Delete ${selectedFiles.size} files?`}
+            title={`Delete ${selectedFiles.size} file(s)?`}
             onConfirm={handleDeleteFiles}
             okText="Yes"
             cancelText="No"
@@ -290,6 +307,9 @@ const FileListPage: React.FC = () => {
             </Button>
           </Popconfirm>
         )}
+        <Text type="secondary" style={{ marginLeft: "auto" }}>
+          Selected: {selectedFiles.size} / Showing: {files.length}
+        </Text>
       </div>
 
       {/* File List */}
