@@ -1,29 +1,19 @@
+/* components/sections/AboutUsSection.tsx */
 "use client";
 
 import React from "react";
-import { Row, Col, Card } from "antd";
+import { Row, Col, Card, theme } from "antd";
 import { motion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
-import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
+import { getTranslatedText } from "@/utils/getTranslatedText";
 import {
-  sectionTitleStyle,
-  sectionDescriptionStyle,
-  sectionWrapperStyle,
-  sectionOuterStyle,
-} from "./sectionStyles";
+  HOME_PAGE_SETTINGS_KEYS as K,
+  HOME_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
-export type AboutUsSectionItem = {
-  title: LanguageJson;
-  description: LanguageJson;
-  icon?: string;
-};
-
+type AboutData = HOME_PAGE_SETTINGS_TYPES[typeof K.ABOUT_US_SECTION];
 type AboutUsSectionProps = {
-  section: {
-    title?: LanguageJson;
-    description?: LanguageJson;
-    items: AboutUsSectionItem[];
-  };
+  data: AboutData;
   language: string;
 };
 
@@ -34,110 +24,97 @@ const variants = {
 
 const getColSpan = (descLen: number, totalItems: number) => {
   if (totalItems <= 3) {
-    const span = Math.floor(24 / totalItems);
-    return { xs: 24, sm: span, md: span };
+    const span = Math.floor(24 / Math.max(totalItems, 1));
+    return { xs: 24, sm: span, md: span, lg: span };
   }
-  if (descLen > 380) return { xs: 24, sm: 24, md: 24 };
-  if (descLen > 250) return { xs: 24, sm: 24, md: 12 };
-  return { xs: 24, sm: 12, md: 8 };
+  if (descLen > 380) return { xs: 24, sm: 24, md: 24, lg: 24 };
+  if (descLen > 250) return { xs: 24, sm: 24, md: 12, lg: 12 };
+  return { xs: 24, sm: 12, md: 8, lg: 6 };
 };
 
-const AboutUsSection: React.FC<AboutUsSectionProps> = ({
-  section,
-  language,
-}) => {
-  const items = section.items || [];
-  if (!items.length) return null;
+const AboutUsSection: React.FC<AboutUsSectionProps> = ({ data, language }) => {
+  const { token } = theme.useToken();
 
-  const title = getTranslatedText(section.title, language) || "About Us";
-  const description = getTranslatedText(section.description, language) || "";
+  const items = Array.isArray(data?.items) ? data.items : [];
+  if (items.length === 0) return null;
 
   return (
-    <section style={sectionOuterStyle}>
-      <div style={sectionWrapperStyle}>
-        <h2 style={sectionTitleStyle}>{title}</h2>
-        {description && (
-          <p
-            style={{
-              ...sectionDescriptionStyle,
-              maxWidth: 720,
-              margin: "0 auto",
-            }}
-          >
-            {description}
-          </p>
-        )}
-      </div>
+    <Row gutter={[24, 24]} justify="start" align="stretch">
+      {items.map((item, idx) => {
+        const desc = getTranslatedText(item.description, language) || "";
+        const titleText = getTranslatedText(item.title, language) || "";
+        const colSpan = getColSpan(desc.length, items.length);
 
-      <Row gutter={[24, 24]} justify="start" align="top">
-        {items.map((item, idx) => {
-          const desc = getTranslatedText(item.description, language) || "";
-          const titleText = getTranslatedText(item.title, language) || "";
-          const colSpan = getColSpan(desc.length, items.length);
-
-          return (
-            <Col key={idx} {...colSpan}>
-              <motion.div
-                initial={variants.initial}
-                animate={variants.animate}
-                transition={{ duration: 0.4 + idx * 0.08 }}
-              >
-                <Card
-                  bordered={false}
-                  hoverable
-                  style={{
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 18px rgba(0,0,0,0.05)",
-                    padding: "24px",
-                    height: "100%",
+        return (
+          <Col key={`${titleText}-${idx}`} {...colSpan} style={{ display: "flex" }}>
+            <motion.div
+              initial={variants.initial}
+              animate={variants.animate}
+              transition={{ duration: 0.4 + idx * 0.08 }}
+              style={{ width: "100%", height: "100%" }}
+            >
+              <Card
+                bordered={false}
+                hoverable
+                style={{
+                  borderRadius: 12,
+                  boxShadow: "0 4px 18px rgba(0,0,0,0.05)",
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+                styles={{
+                  body: {
+                    padding: token.paddingLG,
                     display: "flex",
                     flexDirection: "column",
+                    gap: 12,
+                    height: "100%",
+                  },
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  <div
+                  {item.icon && (
+                    <DynamicIcon
+                      name={item.icon}
+                      style={{ color: token.colorPrimary, fontSize: 28 }}
+                    />
+                  )}
+                  <span
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: 16,
+                      marginLeft: 10,
+                      fontSize: "1.3em",
+                      fontWeight: 600,
+                      color: token.colorText,
                     }}
                   >
-                    {item.icon && (
-                      <DynamicIcon
-                        name={item.icon}
-                        style={{ color: "#1677ff", fontSize: 28 }}
-                      />
-                    )}
-                    <span
-                      style={{
-                        marginLeft: 10,
-                        fontSize: "1.3em",
-                        fontWeight: 600,
-                        color: "#222",
-                      }}
-                    >
-                      {titleText}
-                    </span>
-                  </div>
+                    {titleText}
+                  </span>
+                </div>
 
-                  <p
-                    style={{
-                      fontSize: "15.5px",
-                      color: "#444",
-                      lineHeight: 1.75,
-                      margin: 0,
-                      whiteSpace: "pre-line",
-                      flexGrow: 1,
-                    }}
-                  >
-                    {desc}
-                  </p>
-                </Card>
-              </motion.div>
-            </Col>
-          );
-        })}
-      </Row>
-    </section>
+                <p
+                  style={{
+                    fontSize: 15.5,
+                    color: token.colorTextSecondary,
+                    lineHeight: 1.75,
+                    margin: 0,
+                    whiteSpace: "pre-line",
+                    flexGrow: 1,
+                  }}
+                >
+                  {desc}
+                </p>
+              </Card>
+            </motion.div>
+          </Col>
+        );
+      })}
+    </Row>
   );
 };
 

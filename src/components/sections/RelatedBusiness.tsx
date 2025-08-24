@@ -47,9 +47,7 @@ const useBodyLock = (locked: boolean) => {
   }, [locked]);
 };
 
-const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
-  business,
-}) => {
+const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({ business }) => {
   const { language } = useLanguage();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -69,13 +67,11 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
   const hasContacts =
     Array.isArray(business.contacts) && business.contacts.length > 0;
   const hasHours =
-    Array.isArray(business.operatingHours) &&
-    business.operatingHours.length > 0;
+    Array.isArray(business.operatingHours) && business.operatingHours.length > 0;
   const hasSocial =
     Array.isArray(business.socialLinks) && business.socialLinks.length > 0;
 
-  const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] =
-    [];
+  const contactItems: { icon: React.ReactNode; content: React.ReactNode }[] = [];
   if (business.address)
     contactItems.push({
       icon: <EnvironmentOutlined />,
@@ -117,10 +113,26 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
           />
         )
       }
-      style={{ maxWidth: 500, margin: "auto", borderRadius: 12 }}
-      bodyStyle={{ padding: 20 }}
+      style={{
+        width: "100%",
+        height: "100%",
+        borderRadius: 12,
+        display: "flex",
+        flexDirection: "column",
+      }}
+      styles={{
+        body: {
+          padding: 20,
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          height: "100%",
+        },
+      }}
     >
-      <Title level={4}>{getTranslatedText(business.title, language)}</Title>
+      <Title level={4} style={{ margin: 0 }}>
+        {getTranslatedText(business.title, language)}
+      </Title>
 
       {business.subtitle && (
         <Text type="secondary">
@@ -129,14 +141,14 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
       )}
 
       {Array.isArray(business.tags) && business.tags.length > 0 && (
-        <div style={{ margin: "8px 0 12px" }}>
+        <div style={{ marginTop: 4 }}>
           {business.tags.map((t, i) => (
             <Tag key={i}>{t.value}</Tag>
           ))}
         </div>
       )}
 
-      <Paragraph ellipsis={{ rows: 3 }}>
+      <Paragraph ellipsis={{ rows: 3 }} style={{ margin: 0, flexGrow: 1 }}>
         {getTranslatedText(business.description, language)}
       </Paragraph>
 
@@ -178,6 +190,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
               icon={<CloseOutlined />}
               onClick={() => setOpen(false)}
               style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}
+              aria-label="Close details"
             />
 
             <div
@@ -192,11 +205,24 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
                 <div
                   style={{
                     width: "100%",
-                    maxHeight: 500,
-                    paddingTop: "56%",
-                    background: `url(${business.image}) center/contain no-repeat`,
+                    height: "min(60vh, 420px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#fff",
                   }}
-                />
+                >
+                  <img
+                    src={business.image}
+                    alt={getTranslatedText(business.title, language) || "logo"}
+                    style={{
+                      maxWidth: "90%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
+                </div>
               )}
 
               <div
@@ -208,7 +234,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
                 }}
               >
                 {business.subtitle && (
-                  <Title level={5}>
+                  <Title level={5} style={{ marginTop: 0 }}>
                     {getTranslatedText(business.subtitle, language)}
                   </Title>
                 )}
@@ -234,7 +260,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
 
                 {hasHours && (
                   <>
-                    <Divider>{tOperatingHrs}</Divider>
+                    <Divider>Operating Hours</Divider>
                     <List
                       dataSource={business.operatingHours}
                       renderItem={(h) => (
@@ -251,7 +277,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
 
                 {hasSocial && (
                   <>
-                    <Divider>{tSocialLinks}</Divider>
+                    <Divider>Social Links</Divider>
                     <Space size="large" wrap>
                       {business.socialLinks!.map((s) => (
                         <a
@@ -259,11 +285,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
                           href={s.url}
                           target="_blank"
                           rel="noreferrer"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                          }}
+                          style={{ display: "flex", alignItems: "center", gap: 8 }}
                         >
                           {platformIcons[s.platform] || <GlobalOutlined />}
                           <span>{s.platform}</span>
@@ -275,7 +297,7 @@ const RelatedBusiness: React.FC<{ business?: BusinessItem }> = ({
 
                 {business.mapLink && (
                   <>
-                    <Divider>{tMapLocation}</Divider>
+                    <Divider>Map Location</Divider>
                     <iframe
                       src={business.mapLink}
                       style={{

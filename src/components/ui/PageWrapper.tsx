@@ -36,8 +36,8 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
             height: 350,
             ...(pageContent?.backgroundImage
               ? {
-                  background: `url('${pageContent.backgroundImage}') center/cover no-repeat`,
-                }
+                background: `url('${pageContent.backgroundImage}') center/cover no-repeat`,
+              }
               : {}),
             position: "relative",
             display: "flex",

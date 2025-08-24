@@ -4,7 +4,7 @@ import { Button, Typography, theme } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { lighten } from "polished";
 
-type FlatOutsideCardProps = {
+type ArrayFlatOutsideCardProps = {
   label: string;
   children: React.ReactNode;
   onAdd: () => void;
@@ -12,7 +12,7 @@ type FlatOutsideCardProps = {
   style?: CSSProperties;
 };
 
-const FlatOutsideCard: React.FC<FlatOutsideCardProps> = ({
+const ArrayFlatOutsideCard: React.FC<ArrayFlatOutsideCardProps> = ({
   label,
   children,
   onAdd,
@@ -66,4 +66,4 @@ const FlatOutsideCard: React.FC<FlatOutsideCardProps> = ({
   );
 };
 
-export default FlatOutsideCard;
+export default ArrayFlatOutsideCard;

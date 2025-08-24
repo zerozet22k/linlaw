@@ -1,169 +1,220 @@
+/* components/sections/NewsletterSection.tsx */
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Typography, Spin, Alert, Empty, Card } from "antd";
+import { Typography, Alert, Empty, Card, Skeleton, theme } from "antd";
 import Link from "next/link";
-import { ArrowRightOutlined } from "@ant-design/icons";
+import {
+  ArrowRightOutlined,
+  CalendarOutlined,
+  PaperClipOutlined,
+} from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
-import { useLanguage } from "@/hooks/useLanguage";
 import { INewsletterAPI } from "@/models/Newsletter";
 import apiClient from "@/utils/api/apiClient";
-import { commonTranslations, titleTranslations } from "@/translations";
+import { commonTranslations } from "@/translations";
 import {
-  sectionDescriptionStyle,
-  sectionOuterStyle,
-  sectionTitleStyle,
-  sectionWrapperStyle,
-} from "./sectionStyles";
+  HOME_PAGE_SETTINGS_KEYS as K,
+  HOME_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
-const NewsletterSection: React.FC = () => {
-  const { language } = useLanguage();
+type NewsletterData =
+  HOME_PAGE_SETTINGS_TYPES[typeof K.NEWSLETTER_SECTION];
+
+type Props = {
+  data?: NewsletterData;
+  language: string; // still used for UI strings only
+};
+
+function formatDate(d?: string | number | Date) {
+  if (!d) return "";
+  try {
+    const date = d instanceof Date ? d : new Date(d);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+
+const NewsletterSection: React.FC<Props> = ({ data, language }) => {
+  const { token } = useToken();
+
   const [newsletters, setNewsletters] = useState<INewsletterAPI[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchNewsletters = async () => {
+    let mounted = true;
+    (async () => {
       try {
-        const response = await apiClient.get(
-          `/newsletters?search=&page=1&limit=5`
-        );
-        if (
-          response.status === 200 &&
-          Array.isArray(response.data.newsletters)
-        ) {
-          setNewsletters(response.data.newsletters);
-        } else {
-          throw new Error("Invalid response format");
-        }
-      } catch (err) {
-        console.error("Newsletter fetch error:", err);
-        setError("Failed to load newsletters.");
+        const res = await apiClient.get(`/newsletters?search=&page=1&limit=5`);
+        const list = Array.isArray(res?.data?.newsletters)
+          ? (res.data.newsletters as INewsletterAPI[])
+          : [];
+        if (mounted) setNewsletters(list);
+      } catch (e) {
+        console.error("Newsletter fetch error:", e);
+        if (mounted) setError("Failed to load newsletters.");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
+    })();
+    return () => {
+      mounted = false;
     };
-
-    fetchNewsletters();
   }, []);
 
-  const translatedTitle =
-    getTranslatedText(titleTranslations.newsletterTitle, language) ||
-    "Our Newsletters";
-  const translatedSubtitle =
-    getTranslatedText(titleTranslations.newsletterSubtitle, language) || "";
-
-  const translatedReadMore =
+  const tReadMore =
     getTranslatedText(commonTranslations.readMore, language) || "Read More";
-  const translatedViewAll =
+  const tViewAll =
     getTranslatedText(commonTranslations.viewAll, language) ||
     "View all newsletters";
 
-  return (
-    <section style={sectionOuterStyle}>
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-        <div style={sectionWrapperStyle}>
-          <Title level={2} style={sectionTitleStyle}>
-            {translatedTitle}
-          </Title>
-          {translatedSubtitle && (
-            <Text type="secondary" style={sectionDescriptionStyle}>
-              {translatedSubtitle}
-            </Text>
-          )}
-        </div>
+  const gridStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+    gap: token.sizeLG,
+  };
 
-        {loading ? (
-          <Spin
-            size="large"
-            style={{ display: "block", margin: "40px auto" }}
-          />
-        ) : error ? (
-          <Alert
-            message="Error"
-            description={error}
-            type="error"
-            showIcon
-            style={{ maxWidth: 600, margin: "0 auto" }}
-          />
-        ) : newsletters.length === 0 ? (
-          <Empty
-            description="No newsletters found."
-            style={{ marginTop: 40 }}
-          />
-        ) : (
-          <>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: 20,
-              }}
-            >
-              {newsletters.map((item) => {
-                const title =
-                  typeof item.title === "string"
-                    ? item.title
-                    : item.title[language] || item.title.en || "Untitled";
-
-                return (
-                  <Link
-                    key={item._id}
-                    href={`/newsletters/${item._id}`}
-                    passHref
-                  >
-                    <Card
-                      hoverable
-                      bordered={false}
-                      style={{
-                        borderRadius: 10,
-                        boxShadow: "0 6px 18px rgba(0,0,0,0.05)",
-                        padding: 16,
-                        height: "100%",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                      }}
-                    >
-                      <Title
-                        level={5}
-                        style={{
-                          marginBottom: 12,
-                          fontSize: "1.1em",
-                          color: "#222",
-                        }}
-                      >
-                        {title}
-                      </Title>
-                      <Text type="secondary" style={{ fontSize: 14 }}>
-                        {translatedReadMore} <ArrowRightOutlined />
-                      </Text>
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
-
-            <div style={{ textAlign: "center", marginTop: 40 }}>
-              <Link
-                href="/newsletters"
-                style={{
-                  fontWeight: 500,
-                  fontSize: 16,
-                  color: "#1677ff",
-                  textDecoration: "none",
-                }}
-              >
-                <span style={{ borderBottom: "1px solid transparent" }}>
-                  {translatedViewAll}
-                </span>
-              </Link>
-            </div>
-          </>
-        )}
+  if (loading) {
+    return (
+      <div style={gridStyle}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Card
+            key={i}
+            bordered
+            hoverable={false}
+            style={{
+              borderRadius: token.borderRadiusLG,
+              borderColor: token.colorBorderSecondary,
+              boxShadow: "none",
+              background: token.colorBgContainer,
+            }}
+            styles={{ body: { padding: token.paddingLG } }}
+          >
+            <Skeleton active title paragraph={{ rows: 2 }} />
+          </Card>
+        ))}
       </div>
-    </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert
+        message="Error"
+        description={error}
+        type="error"
+        showIcon
+        style={{ maxWidth: 600, margin: "0 auto" }}
+      />
+    );
+  }
+
+  if (newsletters.length === 0) {
+    return (
+      <Empty
+        description="No newsletters found."
+        style={{ marginTop: token.marginXL }}
+      />
+    );
+  }
+
+  return (
+    <>
+      <div style={gridStyle}>
+        {newsletters.map((item) => {
+          const title =
+            typeof item.title === "string"
+              ? item.title
+              : item.title?.[language] || item.title?.en || "Untitled";
+
+          const created = formatDate(item.createdAt);
+          const files = Array.isArray(item.fileAttachments)
+            ? item.fileAttachments.length
+            : 0;
+
+          return (
+            <Link
+              key={item._id}
+              href={`/newsletters/${item._id}`}
+              style={{ textDecoration: "none" }}
+              aria-label={`Open newsletter: ${title}`}
+            >
+              <Card
+                bordered
+                hoverable
+                style={{
+                  borderRadius: token.borderRadiusLG,
+                  borderColor: token.colorBorderSecondary,
+                  boxShadow: "none",
+                  background: token.colorBgContainer,
+                  height: "100%",
+                }}
+                styles={{ body: { padding: token.paddingLG } }}
+              >
+                <Title
+                  level={5}
+                  style={{
+                    marginBottom: token.marginXS,
+                    color: token.colorText,
+                  }}
+                >
+                  {title}
+                </Title>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: token.sizeLG,
+                    alignItems: "center",
+                    color: token.colorTextTertiary,
+                    fontSize: 13,
+                    marginBottom: token.marginSM,
+                  }}
+                >
+                  {created && (
+                    <span>
+                      <CalendarOutlined /> {created}
+                    </span>
+                  )}
+                  {files > 0 && (
+                    <span>
+                      <PaperClipOutlined /> {files}
+                    </span>
+                  )}
+                </div>
+
+                <Text type="secondary" style={{ fontSize: 14 }}>
+                  {tReadMore} <ArrowRightOutlined />
+                </Text>
+              </Card>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div style={{ textAlign: "center", marginTop: token.marginXL }}>
+        <Link
+          href="/newsletters"
+          style={{
+            fontWeight: 500,
+            fontSize: 16,
+            color: token.colorPrimary,
+            textDecoration: "none",
+          }}
+        >
+          {tViewAll}
+        </Link>
+      </div>
+    </>
   );
 };
 

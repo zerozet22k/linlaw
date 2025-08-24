@@ -1,10 +1,11 @@
+// components/Fields/LanguageJson/LanguageJsonTextInput.tsx
 "use client";
 import React from "react";
 import { Input, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { lighten, darken } from "polished";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags } from "./SupportedLanguageSelector";
+import { languageFlags, languageNames } from "./SupportedLanguageSelector"; // ⬅️ import names
 import { languageInputWrapperStyle, defaultInputStyle } from "../../InputStyle";
 
 interface LanguageJsonTextInputProps {
@@ -37,12 +38,13 @@ const LanguageJsonTextInput: React.FC<LanguageJsonTextInputProps> = ({
     >
       {currentSupportedLanguages.map((lang) => {
         const flagUrl = getFlagUrl(languageFlags[lang] || "un", 40);
+        const nice = languageNames[lang] ?? lang.toUpperCase();
 
         return (
           <Input
             key={lang}
             value={value[lang] || ""}
-            placeholder={`Enter ${lang.toUpperCase()} text`}
+            placeholder={`Enter ${nice} translation`}
             onChange={(e) => handleChange(lang, e.target.value)}
             prefix={
               <img

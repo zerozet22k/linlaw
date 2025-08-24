@@ -1,5 +1,17 @@
 export const contactTranslations = {
   header: {
+    en: "Contact Us",
+    fr: "Contactez-nous",
+    de: "Kontaktieren Sie uns",
+    es: "Contáctenos",
+    zh: "联系我们",
+    ja: "お問い合わせ",
+    ko: "문의하기",
+    th: "ติดต่อเรา",
+    ms: "Hubungi Kami",
+    my: "ကျွန်ုပ်တို့ကို ဆက်သွယ်ပါ",
+  },
+  clickToActionHeader: {
     en: "Need Legal Assistance?",
     fr: "Besoin d'aide juridique ?",
     de: "Benötigen Sie rechtliche Hilfe?",

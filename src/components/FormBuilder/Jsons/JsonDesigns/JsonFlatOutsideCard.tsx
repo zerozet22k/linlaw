@@ -3,7 +3,7 @@ import React from "react";
 import { Typography, theme } from "antd";
 import FieldTitle from "../../Fields/extra/FieldTitle";
 
-type FlatOutsideCardProps = {
+type JsonFlatOutsideCardProps = {
   label?: string | null;
   guide?: string | null;
   children: React.ReactNode;
@@ -11,7 +11,7 @@ type FlatOutsideCardProps = {
   style?: React.CSSProperties;
 };
 
-const JsonFlatOutsideCard: React.FC<FlatOutsideCardProps> = ({
+const JsonFlatOutsideCard: React.FC<JsonFlatOutsideCardProps> = ({
   label,
   guide,
   children,
@@ -20,8 +20,9 @@ const JsonFlatOutsideCard: React.FC<FlatOutsideCardProps> = ({
 }) => {
   const { token } = theme.useToken();
 
+
   return (
-    <div style={{ marginBottom: "16px" }}>
+    <div style={{ marginBottom: "16px", padding: "12px", }}>
       {(label || extra) && (
         <div
           style={{

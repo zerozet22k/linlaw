@@ -1,10 +1,11 @@
+// components/Fields/LanguageJson/LanguageJsonTextarea.tsx
 "use client";
 import React from "react";
 import { Input, theme } from "antd";
 import { lighten, darken } from "polished";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags } from "./SupportedLanguageSelector";
+import { languageFlags, languageNames } from "./SupportedLanguageSelector"; // ⬅️ import names
 import { languageInputWrapperStyle, languageInputStyle } from "../../InputStyle";
 
 interface LanguageJsonTextareaProps {
@@ -37,6 +38,7 @@ const LanguageJsonTextarea: React.FC<LanguageJsonTextareaProps> = ({
     >
       {currentSupportedLanguages.map((lang) => {
         const flagUrl = getFlagUrl(languageFlags[lang] || "un", 40);
+        const nice = languageNames[lang] ?? lang.toUpperCase();
 
         return (
           <div
@@ -61,7 +63,7 @@ const LanguageJsonTextarea: React.FC<LanguageJsonTextareaProps> = ({
               }}
             />
             <Input.TextArea
-              placeholder={`Enter text for ${lang.toUpperCase()}`}
+              placeholder={`Write ${nice} translation`}
               value={value[lang] || ""}
               onChange={(e) => handleChange(lang, e.target.value)}
               rows={6}

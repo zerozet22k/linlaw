@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
+import { Modal, Button } from "antd";
 import { JsonDesign, ModalBehaviorType } from "@/config/CMS/settings";
 import JsonFlatCard from "./JsonDesigns/JsonFlatCard";
 import JsonFlatOutsideCard from "./JsonDesigns/JsonFlatOutsideCard";
 import JsonParentCard from "./JsonDesigns/JsonParentCard";
 import JsonDefaultCard from "./JsonDesigns/JsonDefaultCard";
-import { Modal, Button } from "antd";
+import JsonNoneCard from "./JsonDesigns/JsonNone";
 
 type JsonDesignRendererProps = {
   design: JsonDesign;
@@ -34,17 +35,22 @@ const JsonDesignRenderer: React.FC<JsonDesignRendererProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = modalState;
 
+  // When OPEN_IN_MODAL, render the requested design (FLAT/CARD/etc.)
+  // with just an "Edit" button, and show the real fields in a modal.
   if (modalBehavior[ModalBehaviorType.OPEN_IN_MODAL]) {
-    return (
-      <JsonParentCard label={label} guide={guide} extra={extra} style={style}>
-        <Button
-          type="primary"
-          onClick={() => setIsModalOpen(true)}
-          style={{ width: "100%", marginBottom: "16px", padding: "12px" }}
-        >
-          Edit {label}
-        </Button>
+    const editButton = (
+      <Button
+        type="primary"
+        onClick={() => setIsModalOpen(true)}
+        style={{ width: "100%", marginBottom: 16, padding: 12 }}
+      >
+        Edit {label ?? "Section"}
+      </Button>
+    );
 
+    return (
+      <>
+        {renderDesign(design, () => editButton, label, guide, extra, style)}
         <Modal
           open={isModalOpen}
           onCancel={() => setIsModalOpen(false)}
@@ -52,9 +58,9 @@ const JsonDesignRenderer: React.FC<JsonDesignRendererProps> = ({
           width="90%"
           zIndex={zIndex}
         >
-          {renderDesign(design, renderItem, label, guide, extra, style)}
+          {renderItem()}
         </Modal>
-      </JsonParentCard>
+      </>
     );
   }
 
@@ -76,19 +82,12 @@ const renderDesign = (
           {renderItem()}
         </JsonFlatCard>
       );
-
     case JsonDesign.FLAT_OUTSIDE:
       return (
-        <JsonFlatOutsideCard
-          label={label}
-          guide={guide}
-          extra={extra}
-          style={style}
-        >
+        <JsonFlatOutsideCard label={label} guide={guide} extra={extra} style={style}>
           {renderItem()}
         </JsonFlatOutsideCard>
       );
-
     case JsonDesign.PARENT:
       return (
         <JsonParentCard label={label} guide={guide} extra={extra} style={style}>
@@ -96,17 +95,11 @@ const renderDesign = (
         </JsonParentCard>
       );
     case JsonDesign.NONE:
-      return <>{renderItem()}</>;
-
+      return <JsonNoneCard>{renderItem()}</JsonNoneCard>;
     case JsonDesign.CARD:
     default:
       return (
-        <JsonDefaultCard
-          label={label}
-          guide={guide}
-          extra={extra}
-          style={style}
-        >
+        <JsonDefaultCard label={label} guide={guide} extra={extra} style={style}>
           {renderItem()}
         </JsonDefaultCard>
       );

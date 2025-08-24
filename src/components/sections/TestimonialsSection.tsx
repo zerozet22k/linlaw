@@ -4,58 +4,47 @@ import React from "react";
 import { Card, Typography, Avatar } from "antd";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
-import { LanguageJson } from "@/utils/getTranslatedText";
 import {
-  sectionWrapperStyle,
-  sectionTitleStyle,
-  sectionDescriptionStyle,
-  sectionOuterStyle,
-} from "./sectionStyles";
+  HOME_PAGE_SETTINGS_KEYS,
+  HOME_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-interface TestimonialItem {
-  name: LanguageJson;
-  comment: LanguageJson;
-  title?: string;
-  company?: string;
-  avatar?: string;
-}
+type TestimonialsData =
+  HOME_PAGE_SETTINGS_TYPES[typeof HOME_PAGE_SETTINGS_KEYS.TESTIMONIALS_SECTION];
+type TestimonialItem = TestimonialsData["items"][number];
 
 interface TestimonialsProps {
-  section: {
-    title?: LanguageJson;
-    testimonials: TestimonialItem[];
-  };
+  data: TestimonialsData;
+  language: string;
 }
 
-const Testimonials: React.FC<TestimonialsProps> = ({ section }) => {
-  const { language } = useLanguage();
-  const { title, testimonials = [] } = section || {};
+const Testimonials: React.FC<TestimonialsProps> = ({ data, language }) => {
 
-  if (!testimonials.length) return null;
 
-  const translatedTitle = getTranslatedText(title, language) || "Our Customers";
+  const testimonials: TestimonialItem[] = Array.isArray(data?.items)
+    ? data.items
+    : [];
+
+  if (testimonials.length === 0) return null;
 
   return (
-    <section style={sectionOuterStyle}>
-      <div style={sectionWrapperStyle}>
-        <h2 style={sectionTitleStyle}>{translatedTitle}</h2>
-        {/* {translatedDescription && (
-          <p style={sectionDescriptionStyle}>{translatedDescription}</p>
-        )} */}
-      </div>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+        gap: 24,
+        maxWidth: 1080,
+        margin: "0 auto",
+      }}
+    >
+      {testimonials.map((t, idx) => {
+        const name = getTranslatedText(t.name, language) || "";
+        const comment = getTranslatedText(t.comment, language) || "";
+        const sub = [t.title, t.company].filter(Boolean).join(" · ");
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: 24,
-          maxWidth: 1080,
-          margin: "0 auto",
-        }}
-      >
-        {testimonials.map((t, idx) => (
+        return (
           <Card
             key={idx}
             bordered={false}
@@ -77,15 +66,16 @@ const Testimonials: React.FC<TestimonialsProps> = ({ section }) => {
                 marginBottom: 16,
               }}
             >
-              <Avatar size={48} src={t.avatar} />
+              <Avatar size={48} src={t.avatar}>
+                {name?.charAt(0) || "?"}
+              </Avatar>
               <div style={{ marginLeft: 12 }}>
                 <Text strong style={{ display: "block", fontSize: 16 }}>
-                  {getTranslatedText(t.name, language)}
+                  {name}
                 </Text>
-                <Text style={{ color: "#999", fontSize: 13 }}>
-                  {t.title}
-                  {t.company ? ` , ${t.company}` : ""}
-                </Text>
+                {sub && (
+                  <Text style={{ color: "#999", fontSize: 13 }}>{sub}</Text>
+                )}
               </div>
             </div>
 
@@ -97,15 +87,16 @@ const Testimonials: React.FC<TestimonialsProps> = ({ section }) => {
                   color: "#555",
                   lineHeight: 1.6,
                   display: "block",
+                  whiteSpace: "pre-line",
                 }}
               >
-                “{getTranslatedText(t.comment, language)}”
+                “{comment}”
               </Text>
             </div>
           </Card>
-        ))}
-      </div>
-    </section>
+        );
+      })}
+    </div>
   );
 };
 

@@ -1,9 +1,9 @@
 "use client";
 import React, { CSSProperties } from "react";
-import { Button, Card, theme } from "antd";
+import { Button, Card } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
-type ParentCardProps = {
+type ArrayDefaultCardProps = {
   label: string;
   children: React.ReactNode;
   onAdd: () => void;
@@ -11,15 +11,13 @@ type ParentCardProps = {
   style?: CSSProperties;
 };
 
-const ParentCard: React.FC<ParentCardProps> = ({
+const ArrayDefaultCard: React.FC<ArrayDefaultCardProps> = ({
   label,
   children,
   onAdd,
   showAddButton = true,
   style = {},
 }) => {
-  const { token } = theme.useToken();
-
   return (
     <Card
       title={label}
@@ -31,9 +29,8 @@ const ParentCard: React.FC<ParentCardProps> = ({
         )
       }
       style={{
-        borderLeft: `4px solid ${token.colorPrimary}`,
+        borderRadius: "12px",
         padding: "16px",
-        borderRadius: "10px",
         marginBottom: "20px",
         ...style,
       }}
@@ -43,4 +40,4 @@ const ParentCard: React.FC<ParentCardProps> = ({
   );
 };
 
-export default ParentCard;
+export default ArrayDefaultCard;

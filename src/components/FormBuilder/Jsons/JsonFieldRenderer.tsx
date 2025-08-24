@@ -37,7 +37,7 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
   const modalBehavior = config.modalBehavior || {};
   const design: JsonDesign = config.design || JsonDesign.CARD;
   const functionalities: JsonFunctionality[] = config.jsonFunctionalities || [];
-
+  const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
   // Helper function to parse key = value formatted text.
   const parseKeyValueFormat = (text: string): Record<string, any> => {
     const lines = text.split(/\r?\n/);
@@ -116,7 +116,7 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
       renderItem={renderItem}
       style={style}
       modalBehavior={modalBehavior}
-      modalState={[false, () => {}]}
+      modalState={[isJsonModalOpen, setIsJsonModalOpen]}
       zIndex={zIndex}
       extra={
         functionalities.includes(JsonFunctionality.INTELLIGENT) && (

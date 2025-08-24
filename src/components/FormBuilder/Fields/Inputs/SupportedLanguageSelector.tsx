@@ -26,7 +26,17 @@ export const languageFlags: Record<string, string> = {
   th: "th",
   my: "mm",
 };
-
+export const languageNames: Record<string, string> = {
+  en: "English",
+  fr: "French",
+  de: "German",
+  es: "Spanish",
+  zh: "Chinese",
+  ja: "Japanese",
+  ko: "Korean",
+  th: "Thai",
+  my: "Burmese",
+};
 const SupportedLanguageSelector: React.FC<Props> = ({
   value = [],
   onChange,

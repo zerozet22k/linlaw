@@ -1,125 +1,98 @@
+/* components/sections/FAQSection.tsx */
 "use client";
 
 import React, { useState } from "react";
 import { Collapse, Card, Button } from "antd";
-import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
-import { useLanguage } from "@/hooks/useLanguage";
+import { getTranslatedText } from "@/utils/getTranslatedText";
+import {
+  HOME_PAGE_SETTINGS_KEYS as K,
+  HOME_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
+import { commonTranslations } from "@/translations";
 
 const { Panel } = Collapse;
 
-interface FAQItem {
-  question: LanguageJson;
-  answer: LanguageJson;
-}
+type FAQData = HOME_PAGE_SETTINGS_TYPES[typeof K.FAQS_SECTION];
 
 interface FAQSectionProps {
-  section: {
-    title?: LanguageJson;
-    description?: LanguageJson;
-    backgroundImage?: string;
-    items: FAQItem[]; // 🔁 renamed
-  };
+  data: FAQData;
+  language: string;
 }
 
-const FAQSection: React.FC<FAQSectionProps> = ({ section }) => {
-  const { language } = useLanguage();
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
+  const [expandedBodies, setExpandedBodies] = useState<Set<number>>(new Set());
+  const [activeKey, setActiveKey] = useState<string | undefined>();
 
-  const { title, description, backgroundImage, items = [] } = section || {}; // 🔁 renamed
+  const items = Array.isArray(data?.items) ? data.items : [];
+  if (items.length === 0) return null;
 
-  const toggleReadMore = (index: number) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
+  const tReadMore =
+    getTranslatedText(commonTranslations.readMore, language) || "Read More";
+  const tReadLess =
+    getTranslatedText(commonTranslations.readLess, language) || "Read Less";
+
+  const toggleBody = (idx: number) => {
+    setExpandedBodies((prev) => {
+      const next = new Set(prev);
+      next.has(idx) ? next.delete(idx) : next.add(idx);
+      return next;
+    });
   };
 
-  if (!items || items.length === 0) return null; // 🔁 renamed
-
   return (
-    <section
+    <Card
+      bordered={false}
       style={{
-        padding: "60px 20px",
         width: "100%",
-        backgroundImage: backgroundImage
-          ? `url(${backgroundImage})`
-          : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
+        maxWidth: 1000,
+        margin: "0 auto",
+        borderRadius: 12,
+        boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
       }}
+      styles={{ body: { padding: 0 } }}
     >
-      <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <h2 style={{ fontSize: "2.25em", fontWeight: 600, color: "#222" }}>
-          {getTranslatedText(title, language) || "FAQs"}
-        </h2>
-
-        {description && (
-          <p style={{ fontSize: 16, color: "#555", marginTop: 8 }}>
-            {getTranslatedText(description, language)}
-          </p>
-        )}
-      </div>
-
-      <Card
+      <Collapse
+        accordion
         bordered={false}
-        style={{
-          width: "100%",
-          maxWidth: 1000,
-          margin: "0 auto",
-          borderRadius: 12,
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.06)",
-        }}
-        bodyStyle={{ padding: 0 }}
+        style={{ borderRadius: 12, overflow: "hidden" }}
+        activeKey={activeKey}
+        onChange={(key) => setActiveKey(Array.isArray(key) ? key[0] : key)}
       >
-        <Collapse
-          accordion
-          bordered={false}
-          style={{ borderRadius: 12, overflow: "hidden" }}
-        >
-          {items.map((faq, index) => {
-            const translatedQuestion = getTranslatedText(
-              faq.question,
-              language
-            );
-            const translatedAnswer = getTranslatedText(faq.answer, language);
-            const isExpanded = expandedIndex === index;
-            const previewText =
-              translatedAnswer.length > 120
-                ? `${translatedAnswer.substring(0, 120)}...`
-                : translatedAnswer;
+        {items.map((faq, index) => {
+          const q = getTranslatedText(faq.question, language) || "";
+          const a = getTranslatedText(faq.answer, language) || "";
+          const isBodyExpanded = expandedBodies.has(index);
+          const preview = a.length > 120 ? `${a.substring(0, 120)}...` : a;
 
-            return (
-              <Panel
-                key={index}
-                header={
-                  <span style={{ fontSize: 16, fontWeight: 500 }}>
-                    {translatedQuestion}
-                  </span>
-                }
-                style={{
-                  borderBottom: "1px solid #f0f0f0",
-                  padding: "16px 24px",
-                  background: "#fafafa",
-                }}
-              >
-                <div style={{ padding: "4px 0 0 0" }}>
-                  <p style={{ fontSize: 15, color: "#555", marginBottom: 8 }}>
-                    {isExpanded ? translatedAnswer : previewText}
-                  </p>
-                  {translatedAnswer.length > 120 && (
-                    <Button
-                      type="link"
-                      onClick={() => toggleReadMore(index)}
-                      style={{ padding: 0, fontSize: 14 }}
-                    >
-                      {isExpanded ? "Read Less" : "Read More"}
-                    </Button>
-                  )}
-                </div>
-              </Panel>
-            );
-          })}
-        </Collapse>
-      </Card>
-    </section>
+          return (
+            <Panel
+              key={String(index)}
+              header={<span style={{ fontSize: 16, fontWeight: 500 }}>{q}</span>}
+              style={{
+                borderBottom: "1px solid #f0f0f0",
+                padding: "16px 24px",
+                background: "#fafafa",
+              }}
+            >
+              <div style={{ padding: "4px 0 0 0" }}>
+                <p style={{ fontSize: 15, color: "#555", marginBottom: 8 }}>
+                  {isBodyExpanded ? a : preview}
+                </p>
+                {a.length > 120 && (
+                  <Button
+                    type="link"
+                    onClick={() => toggleBody(index)}
+                    style={{ padding: 0, fontSize: 14 }}
+                  >
+                    {isBodyExpanded ? tReadLess : tReadMore}
+                  </Button>
+                )}
+              </div>
+            </Panel>
+          );
+        })}
+      </Collapse>
+    </Card>
   );
 };
 

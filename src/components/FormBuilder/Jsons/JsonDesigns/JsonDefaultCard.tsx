@@ -4,7 +4,7 @@ import { Card, theme } from "antd";
 import { darken } from "polished";
 import FieldTitle from "../../Fields/extra/FieldTitle";
 
-type DefaultCardProps = {
+type JsonDefaultCardProps = {
   label?: string | null;
   guide?: string | null;
   children: React.ReactNode;
@@ -12,7 +12,7 @@ type DefaultCardProps = {
   style?: React.CSSProperties;
 };
 
-const JsonDefaultCard: React.FC<DefaultCardProps> = ({
+const JsonDefaultCard: React.FC<JsonDefaultCardProps> = ({
   label,
   guide,
   children,

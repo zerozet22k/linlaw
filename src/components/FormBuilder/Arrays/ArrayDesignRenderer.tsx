@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import { ArrayDesign, ModalBehaviorType } from "@/config/CMS/settings";
-import FlatCard from "./ArrayDesigns/FlatCard";
-import FlatOutsideCard from "./ArrayDesigns/FlatOutsideCard";
-import ParentCard from "./ArrayDesigns/ParentCard";
-import DefaultCard from "./ArrayDesigns/DefaultCard";
+import ArrayFlatCard from "./ArrayDesigns/ArrayFlatCard";
+import ArrayFlatOutsideCard from "./ArrayDesigns/ArrayFlatOutsideCard";
+import ArrayParentCard from "./ArrayDesigns/ArrayParentCard";
+import ArrayDefaultCard from "./ArrayDesigns/ArrayDefaultCard";
 import { Modal, Button } from "antd";
 
 type ArrayDesignRendererProps = {
@@ -34,7 +34,7 @@ const ArrayDesignRenderer: React.FC<ArrayDesignRendererProps> = ({
 
   if (modalBehavior[ModalBehaviorType.OPEN_IN_MODAL]) {
     return (
-      <ParentCard
+      <ArrayParentCard
         label={label}
         onAdd={onAdd}
         showAddButton={true}
@@ -57,7 +57,7 @@ const ArrayDesignRenderer: React.FC<ArrayDesignRendererProps> = ({
         >
           {renderDesign(arrayValue, design, label, onAdd, renderItem, style)}
         </Modal>
-      </ParentCard>
+      </ArrayParentCard>
     );
   }
 
@@ -75,51 +75,51 @@ const renderDesign = (
   switch (design) {
     case ArrayDesign.FLAT:
       return (
-        <FlatCard
+        <ArrayFlatCard
           label={label}
           onAdd={onAdd}
           showAddButton={true}
           style={style}
         >
           {arrayValue.map(renderItem)}
-        </FlatCard>
+        </ArrayFlatCard>
       );
 
     case ArrayDesign.FLAT_OUTSIDE:
       return (
-        <FlatOutsideCard
+        <ArrayFlatOutsideCard
           label={label}
           onAdd={onAdd}
           showAddButton={true}
           style={style}
         >
           {arrayValue.map(renderItem)}
-        </FlatOutsideCard>
+        </ArrayFlatOutsideCard>
       );
 
     case ArrayDesign.PARENT:
       return (
-        <ParentCard
+        <ArrayParentCard
           label={label}
           onAdd={onAdd}
           showAddButton={true}
           style={style}
         >
           {arrayValue.map(renderItem)}
-        </ParentCard>
+        </ArrayParentCard>
       );
 
     case ArrayDesign.CARD:
     default:
       return (
-        <DefaultCard
+        <ArrayDefaultCard
           label={label}
           onAdd={onAdd}
           showAddButton={true}
           style={style}
         >
           {arrayValue.map(renderItem)}
-        </DefaultCard>
+        </ArrayDefaultCard>
       );
   }
 };

@@ -4,7 +4,7 @@ import { Card, theme } from "antd";
 import { darken } from "polished";
 import FieldTitle from "../../Fields/extra/FieldTitle";
 
-type ParentCardProps = {
+type JsonParentCardProps = {
   label?: string | null;
   guide?: string | null;
   children: React.ReactNode;
@@ -12,7 +12,7 @@ type ParentCardProps = {
   style?: React.CSSProperties;
 };
 
-const JsonParentCard: React.FC<ParentCardProps> = ({
+const JsonParentCard: React.FC<JsonParentCardProps> = ({
   label,
   guide,
   children,

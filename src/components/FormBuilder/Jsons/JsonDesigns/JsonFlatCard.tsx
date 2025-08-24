@@ -3,7 +3,7 @@ import React from "react";
 import { theme } from "antd";
 import FieldTitle from "../../Fields/extra/FieldTitle";
 
-type FlatCardProps = {
+type JsonFlatCardProps = {
   label?: string | null;
   guide?: string | null;
   children: React.ReactNode;
@@ -11,7 +11,7 @@ type FlatCardProps = {
   style?: React.CSSProperties;
 };
 
-const JsonFlatCard: React.FC<FlatCardProps> = ({
+const JsonFlatCard: React.FC<JsonFlatCardProps> = ({
   label,
   guide,
   children,
