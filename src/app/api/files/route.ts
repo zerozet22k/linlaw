@@ -4,7 +4,6 @@ import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import { STORAGE_SERVICES } from "@/models/FileModel";
 import { APP_PERMISSIONS } from "@/config/permissions";
 import { User } from "@/models/UserModel";
-import { detectFileType } from "@/utils/filesUtil";
 
 const fileService = new FileService();
 

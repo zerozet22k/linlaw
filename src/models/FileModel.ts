@@ -20,8 +20,23 @@ export enum FileType {
   CODE = "code",
   SPREADSHEET = "spreadsheet",
   PRESENTATION = "presentation",
+  EXECUTABLE = "executable",
+  INSTALLER_PACKAGE = "installer-package",
+  DISK_IMAGE = "disk-image",
+  DATA = "data",
+  DATABASE = "database",
+  MODEL_3D = "3d-model",
+  CAD = "cad",
+  FONT = "font",
+  EBOOK = "ebook",
+  CERTIFICATE_KEY = "certificate-key",
+  EMAIL = "email",
+  CALENDAR = "calendar",
+  GEO = "geo",
+  TORRENT = "torrent",
   UNKNOWN = "unknown",
 }
+
 
 interface BaseFileData {
   rawFilePath: string;

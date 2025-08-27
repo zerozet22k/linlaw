@@ -29,22 +29,21 @@ import {
 import { SearchState } from "@/contexts/FileContext";
 import { useUser } from "@/hooks/useUser";
 import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
+import { BUCKET_TO_FILETYPE } from "@/utils/filesUtil";
 
 const { Text } = Typography;
 
 const ALLOW_LOCAL_DELETE = false;
 
+const niceFileTypeLabel = (v: string) =>
+  v.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 const fileTypeOptions = [
   { value: "", label: "All" },
-  { value: FileType.IMAGE, label: "Image" },
-  { value: FileType.VIDEO, label: "Video" },
-  { value: FileType.AUDIO, label: "Audio" },
-  { value: FileType.DOCUMENT, label: "Document" },
-  { value: FileType.ARCHIVE, label: "Archive" },
-  { value: FileType.CODE, label: "Code" },
-  { value: FileType.SPREADSHEET, label: "Spreadsheet" },
-  { value: FileType.PRESENTATION, label: "Presentation" },
-  { value: FileType.UNKNOWN, label: "Unknown" },
+  ...Array.from(new Set(Object.values(BUCKET_TO_FILETYPE) as FileType[]))
+    .filter(Boolean)
+    .sort((a, b) => niceFileTypeLabel(a).localeCompare(niceFileTypeLabel(b)))
+    .map((t) => ({ value: t as FileTypeWithEmpty, label: niceFileTypeLabel(t) })),
 ];
 
 const FileListPage: React.FC = () => {
@@ -147,7 +146,7 @@ const FileListPage: React.FC = () => {
 
   const handleDeleteSingle = async (id: string) => {
     if (!canDeleteFiles) return;
-    await deleteFile([id]); // hook shows progress + success/fail
+    await deleteFile([id]);
     setSelectedFiles((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -157,7 +156,7 @@ const FileListPage: React.FC = () => {
 
   const handleDeleteFiles = async () => {
     if (!canDeleteFiles) return;
-    await deleteFile(Array.from(selectedFiles)); // hook shows progress + success/fail
+    await deleteFile(Array.from(selectedFiles));
     setSelectedFiles(new Set());
   };
 
@@ -197,29 +196,29 @@ const FileListPage: React.FC = () => {
             </Tooltip>,
 
             canDeleteFiles &&
-              (ALLOW_LOCAL_DELETE || file.service !== STORAGE_SERVICES.LOCAL) &&
-              !disableIndividualDelete && (
-                <Popconfirm
-                  title="Are you sure you want to delete this file?"
-                  onConfirm={(e) => {
-                    e?.stopPropagation();
-                    void handleDeleteSingle(file._id);
-                  }}
-                  onCancel={(e) => e?.stopPropagation()}
-                  okText="Yes"
-                  cancelText="No"
-                  key="delete"
-                >
-                  <Tooltip title="Delete File">
-                    <Button
-                      icon={<DeleteOutlined />}
-                      danger
-                      shape="circle"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </Tooltip>
-                </Popconfirm>
-              ),
+            (ALLOW_LOCAL_DELETE || file.service !== STORAGE_SERVICES.LOCAL) &&
+            !disableIndividualDelete && (
+              <Popconfirm
+                title="Are you sure you want to delete this file?"
+                onConfirm={(e) => {
+                  e?.stopPropagation();
+                  void handleDeleteSingle(file._id);
+                }}
+                onCancel={(e) => e?.stopPropagation()}
+                okText="Yes"
+                cancelText="No"
+                key="delete"
+              >
+                <Tooltip title="Delete File">
+                  <Button
+                    icon={<DeleteOutlined />}
+                    danger
+                    shape="circle"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </Tooltip>
+              </Popconfirm>
+            ),
           ]}
         >
           <Card.Meta title={file.name} description={file.service} />
@@ -312,15 +311,13 @@ const FileListPage: React.FC = () => {
         </Text>
       </div>
 
-      {/* File List */}
       <List
-        grid={{ gutter: 16, column: 4 }}
+        grid={{ gutter: 16, xs: 2, sm: 2, md: 3, lg: 4, xl: 4, xxl: 5 }}
         dataSource={files}
         renderItem={renderFileCard}
         locale={{ emptyText: "No files found" }}
       />
 
-      {/* Observer div for infinite scrolling */}
       <div ref={observerRef} style={{ textAlign: "center", marginTop: "20px" }}>
         {loading && <Spin size="large" style={{ margin: "20px 0" }} />}
         {!hasMore && !loading && (

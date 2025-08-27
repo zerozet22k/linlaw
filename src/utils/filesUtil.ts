@@ -1,4 +1,55 @@
 import { FileType } from "@/models/FileModel";
+import rawRules from "./mime.json";
+
+type Rule = { bucket: string; priority: number; extensions: string[]; patterns?: string[] };
+
+const rules: Rule[] = (rawRules as unknown as Rule[]).slice().sort((a, b) => b.priority - a.priority);
+
+export const BUCKET_TO_FILETYPE: Record<string, FileType> = {
+  document: FileType.DOCUMENT,
+  spreadsheet: FileType.SPREADSHEET,
+  presentation: FileType.PRESENTATION,
+  image: FileType.IMAGE,
+  audio: FileType.AUDIO,
+  video: FileType.VIDEO,
+  archive: FileType.ARCHIVE,
+  code: FileType.CODE,
+  executable: FileType.EXECUTABLE,
+  "installer-package": FileType.INSTALLER_PACKAGE,
+  "disk-image": FileType.DISK_IMAGE,
+  data: FileType.DATA,
+  database: FileType.DATABASE,
+  "3d-model": FileType.MODEL_3D,
+  cad: FileType.CAD,
+  font: FileType.FONT,
+  ebook: FileType.EBOOK,
+  "certificate-key": FileType.CERTIFICATE_KEY,
+  email: FileType.EMAIL,
+  calendar: FileType.CALENDAR,
+  geo: FileType.GEO,
+  torrent: FileType.TORRENT,
+  unknown: FileType.UNKNOWN,
+};
+
+function extractExt(name: string): string | undefined {
+  const base = name.split("/").pop() || name;
+  const i = base.lastIndexOf(".");
+  if (i <= 0) return undefined;
+  return base.slice(i + 1).toLowerCase();
+}
+
+function bucketForExt(ext: string): string | undefined {
+  for (const r of rules) if (r.extensions.includes(ext)) return r.bucket;
+  return undefined;
+}
+
+export const detectFileType = (fileName: string): FileType => {
+  const ext = extractExt(fileName);
+  if (!ext) return FileType.UNKNOWN;
+  const bucket = bucketForExt(ext) || "unknown";
+  return BUCKET_TO_FILETYPE[bucket] ?? FileType.UNKNOWN;
+};
+
 export const getFileFolderWithType = (
   rawFilePath?: string
 ): {
@@ -9,82 +60,21 @@ export const getFileFolderWithType = (
   urlFriendlyFilePath: string;
 } => {
   if (!rawFilePath) {
-    return {
-      folder: "",
-      fileName: "",
-      fileType: FileType.UNKNOWN,
-      filePath: "",
-      urlFriendlyFilePath: "",
-    };
+    return { folder: "", fileName: "", fileType: FileType.UNKNOWN, filePath: "", urlFriendlyFilePath: "" };
   }
-
   const normalizedPath = rawFilePath.replace(/\\/g, "/");
   const lastSlashIndex = normalizedPath.lastIndexOf("/");
-
-  const folder =
-    lastSlashIndex === -1
-      ? ""
-      : normalizedPath.substring(0, lastSlashIndex) || "/";
-  const fileName =
-    lastSlashIndex === -1
-      ? normalizedPath
-      : normalizedPath.substring(lastSlashIndex + 1);
-
+  const folder = lastSlashIndex === -1 ? "" : normalizedPath.substring(0, lastSlashIndex) || "/";
+  const fileName = lastSlashIndex === -1 ? normalizedPath : normalizedPath.substring(lastSlashIndex + 1);
   const fileType = detectFileType(fileName);
-
   const urlFriendlyFilePath = encodeURIComponent(normalizedPath);
-
-  return {
-    folder,
-    fileName,
-    fileType,
-    filePath: normalizedPath,
-    urlFriendlyFilePath,
-  };
-};
-
-export const detectFileType = (fileName: string): FileType => {
-  const extension = fileName.split(".").pop()?.toLowerCase();
-  if (!extension) return FileType.UNKNOWN;
-
-  const imageExtensions = ["png", "jpg", "jpeg", "webp", "svg", "ico", "gif"];
-  const videoExtensions = ["mp4", "mov", "avi", "mkv", "webm", "flv", "wmv"];
-  const audioExtensions = ["mp3", "wav", "ogg", "aac", "flac"];
-  const archiveExtensions = ["zip", "rar", "7z", "tar", "gz"];
-  const codeExtensions = [
-    "js",
-    "jsx",
-    "ts",
-    "tsx",
-    "java",
-    "py",
-    "cpp",
-    "c",
-    "cs",
-    "rb",
-    "php",
-    "go",
-  ];
-  const spreadsheetExtensions = ["xls", "xlsx", "csv"];
-  const presentationExtensions = ["ppt", "pptx"];
-  const documentExtensions = ["pdf", "doc", "docx", "odt", "txt", "rtf"];
-
-  if (imageExtensions.includes(extension)) return FileType.IMAGE;
-  if (videoExtensions.includes(extension)) return FileType.VIDEO;
-  if (audioExtensions.includes(extension)) return FileType.AUDIO;
-  if (archiveExtensions.includes(extension)) return FileType.ARCHIVE;
-  if (codeExtensions.includes(extension)) return FileType.CODE;
-  if (spreadsheetExtensions.includes(extension)) return FileType.SPREADSHEET;
-  if (presentationExtensions.includes(extension)) return FileType.PRESENTATION;
-  if (documentExtensions.includes(extension)) return FileType.DOCUMENT;
-
-  return FileType.UNKNOWN;
+  return { folder, fileName, fileType, filePath: normalizedPath, urlFriendlyFilePath };
 };
 
 export const shortenFileName = (name: string, maxLength = 15) => {
   if (name.length <= maxLength) return name;
   const extIndex = name.lastIndexOf(".");
-  const ext = extIndex !== -1 ? name.slice(extIndex) : "";
-  const baseName = extIndex !== -1 ? name.slice(0, extIndex) : name;
-  return `${baseName.slice(0, maxLength - ext.length - 3)}...${ext}`;
+  const ext = extIndex > 0 ? name.slice(extIndex) : "";
+  const baseName = extIndex > 0 ? name.slice(0, extIndex) : name;
+  return `${baseName.slice(0, Math.max(1, maxLength - ext.length - 3))}...${ext}`;
 };

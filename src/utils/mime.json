@@ -1,0 +1,491 @@
+[
+  {
+    "bucket": "document",
+    "patterns": [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.*",
+      "application/vnd.oasis.opendocument.text*",
+      "application/rtf",
+      "text/rtf",
+      "text/plain",
+      "text/richtext",
+      "application/x-latex",
+      "application/x-tex",
+      "application/xhtml+xml",
+      "application/vnd.apple.pages",
+      "application/x-iwork-pages-sffpages",
+      "application/vnd.ms-publisher",
+      "application/vnd.visio",
+      "application/vnd.ms-project",
+      "application/vnd.adobe.indesign-idml",
+      "application/x-indesign",
+      "application/postscript"
+    ],
+    "extensions": [
+      "pdf","doc","docx","dot","dotx","odt","rtf","txt","tex","ltx","xhtml","htm","html","pages",
+      "pub","vsd","vsdx","mpp","idml","indd","ps","rtx"
+    ],
+    "priority": 90
+  },
+  {
+    "bucket": "spreadsheet",
+    "patterns": [
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.*",
+      "application/vnd.ms-excel.*",
+      "application/vnd.oasis.opendocument.spreadsheet*",
+      "application/vnd.apple.numbers",
+      "application/x-iwork-numbers-sffnumbers",
+      "text/csv",
+      "application/csv",
+      "application/vnd.lotus-1-2-3"
+    ],
+    "extensions": [
+      "xls","xlsx","xlsm","xlt","xltx","ods","csv","numbers","tsv","dif","slk"
+    ],
+    "priority": 80
+  },
+  {
+    "bucket": "presentation",
+    "patterns": [
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.*",
+      "application/vnd.ms-powerpoint.*",
+      "application/vnd.oasis.opendocument.presentation*",
+      "application/vnd.apple.keynote",
+      "application/x-iwork-keynote-sffkey",
+      "application/vnd.apple.keynote.*"
+    ],
+    "extensions": [
+      "ppt","pptx","pps","ppsx","pot","potx","odp","key"
+    ],
+    "priority": 80
+  },
+  {
+    "bucket": "image",
+    "patterns": [
+      "image/*",
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/avif",
+      "image/svg+xml",
+      "image/tiff",
+      "image/bmp",
+      "image/x-icon",
+      "image/heif",
+      "image/heic",
+      "image/jp2",
+      "application/illustrator",
+      "application/vnd.adobe.illustrator",
+      "application/x-photoshop",
+      "image/vnd.adobe.photoshop",
+      "application/eps",
+      "application/x-eps",
+      "application/postscript",
+      "image/x-adobe-dng",
+      "image/x-canon-cr2",
+      "image/x-nikon-nef",
+      "image/x-sony-arw",
+      "image/x-olympus-orf",
+      "image/x-fuji-raf",
+      "image/x-panasonic-rw2",
+      "image/x-samsung-srw",
+      "application/vnd.corel-draw",
+      "application/x-cdr"
+    ],
+    "extensions": [
+      "jpg","jpeg","png","gif","webp","avif","svg","tif","tiff","bmp","ico","heic","heif","jp2",
+      "psd","ai","eps","cdr","dng","cr2","nef","arw","orf","raf","rw2","srw"
+    ],
+    "priority": 85
+  },
+  {
+    "bucket": "audio",
+    "patterns": [
+      "audio/*",
+      "audio/mpeg",
+      "audio/mp3",
+      "audio/wav",
+      "audio/x-wav",
+      "audio/vnd.wave",
+      "audio/ogg",
+      "audio/opus",
+      "audio/flac",
+      "audio/aac",
+      "audio/mp4",
+      "audio/x-m4a",
+      "audio/x-ms-wma",
+      "audio/x-aiff",
+      "audio/midi",
+      "audio/x-midi",
+      "audio/vnd.dolby.dd-raw",
+      "audio/vnd.rn-realaudio",
+      "application/ogg"
+    ],
+    "extensions": [
+      "mp3","wav","ogg","opus","flac","aac","m4a","wma","aiff","aif","mid","midi","ra","ac3"
+    ],
+    "priority": 85
+  },
+  {
+    "bucket": "video",
+    "patterns": [
+      "video/*",
+      "video/mp4",
+      "video/x-msvideo",
+      "video/x-matroska",
+      "video/webm",
+      "video/quicktime",
+      "video/x-flv",
+      "video/x-ms-wmv",
+      "application/x-mpegURL",
+      "application/vnd.apple.mpegurl",
+      "video/x-m4v",
+      "video/3gpp",
+      "video/3gpp2",
+      "video/mpeg",
+      "video/mp2t",
+      "video/ogg",
+      "video/vnd.dlna.mpeg-tts",
+      "video/vnd.rn-realvideo"
+    ],
+    "extensions": [
+      "mp4","m4v","mov","avi","mkv","webm","flv","wmv","mpeg","mpg","ts","m2ts","m3u8","3gp","3g2"
+    ],
+    "priority": 85
+  },
+  {
+    "bucket": "archive",
+    "patterns": [
+      "application/zip",
+      "application/x-zip-compressed",
+      "application/x-7z-compressed",
+      "application/x-rar-compressed",
+      "application/vnd.rar",
+      "application/x-tar",
+      "application/gzip",
+      "application/x-gzip",
+      "application/x-bzip2",
+      "application/x-xz",
+      "application/zstd",
+      "application/x-archive",
+      "application/x-cpio",
+      "application/x-gtar",
+      "application/x-lzip",
+      "application/x-lzma",
+      "application/x-compress",
+      "application/java-archive",
+      "application/x-jar",
+      "application/x-war",
+      "application/x-ear",
+      "application/x-lzh-compressed",
+      "application/x-arj",
+      "application/vnd.ms-cab-compressed",
+      "application/x-applearchive",
+      "application/x-xar"
+    ],
+    "extensions": [
+      "zip","rar","7z","tar","gz","bz2","xz","zst","jar","war","ear","lzh","arj","cab","xar","z","lz","lzma"
+    ],
+    "priority": 70
+  },
+  {
+    "bucket": "executable",
+    "patterns": [
+      "application/x-msdownload",
+      "application/x-dosexec",
+      "application/vnd.microsoft.portable-executable",
+      "application/x-executable",
+      "application/x-elf",
+      "application/x-mach-binary",
+      "application/x-sharedlib",
+      "application/x-appimage",
+      "application/x-msi",
+      "application/x-ms-shortcut"
+    ],
+    "extensions": [
+      "exe","dll","msi","appimage","lnk"
+    ],
+    "priority": 95
+  },
+  {
+    "bucket": "installer-package",
+    "patterns": [
+      "application/vnd.android.package-archive",
+      "application/x-deb",
+      "application/x-rpm",
+      "application/vnd.apple.installer+xml",
+      "application/x-xar",
+      "application/vnd.snap"
+    ],
+    "extensions": [
+      "apk","deb","rpm","pkg","snap"
+    ],
+    "priority": 90
+  },
+  {
+    "bucket": "disk-image",
+    "patterns": [
+      "application/x-iso9660-image",
+      "application/x-apple-diskimage",
+      "application/x-raw-disk-image",
+      "application/x-vhd",
+      "application/x-vhdx",
+      "application/x-vmdk",
+      "application/x-qcow",
+      "application/x-qcow2"
+    ],
+    "extensions": [
+      "iso","dmg","img","vhd","vhdx","vmdk","qcow","qcow2"
+    ],
+    "priority": 90
+  },
+  {
+    "bucket": "code",
+    "patterns": [
+      "text/x-*",
+      "text/markdown",
+      "application/javascript",
+      "text/javascript",
+      "application/typescript",
+      "text/typescript",
+      "text/x-shellscript",
+      "application/x-sh",
+      "application/x-bash",
+      "text/x-python",
+      "application/x-python",
+      "text/x-c",
+      "text/x-c++",
+      "text/x-csharp",
+      "text/x-go",
+      "text/x-java-source",
+      "text/x-kotlin",
+      "text/x-rust",
+      "text/x-swift",
+      "text/x-php",
+      "application/x-httpd-php",
+      "text/x-lua",
+      "text/x-haskell",
+      "text/x-scala",
+      "text/x-ruby",
+      "application/x-ruby",
+      "text/x-perl",
+      "application/x-perl",
+      "text/x-sql",
+      "application/sql",
+      "application/graphql",
+      "application/x-protobuf",
+      "application/x-toml",
+      "text/x-toml",
+      "application/x-properties",
+      "application/x-yaml",
+      "text/yaml",
+      "application/json5",
+      "application/jsonc"
+    ],
+    "extensions": [
+      "js","mjs","ts","tsx","jsx","sh","bash","bat","cmd","py","c","h","cpp","hpp","cs","go","java","kt","rs",
+      "swift","php","lua","hs","scala","rb","pl","sql","toml","yml","yaml","json5","jsonc","proto","graphql",
+      "gradle","cmake","make","mk","conf","ini","properties","env","tsconfig","eslintrc","prettierrc"
+    ],
+    "priority": 60
+  },
+  {
+    "bucket": "data",
+    "patterns": [
+      "application/json",
+      "application/ld+json",
+      "application/x-ndjson",
+      "application/xml",
+      "text/xml",
+      "application/x-yaml",
+      "text/csv",
+      "application/csv",
+      "application/parquet",
+      "application/vnd.apache.parquet",
+      "application/msgpack",
+      "application/x-msgpack"
+    ],
+    "extensions": [
+      "json","ndjson","xml","yaml","yml","csv","tsv","parquet","pqt","msgpack","mpack","avro"
+    ],
+    "priority": 65
+  },
+  {
+    "bucket": "database",
+    "patterns": [
+      "application/vnd.sqlite3",
+      "application/x-sqlite3",
+      "application/x-msaccess",
+      "application/vnd.ms-access",
+      "application/x-hdf5",
+      "application/x-dbf",
+      "application/vnd.oasis.opendocument.database",
+      "application/x-postgresql-dump",
+      "application/x-mysql-backup"
+    ],
+    "extensions": [
+      "sqlite","sqlite3","db","accdb","mdb","h5","hdf5","dbf","odb","dump"
+    ],
+    "priority": 70
+  },
+  {
+    "bucket": "3d-model",
+    "patterns": [
+      "model/*",
+      "model/gltf+json",
+      "model/gltf-binary",
+      "model/3mf",
+      "model/vrml",
+      "model/x3d+xml",
+      "model/stl",
+      "model/obj",
+      "model/vnd.collada+xml",
+      "application/x-blender",
+      "application/vnd.blender",
+      "application/x-3ds",
+      "application/x-sketchup"
+    ],
+    "extensions": [
+      "gltf","glb","3mf","wrl","x3d","stl","obj","dae","blend","3ds","skp","fbx"
+    ],
+    "priority": 65
+  },
+  {
+    "bucket": "cad",
+    "patterns": [
+      "image/vnd.dwg",
+      "image/x-dwg",
+      "application/vnd.dwg",
+      "image/vnd.dxf",
+      "application/vnd.dxf",
+      "application/acad",
+      "application/x-autocad",
+      "model/iges",
+      "application/iges",
+      "model/step",
+      "application/step",
+      "application/sla"
+    ],
+    "extensions": [
+      "dwg","dxf","iges","igs","step","stp","sla"
+    ],
+    "priority": 65
+  },
+  {
+    "bucket": "font",
+    "patterns": [
+      "font/ttf",
+      "font/otf",
+      "font/woff",
+      "font/woff2",
+      "font/collection",
+      "application/x-font-ttf",
+      "application/x-font-otf",
+      "application/x-font-woff",
+      "application/vnd.ms-fontobject"
+    ],
+    "extensions": [
+      "ttf","otf","woff","woff2","ttc","eot"
+    ],
+    "priority": 50
+  },
+  {
+    "bucket": "ebook",
+    "patterns": [
+      "application/epub+zip",
+      "application/vnd.amazon.ebook",
+      "application/x-mobipocket-ebook",
+      "application/x-fictionbook+xml",
+      "application/vnd.comicbook+zip",
+      "application/vnd.comicbook-rar",
+      "application/x-cbr",
+      "application/x-cbz",
+      "application/x-ibooks+zip"
+    ],
+    "extensions": [
+      "epub","azw","azw3","mobi","fb2","cbr","cbz","ibooks"
+    ],
+    "priority": 80
+  },
+  {
+    "bucket": "certificate-key",
+    "patterns": [
+      "application/pkcs12",
+      "application/x-pkcs12",
+      "application/pkcs8",
+      "application/pkcs7-signature",
+      "application/pkix-cert",
+      "application/x-x509-ca-cert",
+      "application/x-x509-user-cert",
+      "application/x-pem-file",
+      "application/x-ssh-key",
+      "application/pgp-keys",
+      "application/pgp-signature",
+      "application/pgp-encrypted",
+      "application/pkix-crl"
+    ],
+    "extensions": [
+      "p12","pfx","p8","pem","crt","cer","der","key","pub","ssh","rsa","pgp","asc","crl"
+    ],
+    "priority": 60
+  },
+  {
+    "bucket": "email",
+    "patterns": [
+      "message/rfc822",
+      "message/news",
+      "message/*"
+    ],
+    "extensions": [
+      "eml","msg","mbox"
+    ],
+    "priority": 60
+  },
+  {
+    "bucket": "calendar",
+    "patterns": [
+      "text/calendar",
+      "application/calendar+xml"
+    ],
+    "extensions": [
+      "ics","ical"
+    ],
+    "priority": 60
+  },
+  {
+    "bucket": "geo",
+    "patterns": [
+      "application/geo+json",
+      "application/vnd.google-earth.kml+xml",
+      "application/vnd.google-earth.kmz",
+      "application/vnd.mapbox-vector-tile",
+      "application/gml+xml"
+    ],
+    "extensions": [
+      "geojson","kml","kmz","mvt","gml"
+    ],
+    "priority": 60
+  },
+  {
+    "bucket": "torrent",
+    "patterns": [
+      "application/x-bittorrent"
+    ],
+    "extensions": [
+      "torrent"
+    ],
+    "priority": 60
+  },
+  {
+    "bucket": "unknown",
+    "patterns": [
+      "*/*"
+    ],
+    "extensions": [],
+    "priority": 0
+  }
+]
