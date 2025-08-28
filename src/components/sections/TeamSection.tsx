@@ -19,7 +19,7 @@ type TeamSectionProps = {
 };
 
 const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
-  const maxMembers = teamSection.maxMembersCount ?? 0; // 0 = no cap
+  const maxMembers = teamSection.maxMembersCount ?? 0;
 
   const [blocks, setBlocks] = useState<TeamBlockAPI[]>([]);
   const [loading, setLoading] = useState(true);

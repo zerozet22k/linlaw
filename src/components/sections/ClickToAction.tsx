@@ -1,4 +1,4 @@
-/* components/sections/ClickToAction.tsx */
+
 "use client";
 
 import React, { useState } from "react";
@@ -56,7 +56,7 @@ const ClickToAction: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
-  // i18n
+
   const tCTAHeader = getTranslatedText(contactTranslations.clickToActionHeader, language) || "";
   const tCTASub = getTranslatedText(contactTranslations.subheader, language) || "";
   const tCTAButton = getTranslatedText(contactTranslations.buttonLabel, language) || "Send a Message";
@@ -85,8 +85,8 @@ const ClickToAction: React.FC = () => {
 
   const { embedSrc } = resolveEmbedSrc(mapLink, address === "-" ? "" : address);
 
-  // make map taller (and match left panel)
-  const panelHeight = "clamp(340px, 48vh, 620px)"; // taller than 16:9, grows with viewport
+
+  const panelHeight = "clamp(340px, 48vh, 620px)";
 
   const handleSendEmail = async (values: any) => {
     setLoading(true);
@@ -118,22 +118,22 @@ const ClickToAction: React.FC = () => {
         maxWidth: 1200,
         margin: "0 auto",
         width: "100%",
-        paddingInline: token.paddingLG, // kills gutter overflow
+        paddingInline: token.paddingLG,
         boxSizing: "border-box",
       }}
     >
       <Row gutter={[token.sizeLG, token.sizeLG]} align="stretch" wrap>
-        {/* CTA + Details */}
+
         <Col xs={24} md={12}>
           <Card
             bordered={false}
             style={{
               height: "100%",
-              minHeight: panelHeight,         // match map height
+              minHeight: panelHeight,
               border: "none",
               boxShadow: "none",
               borderRadius: token.borderRadiusLG,
-              background: token.colorBgContainer, // ← theme bg
+              background: token.colorBgContainer,
             }}
             bodyStyle={{ padding: token.paddingLG }}
           >
@@ -255,7 +255,7 @@ const ClickToAction: React.FC = () => {
               border: "none",
               boxShadow: "none",
               borderRadius: token.borderRadiusLG,
-              background: token.colorBgContainer, // ← theme bg
+              background: token.colorBgContainer,
             }}
             bodyStyle={{ padding: 0 }}
           >
@@ -263,7 +263,7 @@ const ClickToAction: React.FC = () => {
               style={{
                 position: "relative",
                 width: "100%",
-                height: panelHeight,            // ← taller map
+                height: panelHeight,
                 background: token.colorBgLayout,
                 borderRadius: token.borderRadiusLG,
                 overflow: "hidden",

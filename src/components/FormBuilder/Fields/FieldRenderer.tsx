@@ -15,6 +15,7 @@ import SizeInput from "./Inputs/SizeInput";
 import ResponsiveImagesInput from "./Inputs/ResponsiveImagesInput";
 import UserSelector from "./Inputs/UserSelector";
 import UsersSelector from "./Inputs/UsersSelector";
+import BoxSidesInput from "./Inputs/BoxSidesInput";
 
 type FieldRendererProps = {
   config: ChildFieldInfo;
@@ -51,7 +52,7 @@ const renderFormField = (
         <RoleSelector value={value} onChange={onChange} style={commonStyle} />
       );
     case FormType.USER_SELECTOR:
-      return <UserSelector value={value} onChange={onChange} style={commonStyle}/>;
+      return <UserSelector value={value} onChange={onChange} style={commonStyle} />;
 
     case FormType.USERS_SELECTOR:
       return <UsersSelector value={value} onChange={onChange} style={commonStyle} />;
@@ -78,6 +79,14 @@ const renderFormField = (
     case FormType.SIZE:
       return (
         <SizeInput
+          value={value || "1em"}
+          onChange={onChange}
+          style={commonStyle}
+        />
+      );
+    case FormType.BOX_SIDES:
+      return (
+        <BoxSidesInput
           value={value || "1em"}
           onChange={onChange}
           style={commonStyle}

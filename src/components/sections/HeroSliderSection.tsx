@@ -29,11 +29,10 @@ export interface Slide {
 interface HeroSliderProps {
   slides: Slide[];
   delay: number;
-  /** Optional responsive sizes; defaults assume full-width slides */
   sizes?: {
-    desktop?: string; // e.g. "100vw" or "1200px"
-    tablet?: string; // e.g. "100vw" or "768px"
-    mobile?: string; // e.g. "100vw" or "375px"
+    desktop?: string;
+    tablet?: string;
+    mobile?: string;
   };
 }
 
@@ -44,16 +43,16 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({
 }) => {
   const { language } = useLanguage();
 
-  // Default sizes; adjust if your slide container isn’t full width
+
   const desktopSize = sizes?.desktop ?? "100vw";
   const tabletSize = sizes?.tablet ?? "100vw";
   const mobileSize = sizes?.mobile ?? "100vw";
 
-  // Fallback chain helper: pick the first defined image
+
   const pick = (...candidates: Array<string | undefined>) =>
     candidates.find(Boolean) ?? "";
 
-  // Combined sizes string for <img> fallback
+
   const sizesAttr = `(min-width: 1024px) ${desktopSize}, (min-width: 768px) ${tabletSize}, ${mobileSize}`;
 
   return (
@@ -68,13 +67,13 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({
         pagination={{ clickable: true }}
         modules={[EffectCube, Navigation, Pagination, Autoplay]}
         className="swiper-container"
-        // Uncomment if you actually want the cube effect:
-        // effect="cube"
+
+
       >
         {slides.map((slide, index) => {
           const isFirst = index === 0;
 
-          // Resolve the three breakpoints with fallbacks
+
           const desktopSrc = pick(
             slide.images.desktop,
             slide.images.tablet,

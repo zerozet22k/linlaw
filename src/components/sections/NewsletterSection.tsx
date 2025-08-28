@@ -21,8 +21,7 @@ import {
 const { Title, Text } = Typography;
 const { useToken } = theme;
 
-type NewsletterData =
-  HOME_PAGE_SETTINGS_TYPES[typeof K.NEWSLETTER_SECTION];
+type NewsletterData = HOME_PAGE_SETTINGS_TYPES[typeof K.NEWSLETTER_SECTION];
 
 type Props = {
   data?: NewsletterData;
@@ -83,8 +82,10 @@ const NewsletterSection: React.FC<Props> = ({ data, language }) => {
     gap: token.sizeLG,
   };
 
+  let content: React.ReactNode;
+
   if (loading) {
-    return (
+    content = (
       <div style={gridStyle}>
         {Array.from({ length: 3 }).map((_, i) => (
           <Card
@@ -104,10 +105,8 @@ const NewsletterSection: React.FC<Props> = ({ data, language }) => {
         ))}
       </div>
     );
-  }
-
-  if (error) {
-    return (
+  } else if (error) {
+    content = (
       <Alert
         message="Error"
         description={error}
@@ -116,105 +115,113 @@ const NewsletterSection: React.FC<Props> = ({ data, language }) => {
         style={{ maxWidth: 600, margin: "0 auto" }}
       />
     );
-  }
-
-  if (newsletters.length === 0) {
-    return (
+  } else if (newsletters.length === 0) {
+    content = (
       <Empty
         description="No newsletters found."
         style={{ marginTop: token.marginXL }}
       />
     );
+  } else {
+    content = (
+      <>
+        <div style={gridStyle}>
+          {newsletters.map((item) => {
+            const title =
+              typeof item.title === "string"
+                ? item.title
+                : item.title?.[language] || item.title?.en || "Untitled";
+
+            const created = formatDate(item.createdAt);
+            const files = Array.isArray(item.fileAttachments)
+              ? item.fileAttachments.length
+              : 0;
+
+            return (
+              <Link
+                key={item._id}
+                href={`/newsletters/${item._id}`}
+                style={{ textDecoration: "none", display: "block" }}
+                aria-label={`Open newsletter: ${title}`}
+              >
+                <Card
+                  bordered
+                  hoverable
+                  style={{
+                    borderRadius: token.borderRadiusLG,
+                    borderColor: token.colorBorderSecondary,
+                    boxShadow: "none",
+                    background: token.colorBgContainer,
+                    height: "100%",
+                  }}
+                  styles={{ body: { padding: token.paddingLG } }}
+                >
+                  <Title
+                    level={5}
+                    style={{
+                      marginBottom: token.marginXS,
+                      color: token.colorText,
+                    }}
+                  >
+                    {title}
+                  </Title>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: token.sizeLG,
+                      alignItems: "center",
+                      color: token.colorTextTertiary,
+                      fontSize: 13,
+                      marginBottom: token.marginSM,
+                    }}
+                  >
+                    {created && (
+                      <span>
+                        <CalendarOutlined /> {created}
+                      </span>
+                    )}
+                    {files > 0 && (
+                      <span>
+                        <PaperClipOutlined /> {files}
+                      </span>
+                    )}
+                  </div>
+
+                  <Text type="secondary" style={{ fontSize: 14 }}>
+                    {tReadMore} <ArrowRightOutlined />
+                  </Text>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: token.marginXL }}>
+          <Link
+            href="/newsletters"
+            style={{
+              fontWeight: 500,
+              fontSize: 16,
+              color: token.colorPrimary,
+              textDecoration: "none",
+            }}
+          >
+            {tViewAll}
+          </Link>
+        </div>
+      </>
+    );
   }
 
   return (
-    <>
-      <div style={gridStyle}>
-        {newsletters.map((item) => {
-          const title =
-            typeof item.title === "string"
-              ? item.title
-              : item.title?.[language] || item.title?.en || "Untitled";
-
-          const created = formatDate(item.createdAt);
-          const files = Array.isArray(item.fileAttachments)
-            ? item.fileAttachments.length
-            : 0;
-
-          return (
-            <Link
-              key={item._id}
-              href={`/newsletters/${item._id}`}
-              style={{ textDecoration: "none" }}
-              aria-label={`Open newsletter: ${title}`}
-            >
-              <Card
-                bordered
-                hoverable
-                style={{
-                  borderRadius: token.borderRadiusLG,
-                  borderColor: token.colorBorderSecondary,
-                  boxShadow: "none",
-                  background: token.colorBgContainer,
-                  height: "100%",
-                }}
-                styles={{ body: { padding: token.paddingLG } }}
-              >
-                <Title
-                  level={5}
-                  style={{
-                    marginBottom: token.marginXS,
-                    color: token.colorText,
-                  }}
-                >
-                  {title}
-                </Title>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: token.sizeLG,
-                    alignItems: "center",
-                    color: token.colorTextTertiary,
-                    fontSize: 13,
-                    marginBottom: token.marginSM,
-                  }}
-                >
-                  {created && (
-                    <span>
-                      <CalendarOutlined /> {created}
-                    </span>
-                  )}
-                  {files > 0 && (
-                    <span>
-                      <PaperClipOutlined /> {files}
-                    </span>
-                  )}
-                </div>
-
-                <Text type="secondary" style={{ fontSize: 14 }}>
-                  {tReadMore} <ArrowRightOutlined />
-                </Text>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div style={{ textAlign: "center", marginTop: token.marginXL }}>
-        <Link
-          href="/newsletters"
-          style={{
-            fontWeight: 500,
-            fontSize: 16,
-            color: token.colorPrimary,
-            textDecoration: "none",
-          }}
-        >
-          {tViewAll}
-        </Link>
-      </div>
-    </>
+    <div
+      data-component="NewsletterSection"
+      aria-busy={loading ? "true" : "false"}
+      style={{ width: "100%" }}
+    >
+      {content}
+    </div>
   );
 };
 

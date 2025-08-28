@@ -28,9 +28,6 @@ const SizeInput: React.FC<TextSizeInputProps> = ({
       ? value.replace(/[0-9.]/g, "")
       : "em"
   );
-
-  const commonHeight = 32;
-
   useEffect(() => {
     onChange?.(`${size}${unit}`);
   }, [size, unit]);

@@ -29,6 +29,9 @@
   width: 100%;
   max-width: 80%;
 }
+.slide-info.center {
+  text-align: center;
+}
 
 .slide-info.left {
   left: 10%;

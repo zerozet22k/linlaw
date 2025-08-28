@@ -16,16 +16,16 @@ import {
   SharedPageDesignType,
 } from "./shared/sharedPageTypes";
 
-const pageName = "Team";
+const pageName = "team";
 
-/* ─ Keys ─ */
+
 export const TEAM_PAGE_SETTINGS_KEYS = {
   PAGE_CONTENT: `${pageName}-page-content`,
   DESIGN: `${pageName}-design`,
   SECTIONS: `${pageName}-sections`,
 } as const;
 
-/* ─ Settings ─ */
+
 export const TEAM_PAGE_SETTINGS: GeneralConfig<typeof TEAM_PAGE_SETTINGS_KEYS> =
 {
   [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: {
@@ -88,7 +88,7 @@ export const TEAM_PAGE_SETTINGS: GeneralConfig<typeof TEAM_PAGE_SETTINGS_KEYS> =
   },
 };
 
-/* ─ Types ─ */
+
 export type TEAM_PAGE_SETTINGS_TYPES = {
   [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
   [TEAM_PAGE_SETTINGS_KEYS.DESIGN]: SharedPageDesignType;

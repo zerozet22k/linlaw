@@ -15,7 +15,7 @@ import {
   SharedPageDesignType,
 } from "./shared/sharedPageTypes";
 
-const pageName = "Newsletter";
+const pageName = "newsletter";
 
 export const NEWSLETTER_PAGE_SETTINGS_KEYS = {
   PAGE_CONTENT: `${pageName}-page-content`,
