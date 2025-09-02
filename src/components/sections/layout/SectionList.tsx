@@ -130,7 +130,7 @@ const SectionList: React.FC<SectionListProps> = ({
                 const textColor = section.content?.textColor || undefined;
                 const contentMaxWidth = normalizeSize(section.content?.contentMaxWidth || 720);
 
-                // background
+
                 const bgMode = normalizeBgMode(section.background?.mode) || BgMode.AUTO;
                 const bgColor =
                     (it.background as string) ?? section.background?.color?.backgroundColor ?? undefined;
@@ -147,7 +147,7 @@ const SectionList: React.FC<SectionListProps> = ({
                         ? section.background?.gradient?.gradientAngle
                         : undefined;
 
-                // overlay
+
                 let overlayCss = it.overlay as string | undefined;
                 if (!overlayCss && section.overlay?.overlayEnabled) {
                     const color = section.overlay.overlayColor || "#000000";
@@ -158,7 +158,7 @@ const SectionList: React.FC<SectionListProps> = ({
                     overlayCss = `linear-gradient(${hexToRgba(color, alpha)}, ${hexToRgba(color, alpha)})`;
                 }
 
-                // layout: height / overflow / items / spacing
+
                 const minHeight =
                     section.layout?.height?.minHeightEnabled && section.layout?.height?.minHeight
                         ? normalizeSize(section.layout.height.minHeight)
@@ -185,7 +185,7 @@ const SectionList: React.FC<SectionListProps> = ({
                 const itemsWrap = section.layout?.items?.wrap ?? undefined;
                 const itemsGap = normalizeSize(section.layout?.items?.gap);
 
-                // -------------------------------- bg source --------------------------------
+
                 let effectiveSource = bgMode;
                 if (effectiveSource === BgMode.AUTO) {
                     if (section.background?.video?.videoUrl) effectiveSource = BgMode.VIDEO;
@@ -195,7 +195,7 @@ const SectionList: React.FC<SectionListProps> = ({
                     else effectiveSource = BgMode.NONE;
                 }
 
-                // non-video background css
+
                 let backgroundImageCss: string | undefined;
                 if (effectiveSource === BgMode.IMAGE && bgImage) {
                     backgroundImageCss = `url(${bgImage})`;
@@ -209,22 +209,22 @@ const SectionList: React.FC<SectionListProps> = ({
                         : overlayCss;
                 }
 
-                // TRBL padding only
+
                 const paddingTop = normalizeSize(paddingBox?.top);
                 const paddingRight = normalizeSize(paddingBox?.right);
                 const paddingBottom = normalizeSize(paddingBox?.bottom);
                 const paddingLeft = normalizeSize(paddingBox?.left);
 
-                // zebra + color underlay
+
                 const zebraColor = zebra ? (idx % 2 === 0 ? zebraLight : zebraDark) : undefined;
                 const bgColorStyle =
                     bgColor ?? (!backgroundImageCss && effectiveSource !== BgMode.VIDEO ? zebraColor : undefined);
 
-                // outer alignment from items.align (fallback to section text align)
+
                 const outerAlignItems =
                     mapAlignItems(itemsAlign) ?? textAlignToFlexAlign(align);
 
-                // ----- section style -----
+
                 const style: React.CSSProperties = {
                     ...sectionOuterStyle,
                     position: "relative",
@@ -277,6 +277,7 @@ const SectionList: React.FC<SectionListProps> = ({
                     width: "100%",
                     maxWidth: "100%",
                     boxSizing: "border-box",
+                    paddingBlock: 32,
                     ...(textColor ? { color: textColor } : {}),
                 };
 
@@ -303,14 +304,14 @@ const SectionList: React.FC<SectionListProps> = ({
                 const innerContentStyle: React.CSSProperties = {
                     position: "relative",
                     zIndex: 1,
-                    padding:'20px',
+                    padding: '20px',
                     width: "100%",
                     maxWidth: "100%",
                     boxSizing: "border-box",
                     overflowX: "hidden",
                 };
 
-                // items layout?
+
                 const hasItemsLayout = Boolean(
                     section.layout?.items?.align ||
                     section.layout?.items?.justify ||
