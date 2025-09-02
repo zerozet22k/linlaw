@@ -11,19 +11,19 @@ import {
 
 const { Text } = Typography;
 
+/** ── Tunables ─────────────────────────────────────────────── */
+const RIGHT_OFFSET_DESKTOP = 18;
+const RIGHT_OFFSET_MOBILE  = 10;
 const BG = "#000";
 const TXT = "#fff";
 const PAD_DESK = "5px 20px";
 const PAD_MOB = "8px 10px";
 const FONT_SIZE = 14;
+/** ─────────────────────────────────────────────────────────── */
 
 type BusinessInfo = GLOBAL_SETTINGS_TYPES[typeof G.BUSINESS_INFO];
+interface Props { businessInfo: BusinessInfo; }
 
-interface Props {
-  businessInfo: BusinessInfo;
-}
-
-/* fixed ordering from your CMS DayOfWeek values */
 const DAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 const normalizeHours = (opens?: string, closes?: string) => {
@@ -34,13 +34,10 @@ const normalizeHours = (opens?: string, closes?: string) => {
   return `${o || "—"} – ${c || "—"}`;
 };
 
-/* Build a compact summary like:
-   "Mon–Fri: 9:00AM – 5:00PM · Sat–Sun: Closed" */
 const buildHoursSummary = (biz: BusinessInfo): string | null => {
   const list = biz.openingHours;
   if (!Array.isArray(list) || list.length === 0) return null;
 
-  // create a normalized per-day map
   const map = new Map<string, string>();
   for (const d of DAY_ORDER) {
     const row = list.find((r) => r?.day === d);
@@ -48,7 +45,6 @@ const buildHoursSummary = (biz: BusinessInfo): string | null => {
     map.set(d, val);
   }
 
-  // group adjacent days with same hours
   type Group = { startIdx: number; endIdx: number; label: string };
   const groups: Group[] = [];
   let start = 0;
@@ -100,10 +96,12 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const contentRef  = useRef<HTMLDivElement>(null);
+  const pillRef     = useRef<HTMLDivElement>(null);
 
   const [needsScroll, setNeedsScroll] = useState(false);
-  const [distance, setDistance]       = useState(0);  // px
-  const [duration, setDuration]       = useState(20); // s
+  const [distance, setDistance]       = useState(0);   // px
+  const [duration, setDuration]       = useState(20);  // s
+  const [padRight, setPadRight]       = useState<number>(isMobile ? 52 : 84);
 
   useEffect(() => {
     const measure = () => {
@@ -113,12 +111,18 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
       setDistance(cw);
       const pxPerSec = isMobile ? 60 : 100;
       setDuration(Math.max(12, Math.round(cw / pxPerSec)));
+
+      // Reserve exactly the pill width + breathing room, so text never sits under it
+      const pillW = pillRef.current?.offsetWidth ?? 0;
+      const extra = isMobile ? 16 : 24;
+      setPadRight(pillW + extra);
     };
 
     measure();
     const ro = new ResizeObserver(measure);
     if (viewportRef.current) ro.observe(viewportRef.current);
     if (contentRef.current) ro.observe(contentRef.current);
+    if (pillRef.current) ro.observe(pillRef.current);
     window.addEventListener("resize", measure);
     return () => {
       ro.disconnect();
@@ -126,7 +130,7 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
     };
   }, [items, isMobile]);
 
-  const segment = (it: (typeof items)[number], i: number) => {
+  const segment = (it: (typeof items)[number], i: number, last: boolean) => {
     const content = (
       <>
         <span aria-hidden style={{ marginRight: 6 }}>{it.icon}</span>
@@ -140,7 +144,7 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          marginRight: 28,
+          marginRight: last ? 0 : 28,
           whiteSpace: "nowrap",
         }}
       >
@@ -151,7 +155,7 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         ) : (
           <Text style={{ color: TXT }}>{content}</Text>
         )}
-        <span aria-hidden style={{ opacity: 0.4 }}>•</span>
+        {!last && <span aria-hidden style={{ opacity: 0.4, marginLeft: 12 }}>•</span>}
       </span>
     );
   };
@@ -164,27 +168,38 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         color: TXT,
         fontSize: FONT_SIZE,
         padding: isMobile ? PAD_MOB : PAD_DESK,
+        paddingRight: padRight, // dynamic, matches pill width
         position: "relative",
         zIndex: 999,
         overflow: "hidden",
-        paddingRight: isMobile ? 52 : 80,
         minHeight: 40,
         display: "flex",
         alignItems: "center",
+        paddingInlineEnd: "calc(env(safe-area-inset-right, 0px) + 0px)",
       }}
     >
+      {/* Right-aligned compact language switcher (flag-only) */}
       <div
+        ref={pillRef}
         style={{
           position: "absolute",
-          right: 10,
+          right: isMobile ? RIGHT_OFFSET_MOBILE : RIGHT_OFFSET_DESKTOP,
           top: "50%",
           transform: "translateY(-50%)",
+          pointerEvents: "none", // wrapper inert; only the pill is clickable
+          zIndex: 2,
         }}
       >
-        <LanguageSelection />
+        <div className="lang-compact" style={{ pointerEvents: "auto" }}>
+          <LanguageSelection />
+        </div>
       </div>
 
-      <div ref={viewportRef} style={{ width: "100%", overflow: "hidden", whiteSpace: "nowrap" }}>
+      {/* Marquee / ticker */}
+      <div
+        ref={viewportRef}
+        style={{ width: "100%", overflow: "hidden", whiteSpace: "nowrap" }}
+      >
         <div
           style={{
             display: "inline-block",
@@ -194,11 +209,11 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
           }}
         >
           <div ref={contentRef} style={{ display: "inline-block" }}>
-            {items.map(segment)}
+            {items.map((it, i) => segment(it, i, i === items.length - 1))}
           </div>
           {needsScroll && (
-            <div aria-hidden style={{ display: "inline-block" }}>
-              {items.map(segment)}
+            <div aria-hidden style={{ display: "inline-block", marginLeft: 28 }}>
+              {items.map((it, i) => segment(it, i, i === items.length - 1))}
             </div>
           )}
         </div>
@@ -208,6 +223,45 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         @keyframes overlayTicker {
           0%   { transform: translateX(0); }
           100% { transform: translateX(calc(-1 * var(--scroll-distance))); }
+        }
+
+        /* Compact the AntD Select so only the visible pill is clickable */
+        .lang-compact .ant-select {
+          width: auto !important;
+        }
+        .lang-compact .ant-select-selector {
+          min-width: auto !important;   /* kill default min-width */
+          inline-size: auto !important; /* logical width */
+          padding: 2px 6px !important;
+          min-height: 26px;
+          border-radius: 999px !important;
+          background: rgba(255,255,255,0.10) !important;
+          border: 1px solid rgba(255,255,255,0.25) !important;
+          display: inline-flex;
+          align-items: center;
+          gap: 0;
+        }
+        .lang-compact .ant-select-arrow { display: none !important; }
+        .lang-compact .ant-select-selection-search { display: none !important; }
+
+        /* FLAG-ONLY in the pill: nuke any text by zeroing font-size on the selection item */
+        .lang-compact .ant-select-selection-item {
+          display: inline-flex;
+          align-items: center;
+          font-size: 0 !important;  /* this kills 'EN/KO' no matter where it lives */
+          padding-inline-end: 0 !important;
+          line-height: 0 !important;
+        }
+        .lang-compact .ant-select-selection-item img {
+          width: 20px;
+          height: 14px;
+          display: block;
+        }
+
+        /* Keep color consistent on the pill */
+        .lang-compact .ant-select-selection-item,
+        .lang-compact .ant-select-selection-item * {
+          color: ${TXT} !important;
         }
       `}</style>
     </div>
