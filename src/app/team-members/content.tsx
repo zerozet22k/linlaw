@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { commonTranslations } from "@/translations";
+import { ROUTE_KEYS } from "@/config/routes";
 
 const { Title, Text } = Typography;
 
@@ -146,7 +147,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
             <Row gutter={[gridGutter, gridGutter]} justify="center">
               {block.members.map((member) => (
                 <Col xs={24} sm={12} md={8} lg={6} key={member._id}>
-                  <Link href={`/team-members/${member._id}`} legacyBehavior>
+                  <Link href={`/${ROUTE_KEYS.TEAM_MEMBERS}/${member._id}`} legacyBehavior>
                     <a style={{ textDecoration: "none" }}>
                       <motion.div
                         initial={variants.initial}

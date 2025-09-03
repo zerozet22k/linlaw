@@ -1,4 +1,4 @@
-// components/FormBuilder/Fields/Inputs/BoxSidesInput.tsx
+
 "use client";
 
 import React, { CSSProperties } from "react";
@@ -58,10 +58,10 @@ export interface BoxSidesInputProps {
 const BoxSidesInput: React.FC<BoxSidesInputProps> = ({ value, onChange, label = "Sides", style }) => {
     const v = value ?? {};
     const { token } = theme.useToken();
-    const [linkX, setLinkX] = React.useState<boolean>( true);
-    const [linkY, setLinkY] = React.useState<boolean>( true);
+    const [linkX, setLinkX] = React.useState<boolean>(true);
+    const [linkY, setLinkY] = React.useState<boolean>(true);
 
-    // keep flags in sync if value was loaded from DB
+
     React.useEffect(() => { setLinkX(!!v._linkX); setLinkY(!!v._linkY); }, [v._linkX, v._linkY]);
 
     const emit = (patch: Partial<BoxSides>) => onChange?.({ ...v, ...patch });

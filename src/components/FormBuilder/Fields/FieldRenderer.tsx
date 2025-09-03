@@ -16,6 +16,9 @@ import ResponsiveImagesInput from "./Inputs/ResponsiveImagesInput";
 import UserSelector from "./Inputs/UserSelector";
 import UsersSelector from "./Inputs/UsersSelector";
 import BoxSidesInput from "./Inputs/BoxSidesInput";
+import DateInput from "./Inputs/DateInput";
+import DateTimeInput from "./Inputs/DateTimeInput";
+import TimeInput from "./Inputs/TimeInput";
 
 type FieldRendererProps = {
   config: ChildFieldInfo;
@@ -94,6 +97,15 @@ const renderFormField = (
       );
     case FormType.RESPONSIVE_IMAGES:
       return <ResponsiveImagesInput value={value} onChange={onChange} />;
+
+    case FormType.DATE:
+      return <DateInput value={value} onChange={onChange} style={commonStyle} />;
+
+    case FormType.DATETIME:
+      return <DateTimeInput value={value} onChange={onChange} style={commonStyle} />;
+
+    case FormType.TIME:
+      return <TimeInput value={value} onChange={onChange} style={commonStyle} />;
     default:
       return (
         <GeneralInput

@@ -20,6 +20,10 @@ export enum FormType {
   RESPONSIVE_IMAGES = "responsive-images",
   SIZE = "size",
   BOX_SIDES = "box-sides",
+
+  DATE = "date",
+  DATETIME = "datetime",
+  TIME = "time",
 }
 export type ResponsiveImagesType = {
   desktop?: string;

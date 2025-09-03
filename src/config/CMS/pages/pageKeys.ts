@@ -16,47 +16,58 @@ import {
   NEWSLETTER_PAGE_SETTINGS_TYPES,
 } from "./keys/NEWSLETTER_PAGE_SETTINGS";
 
+import {
+  CAREER_PAGE_SETTINGS_KEYS,
+  CAREER_PAGE_SETTINGS,
+  CAREER_PAGE_SETTINGS_TYPES,
+} from "./keys/CAREER_PAGE_SETTINGS";
+
 export const PAGE_SETTINGS_KEYS = {
   ...HOME_PAGE_SETTINGS_KEYS,
   ...TEAM_PAGE_SETTINGS_KEYS,
   ...NEWSLETTER_PAGE_SETTINGS_KEYS,
+  ...CAREER_PAGE_SETTINGS_KEYS,
 } as const;
 
 export const PAGE_SETTINGS_GUIDE = {
   ...HOME_PAGE_SETTINGS,
   ...TEAM_PAGE_SETTINGS,
   ...NEWSLETTER_PAGE_SETTINGS,
+  ...CAREER_PAGE_SETTINGS,
 } as const;
 
-export type PagesInterface = HOME_PAGE_SETTINGS_TYPES &
-  TEAM_PAGE_SETTINGS_TYPES &
-  NEWSLETTER_PAGE_SETTINGS_TYPES;
+export type PagesInterface =
+  & HOME_PAGE_SETTINGS_TYPES
+  & TEAM_PAGE_SETTINGS_TYPES
+  & NEWSLETTER_PAGE_SETTINGS_TYPES
+  & CAREER_PAGE_SETTINGS_TYPES;
 
 export type PublicPageKeys = {
-  [K in keyof typeof PAGE_SETTINGS_GUIDE]: (typeof PAGE_SETTINGS_GUIDE)[K]["visibility"] extends "public"
-    ? K
-    : never;
+  [K in keyof typeof PAGE_SETTINGS_GUIDE]:
+  (typeof PAGE_SETTINGS_GUIDE)[K]["visibility"] extends "public" ? K : never;
 }[keyof typeof PAGE_SETTINGS_GUIDE];
 
 export type PrivatePageKeys = {
-  [K in keyof typeof PAGE_SETTINGS_GUIDE]: (typeof PAGE_SETTINGS_GUIDE)[K]["visibility"] extends "private"
-    ? K
-    : never;
+  [K in keyof typeof PAGE_SETTINGS_GUIDE]:
+  (typeof PAGE_SETTINGS_GUIDE)[K]["visibility"] extends "private" ? K : never;
 }[keyof typeof PAGE_SETTINGS_GUIDE];
 
 export type ValidPageSettingKey =
   | keyof HOME_PAGE_SETTINGS_TYPES
   | keyof TEAM_PAGE_SETTINGS_TYPES
-  | keyof NEWSLETTER_PAGE_SETTINGS_TYPES;
+  | keyof NEWSLETTER_PAGE_SETTINGS_TYPES
+  | keyof CAREER_PAGE_SETTINGS_TYPES;
 
 export const pageGroupedKeys = {
   HomePage: Object.values(HOME_PAGE_SETTINGS_KEYS),
   TeamPage: Object.values(TEAM_PAGE_SETTINGS_KEYS),
   NewsletterPage: Object.values(NEWSLETTER_PAGE_SETTINGS_KEYS),
+  CareersPage: Object.values(CAREER_PAGE_SETTINGS_KEYS),
 };
 
 export const pageTabLabels: Record<string, string> = {
   HomePage: "Home Page",
   TeamPage: "Team Page",
   NewsletterPage: "Newsletter Page",
+  CareersPage: "Careers Page",
 };

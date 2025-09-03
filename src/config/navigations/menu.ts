@@ -156,6 +156,13 @@ export const mainMenu: NavigationMenuItem[] = [
     link: ROUTES[ROUTE_KEYS.TEAM_MEMBERS].path,
   },
   {
+    key: ROUTE_KEYS.CAREERS,
+    icon: ROUTES[ROUTE_KEYS.CAREERS].icon!,
+    label: ROUTES[ROUTE_KEYS.CAREERS].label!,
+    link: ROUTES[ROUTE_KEYS.CAREERS].path,
+  },
+
+  {
     key: ROUTE_KEYS.NEWSLETTERS,
     icon: ROUTES[ROUTE_KEYS.NEWSLETTERS].icon!,
     label: ROUTES[ROUTE_KEYS.NEWSLETTERS].label!,

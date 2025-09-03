@@ -27,6 +27,7 @@ export const ROUTE_KEYS = {
   ABOUT: "about",
   SERVICES: "services",
   TEAM_MEMBERS: "team-members",
+  CAREERS: "careers",
   LOGIN: "login",
   REGISTER: "register",
   FORGOT_PASSWORD: "forgot-password",
@@ -233,7 +234,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
-  
+
   [ROUTE_KEYS.TEAM_MEMBERS]: {
     key: ROUTE_KEYS.TEAM_MEMBERS,
     path: "/team-members",
@@ -242,6 +243,16 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
+  
+  [ROUTE_KEYS.CAREERS]: {
+    key: ROUTE_KEYS.CAREERS,
+    path: "/careers",
+    label: "Careers",
+    icon: "IdcardOutlined",
+    loginRequired: false,
+    showGoTop: true,
+  },
+
   [ROUTE_KEYS.NEWSLETTERS]: {
     key: ROUTE_KEYS.NEWSLETTERS,
     path: "/newsletters",
