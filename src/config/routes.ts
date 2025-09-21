@@ -243,21 +243,19 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
-  
+    [ROUTE_KEYS.NEWSLETTERS]: {
+    key: ROUTE_KEYS.NEWSLETTERS,
+    path: "/newsletters",
+    label: "Newsletters",
+    icon: "FileTextOutlined",
+    loginRequired: false,
+    showGoTop: true,
+  },
   [ROUTE_KEYS.CAREERS]: {
     key: ROUTE_KEYS.CAREERS,
     path: "/careers",
     label: "Careers",
     icon: "IdcardOutlined",
-    loginRequired: false,
-    showGoTop: true,
-  },
-
-  [ROUTE_KEYS.NEWSLETTERS]: {
-    key: ROUTE_KEYS.NEWSLETTERS,
-    path: "/newsletters",
-    label: "Newsletters",
-    icon: "FileTextOutlined",
     loginRequired: false,
     showGoTop: true,
   },
