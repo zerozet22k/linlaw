@@ -95,7 +95,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
               style={{
                 width: "100%",
                 height: "100%",
-                borderRadius: token.borderRadiusXL,
+                borderRadius: token.borderRadiusLG,
                 borderColor: token.colorBorderSecondary,
                 background: token.colorBgContainer,
                 overflow: "hidden",
