@@ -102,7 +102,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
         </div>
       </Content>
 
-      <div style={{ width: "100%" , paddingTop: "80px", paddingBottom: "40px" }}>
+      <div style={{ width: "100%" , paddingTop: "0px", paddingBottom: "30px" }}>
         <ClickToAction />
       </div>
     </Layout>

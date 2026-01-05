@@ -191,7 +191,6 @@ const CareersContent: React.FC<Props> = ({ data }) => {
 
   const { token } = theme.useToken();
 
-  // ✅ Design removed: hardcoded defaults
   const cardRadius = 16;
   const gridGutter = 24;
 
