@@ -108,6 +108,28 @@ export const dashboardMenu: NavigationMenuItem[] = [
     ],
   },
   {
+    key: PARENT_KEYS.RELATED_BUSINESSES.key,
+    icon: PARENT_KEYS.RELATED_BUSINESSES.icon!,
+    label: PARENT_KEYS.RELATED_BUSINESSES.label,
+    access: [APP_PERMISSIONS.VIEW_RELATED_BUSINESSES, APP_PERMISSIONS.ADMIN],
+    children: [
+      {
+        key: ROUTE_KEYS.CREATE_RELATED_BUSINESS,
+        label: ROUTES[ROUTE_KEYS.CREATE_RELATED_BUSINESS].label!,
+        link: ROUTES[ROUTE_KEYS.CREATE_RELATED_BUSINESS].path,
+        icon: ROUTES[ROUTE_KEYS.CREATE_RELATED_BUSINESS].icon!,
+        access: ROUTES[ROUTE_KEYS.CREATE_RELATED_BUSINESS].access,
+      },
+      {
+        key: ROUTE_KEYS.RELATED_BUSINESSES_LIST,
+        label: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES_LIST].label!,
+        link: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES_LIST].path,
+        icon: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES_LIST].icon!,
+        access: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES_LIST].access,
+      },
+    ],
+  },
+  {
     key: ROUTE_KEYS.SEND_EMAILS,
     icon: ROUTES[ROUTE_KEYS.SEND_EMAILS].icon!,
     label: ROUTES[ROUTE_KEYS.SEND_EMAILS].label!,
@@ -148,7 +170,6 @@ export const mainMenu: NavigationMenuItem[] = [
     label: ROUTES[ROUTE_KEYS.SERVICES].label!,
     link: ROUTES[ROUTE_KEYS.SERVICES].path,
   },
-
   {
     key: ROUTE_KEYS.TEAM_MEMBERS,
     icon: ROUTES[ROUTE_KEYS.TEAM_MEMBERS].icon!,
@@ -161,11 +182,17 @@ export const mainMenu: NavigationMenuItem[] = [
     label: ROUTES[ROUTE_KEYS.CAREERS].label!,
     link: ROUTES[ROUTE_KEYS.CAREERS].path,
   },
-
   {
     key: ROUTE_KEYS.NEWSLETTERS,
     icon: ROUTES[ROUTE_KEYS.NEWSLETTERS].icon!,
     label: ROUTES[ROUTE_KEYS.NEWSLETTERS].label!,
     link: ROUTES[ROUTE_KEYS.NEWSLETTERS].path,
   },
+  {
+    key: ROUTE_KEYS.RELATED_BUSINESSES,
+    icon: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES].icon!,
+    label: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES].label!,
+    link: ROUTES[ROUTE_KEYS.RELATED_BUSINESSES].path,
+  },
+
 ];

@@ -1,11 +1,10 @@
-// components/Fields/LanguageJson/LanguageJsonTextInput.tsx
 "use client";
 import React from "react";
 import { Input, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { lighten, darken } from "polished";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags, languageNames } from "./SupportedLanguageSelector"; // ⬅️ import names
+import { languageFlags, languageNames } from "@/models/languages";
 import { languageInputWrapperStyle, defaultInputStyle } from "../../InputStyle";
 
 interface LanguageJsonTextInputProps {

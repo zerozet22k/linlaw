@@ -5,7 +5,7 @@ import { Avatar, Select, Tag, theme } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { defaultWrapperStyle, defaultSelectStyle } from "../../InputStyle";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-
+import { languageFlags, languageNames } from "@/models/languages";
 const { Option } = Select;
 
 interface Props {
@@ -15,28 +15,7 @@ interface Props {
   inputStyle?: CSSProperties;
 }
 
-export const languageFlags: Record<string, string> = {
-  en: "us",
-  fr: "fr",
-  de: "de",
-  es: "es",
-  zh: "cn",
-  ja: "jp",
-  ko: "kr",
-  th: "th",
-  my: "mm",
-};
-export const languageNames: Record<string, string> = {
-  en: "English",
-  fr: "French",
-  de: "German",
-  es: "Spanish",
-  zh: "Chinese",
-  ja: "Japanese",
-  ko: "Korean",
-  th: "Thai",
-  my: "Burmese",
-};
+
 const SupportedLanguageSelector: React.FC<Props> = ({
   value = [],
   onChange,

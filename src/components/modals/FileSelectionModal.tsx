@@ -123,7 +123,6 @@ const FileSelectionModal = ({
           },
         }}
       >
-        {/* Upload Button */}
         <Button
           type="primary"
           icon={<UploadOutlined />}
@@ -133,7 +132,6 @@ const FileSelectionModal = ({
           Upload File
         </Button>
 
-        {/* Search Input */}
         <Input
           placeholder={`Search ${fileType || "files"}...`}
           value={localSearchState.search}
@@ -146,7 +144,6 @@ const FileSelectionModal = ({
           style={{ marginBottom: "16px", borderRadius: "8px" }}
         />
 
-        {/* File List */}
         <div
           ref={scrollableContainerRef}
           style={{
@@ -168,6 +165,7 @@ const FileSelectionModal = ({
                     hoverable
                     cover={<LazyImage src={file.publicUrl} alt={file.name} />}
                     onClick={() => onSelectFile(file.publicUrl)}
+                    style={{ overflow: "hidden" }}
                   >
                     <Button
                       icon={<EyeOutlined />}
@@ -183,7 +181,8 @@ const FileSelectionModal = ({
                         border: "none",
                       }}
                     />
-                    {file.name}
+        
+                   <p style={{ overflow: "hidden" }}>{file.name}</p>
                   </Card>
                 </List.Item>
               )}

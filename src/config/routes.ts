@@ -1,3 +1,4 @@
+import path from "path";
 import { APP_PERMISSIONS, AppPermissionType } from "./permissions";
 
 export const PARENT_KEYS = {
@@ -8,6 +9,11 @@ export const PARENT_KEYS = {
     key: "newsletters",
     icon: "MailOutlined",
     label: "Newsletters",
+  },
+  RELATED_BUSINESSES: {
+    key: "related-businesses",
+    icon: "ApartmentOutlined",
+    label: "Related Businesses",
   },
 } as const;
 
@@ -41,6 +47,12 @@ export const ROUTE_KEYS = {
 
   NEWSLETTERS: "newsletters",
   NEWSLETTER_INFO: "newsletters-info",
+
+  RELATED_BUSINESSES_LIST: "related-businesses-list",
+  CREATE_RELATED_BUSINESS: "create-related-business",
+  EDIT_RELATED_BUSINESS: "edit-related-business",
+
+  RELATED_BUSINESSES: "related-businesses",
 } as const;
 
 export type RouteKey = (typeof ROUTE_KEYS)[keyof typeof ROUTE_KEYS];
@@ -162,7 +174,33 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     noAccessMessage: "You do not have permission to edit this newsletter.",
     exactMatch: true,
   },
+  [ROUTE_KEYS.RELATED_BUSINESSES_LIST]: {
+    key: ROUTE_KEYS.RELATED_BUSINESSES_LIST,
+    path: `${dashboardRoute}/related-businesses`,
+    label: "Related Businesses",
+    icon: "ApartmentOutlined",
+    access: [APP_PERMISSIONS.VIEW_RELATED_BUSINESSES, APP_PERMISSIONS.ADMIN],
+    loginRequired: true,
+  },
+  [ROUTE_KEYS.CREATE_RELATED_BUSINESS]: {
+    key: ROUTE_KEYS.CREATE_RELATED_BUSINESS,
+    path: `${dashboardRoute}/related-businesses/create`,
+    label: "Create Related Business",
+    icon: "PlusOutlined",
+    access: [APP_PERMISSIONS.ADMIN],
+    loginRequired: true,
+  },
 
+  [ROUTE_KEYS.EDIT_RELATED_BUSINESS]: {
+    key: ROUTE_KEYS.EDIT_RELATED_BUSINESS,
+    path: `${dashboardRoute}/related-businesses/:id`,
+    label: "Edit Related Business",
+    icon: null,
+    access: [APP_PERMISSIONS.ADMIN],
+    loginRequired: true,
+    exactMatch: true,
+    noAccessMessage: "You do not have permission to edit this related business.",
+  },
   [ROUTE_KEYS.FILES_LIST]: {
     key: ROUTE_KEYS.FILES_LIST,
     path: `${dashboardRoute}/files`,
@@ -243,7 +281,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
-    [ROUTE_KEYS.NEWSLETTERS]: {
+  [ROUTE_KEYS.NEWSLETTERS]: {
     key: ROUTE_KEYS.NEWSLETTERS,
     path: "/newsletters",
     label: "Newsletters",
@@ -251,6 +289,15 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: false,
     showGoTop: true,
   },
+  [ROUTE_KEYS.RELATED_BUSINESSES]: {
+    key: ROUTE_KEYS.RELATED_BUSINESSES,
+    path: "/related-businesses",
+    label: "Related Businesses",
+    icon: "ApartmentOutlined",
+    loginRequired: false,
+    showGoTop: true,
+  },
+
   [ROUTE_KEYS.CAREERS]: {
     key: ROUTE_KEYS.CAREERS,
     path: "/careers",

@@ -2,7 +2,7 @@ import React from "react";
 import { Select, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags } from "../../FormBuilder/Fields/Inputs/SupportedLanguageSelector";
+import { languageFlags, languageNames } from "@/models/languages";
 
 const { Option } = Select;
 

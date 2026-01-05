@@ -7,7 +7,7 @@ import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
 import { rgba } from "polished";
 
-import "./TeamMemberPage.css"; // ←  add this line
+import "./TeamMemberPage.css";
 
 const { Title, Paragraph } = Typography;
 const { useToken } = theme;
@@ -20,7 +20,6 @@ const TeamMemberPage: React.FC = () => {
   const { id: userId } = useParams<{ id: string }>() ?? {};
   const { token } = useToken();
 
-  /* ── fetch member ─────────────────────────────────────────────────── */
   useEffect(() => {
     if (!userId) return;
     (async () => {
@@ -36,7 +35,7 @@ const TeamMemberPage: React.FC = () => {
     })();
   }, [userId]);
 
-  /* ── loading / error ──────────────────────────────────────────────── */
+
   if (loading)
     return <Spin size="large" style={{ display: "block", margin: 40 }} />;
   if (error || !user)
@@ -52,7 +51,7 @@ const TeamMemberPage: React.FC = () => {
 
   const glass = rgba(token.colorBgContainer, 0.2);
 
-  /* ── UI ───────────────────────────────────────────────────────────── */
+
   return (
     <div className="tm-page" style={{ color: token.colorTextBase }}>
       {/* decorative wave */}

@@ -1,25 +1,13 @@
 // NewsletterPageSettings.ts
-import {
-  FormType,
-  GeneralConfig,
-  NestedFieldType,
-  JsonDesign,
-} from "../../settings";
+import { FormType, GeneralConfig, NestedFieldType, JsonDesign } from "../../settings";
 
-import {
-  SHARED_PAGE_CONTENT_FIELDS,
-  SHARED_PAGE_DESIGN_FIELDS,
-} from "./shared/sharedPageConfig";
-import {
-  SharedPageContentType,
-  SharedPageDesignType,
-} from "./shared/sharedPageTypes";
+import { SHARED_PAGE_CONTENT_FIELDS } from "./shared/sharedPageConfig";
+import { SharedPageContentType } from "./shared/sharedPageTypes";
 
 const pageName = "newsletter";
 
 export const NEWSLETTER_PAGE_SETTINGS_KEYS = {
   PAGE_CONTENT: `${pageName}-page-content`,
-  DESIGN: `${pageName}-design`,
   SECTIONS: `${pageName}-sections`,
 } as const;
 
@@ -32,12 +20,7 @@ export const NEWSLETTER_PAGE_SETTINGS: GeneralConfig<
     design: JsonDesign.PARENT,
     fields: SHARED_PAGE_CONTENT_FIELDS,
   },
-  [NEWSLETTER_PAGE_SETTINGS_KEYS.DESIGN]: {
-    label: "Page Design",
-    type: NestedFieldType.JSON,
-    design: JsonDesign.PARENT,
-    fields: SHARED_PAGE_DESIGN_FIELDS,
-  },
+
   [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
     label: "Sections",
     type: NestedFieldType.JSON,
@@ -54,7 +37,6 @@ export const NEWSLETTER_PAGE_SETTINGS: GeneralConfig<
 
 export type NEWSLETTER_PAGE_SETTINGS_TYPES = {
   [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
-  [NEWSLETTER_PAGE_SETTINGS_KEYS.DESIGN]: SharedPageDesignType;
   [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxNewslettersCount: number;
   };

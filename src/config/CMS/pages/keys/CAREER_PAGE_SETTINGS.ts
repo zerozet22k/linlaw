@@ -7,14 +7,8 @@ import {
     ArrayFunctionality,
     ModalBehaviorType,
 } from "../../settings";
-import {
-    SHARED_PAGE_CONTENT_FIELDS,
-    SHARED_PAGE_DESIGN_FIELDS,
-} from "./shared/sharedPageConfig";
-import {
-    SharedPageContentType,
-    SharedPageDesignType,
-} from "./shared/sharedPageTypes";
+import { SHARED_PAGE_CONTENT_FIELDS } from "./shared/sharedPageConfig";
+import { SharedPageContentType } from "./shared/sharedPageTypes";
 import { SECTION, SectionProps } from "../../fields/SECTION_SETTINGS";
 import { LanguageJson } from "@/utils/getTranslatedText";
 
@@ -22,7 +16,6 @@ const pageName = "careers";
 
 export const CAREER_PAGE_SETTINGS_KEYS = {
     PAGE_CONTENT: `${pageName}-page-content`,
-    DESIGN: `${pageName}-design`,
     JOBS_SECTION: `${pageName}-jobs-section`,
 } as const;
 
@@ -33,13 +26,6 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
         type: NestedFieldType.JSON,
         design: JsonDesign.PARENT,
         fields: SHARED_PAGE_CONTENT_FIELDS,
-    },
-
-    [CAREER_PAGE_SETTINGS_KEYS.DESIGN]: {
-        label: "Page Design",
-        type: NestedFieldType.JSON,
-        design: JsonDesign.PARENT,
-        fields: SHARED_PAGE_DESIGN_FIELDS,
     },
 
     [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: {
@@ -54,11 +40,20 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
                 keyLabel: "Job",
                 type: NestedFieldType.ARRAY,
                 arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-                arrayFunctionalities: [ArrayFunctionality.SORTABLE, ArrayFunctionality.FILTERABLE],
-                modalBehavior: { [ModalBehaviorType.OPEN_IN_MODAL]: false, [ModalBehaviorType.ITEM_MODAL]: true },
+                arrayFunctionalities: [
+                    ArrayFunctionality.SORTABLE,
+                    ArrayFunctionality.FILTERABLE,
+                ],
+                modalBehavior: {
+                    [ModalBehaviorType.OPEN_IN_MODAL]: false,
+                    [ModalBehaviorType.ITEM_MODAL]: true,
+                },
                 fields: {
                     title: { label: "Job Title", formType: FormType.LANGUAGE_JSON_TEXT },
-                    summary: { label: "Short Summary", formType: FormType.LANGUAGE_JSON_TEXTAREA },
+                    summary: {
+                        label: "Short Summary",
+                        formType: FormType.LANGUAGE_JSON_TEXTAREA,
+                    },
 
                     department: { label: "Department", formType: FormType.TEXT },
                     location: { label: "Location", formType: FormType.TEXT },
@@ -103,7 +98,10 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
                         type: NestedFieldType.JSON,
                         design: JsonDesign.PARENT,
                         fields: {
-                            currency: { label: "Currency (e.g. THB, USD)", formType: FormType.TEXT },
+                            currency: {
+                                label: "Currency (e.g. THB, USD)",
+                                formType: FormType.TEXT,
+                            },
                             min: { label: "Min", formType: FormType.NUMBER },
                             max: { label: "Max", formType: FormType.NUMBER },
                             period: {
@@ -119,7 +117,10 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
                         },
                     },
 
-                    description: { label: "Description", formType: FormType.LANGUAGE_JSON_TEXTAREA },
+                    description: {
+                        label: "Description",
+                        formType: FormType.LANGUAGE_JSON_TEXTAREA,
+                    },
 
                     responsibilities: {
                         label: "Responsibilities",
@@ -127,7 +128,12 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
                         type: NestedFieldType.ARRAY,
                         arrayDesign: ArrayDesign.FLAT_OUTSIDE,
                         arrayFunctionalities: [ArrayFunctionality.SORTABLE],
-                        fields: { text: { label: "Text", formType: FormType.LANGUAGE_JSON_TEXTAREA } },
+                        fields: {
+                            text: {
+                                label: "Text",
+                                formType: FormType.LANGUAGE_JSON_TEXTAREA,
+                            },
+                        },
                     },
 
                     requirements: {
@@ -136,7 +142,12 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
                         type: NestedFieldType.ARRAY,
                         arrayDesign: ArrayDesign.FLAT_OUTSIDE,
                         arrayFunctionalities: [ArrayFunctionality.SORTABLE],
-                        fields: { text: { label: "Text", formType: FormType.LANGUAGE_JSON_TEXTAREA } },
+                        fields: {
+                            text: {
+                                label: "Text",
+                                formType: FormType.LANGUAGE_JSON_TEXTAREA,
+                            },
+                        },
                     },
 
                     benefits: {
@@ -145,7 +156,12 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
                         type: NestedFieldType.ARRAY,
                         arrayDesign: ArrayDesign.FLAT_OUTSIDE,
                         arrayFunctionalities: [ArrayFunctionality.SORTABLE],
-                        fields: { text: { label: "Text", formType: FormType.LANGUAGE_JSON_TEXTAREA } },
+                        fields: {
+                            text: {
+                                label: "Text",
+                                formType: FormType.LANGUAGE_JSON_TEXTAREA,
+                            },
+                        },
                     },
                 },
             },
@@ -155,7 +171,6 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
 
 export type CAREER_PAGE_SETTINGS_TYPES = {
     [CAREER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
-    [CAREER_PAGE_SETTINGS_KEYS.DESIGN]: SharedPageDesignType;
 
     [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: {
         section?: SectionProps;
@@ -166,8 +181,15 @@ export type CAREER_PAGE_SETTINGS_TYPES = {
             department?: string;
             location?: string;
             employmentType?:
-            | "fullTime" | "partTime" | "contract" | "internship" | "temporary"
-            | "freelance" | "remote" | "hybrid" | "onsite";
+            | "fullTime"
+            | "partTime"
+            | "contract"
+            | "internship"
+            | "temporary"
+            | "freelance"
+            | "remote"
+            | "hybrid"
+            | "onsite";
 
             tags?: { value: string }[];
             postedAt?: string;

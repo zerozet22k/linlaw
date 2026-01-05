@@ -126,7 +126,7 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({
                     sizes={sizesAttr}
                   />
                 </picture>
-
+                <div className="image-overlay" />
                 <div className={`slide-info ${slide.textAlign}`}>
                   <h2>{getTranslatedText(slide.header, language)}</h2>
                   {slide.description && (

@@ -15,6 +15,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { commonTranslations } from "@/translations";
 import { ROUTE_KEYS } from "@/config/routes";
+import { body } from "framer-motion/client";
 
 const { Title, Text } = Typography;
 
@@ -27,17 +28,14 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
   const teamSection = data[TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 
   const { token } = theme.useToken();
-  const cardRadius = data[TEAM_PAGE_SETTINGS_KEYS.DESIGN]?.borderRadius ?? 16;
-  const gridGutter = parseInt(
-    data[TEAM_PAGE_SETTINGS_KEYS.DESIGN]?.gridGutter ?? "24",
-    10
-  );
+  const cardRadius = 16;
+  const gridGutter = 24;
+  const useShadow = true;
 
   const { language } = useLanguage();
   const tLoading =
     getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const tError =
-    getTranslatedText(commonTranslations.error, language) || "Error";
+  const tError = getTranslatedText(commonTranslations.error, language) || "Error";
   const tNoData =
     getTranslatedText(commonTranslations.noData, language) || "No Data";
 
@@ -48,9 +46,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
   useEffect(() => {
     (async () => {
       try {
-        const { data: apiBlocks } = await apiClient.get<TeamBlockAPI[]>(
-          "/team"
-        );
+        const { data: apiBlocks } = await apiClient.get<TeamBlockAPI[]>("/team");
 
         if (teamSection.maxMembersCount && teamSection.maxMembersCount > 0) {
           let remaining = teamSection.maxMembersCount;
@@ -147,7 +143,10 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
             <Row gutter={[gridGutter, gridGutter]} justify="center">
               {block.members.map((member) => (
                 <Col xs={24} sm={12} md={8} lg={6} key={member._id}>
-                  <Link href={`/${ROUTE_KEYS.TEAM_MEMBERS}/${member._id}`} legacyBehavior>
+                  <Link
+                    href={`/${ROUTE_KEYS.TEAM_MEMBERS}/${member._id}`}
+                    legacyBehavior
+                  >
                     <a style={{ textDecoration: "none" }}>
                       <motion.div
                         initial={variants.initial}
@@ -207,12 +206,14 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                                 >
                                   {member.name}
                                 </div>
+
                                 {member.position && (
                                   <div
                                     style={{
                                       fontSize: 14,
                                       opacity: 0.85,
-                                      textShadow: "0 1px 3px rgba(0,0,0,0.6)",
+                                      textShadow:
+                                        "0 1px 3px rgba(0,0,0,0.6)",
                                     }}
                                   >
                                     {member.position}
@@ -225,13 +226,11 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                             borderRadius: cardRadius,
                             overflow: "hidden",
                             background: token.colorBgContainer,
-                            boxShadow:
-                              data[TEAM_PAGE_SETTINGS_KEYS.DESIGN]
-                                ?.cardStyle === "shadow"
-                                ? "0 6px 16px rgba(0,0,0,0.15)"
-                                : "none",
+                            boxShadow: useShadow
+                              ? "0 6px 16px rgba(0,0,0,0.15)"
+                              : "none",
                           }}
-                          bodyStyle={{ display: "none" }}
+                          styles={{ body: { display: "none" } }}
                         />
                       </motion.div>
                     </a>

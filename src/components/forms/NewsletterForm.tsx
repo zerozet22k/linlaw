@@ -8,6 +8,7 @@ import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
 import LanguageTextInput from "../inputs/LanguageTextInput";
 
+
 interface NewsletterFormProps {
   newsletter?: INewsletterAPI;
 }

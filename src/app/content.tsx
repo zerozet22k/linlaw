@@ -6,7 +6,6 @@ import { Layout } from "antd";
 
 import HeroSliderSection from "@/components/sections/HeroSliderSection";
 import FAQSection from "@/components/sections/FAQSection";
-import RelatedBusinesses from "@/components/sections/RelatedBusinesses";
 import ServicesSection from "@/components/sections/ServicesSection";
 import AboutUsSection from "@/components/sections/AboutUsSection";
 import ClickToAction from "@/components/sections/ClickToAction";
@@ -20,11 +19,12 @@ import {
 
 import { useLanguage } from "@/hooks/useLanguage";
 import SectionList, { SectionListItem } from "@/components/sections/layout/SectionList";
+import RelatedBusinessesSection from "@/components/sections/RelatedBusinessesSection";
 
 const { Content } = Layout;
 
 const IDS = {
-  ADS: "ads",
+  RELATED_BUSINESSES: "related-businesses",
   SERVICES: "services",
   ABOUT: "about",
   FAQ: "faq",
@@ -48,7 +48,11 @@ const HomePageContent: React.FC<Props> = ({ data }) => {
   const newsletters = data[K.NEWSLETTER_SECTION] ?? {};
 
   const sections: SectionListItem[] = [
-    { id: IDS.ADS, node: <RelatedBusinesses data={relatedBusinesses} />, requireItems: true },
+    {
+      id: IDS.RELATED_BUSINESSES,
+      node: <RelatedBusinessesSection section={relatedBusinesses.section} limit={6} />,
+      requireItems: false,
+    },
     { id: IDS.SERVICES, node: <ServicesSection data={services} language={language} />, requireItems: true },
     { id: IDS.ABOUT, node: <AboutUsSection data={aboutUs} language={language} />, requireItems: true },
     { id: IDS.FAQ, node: <FAQSection data={faq} language={language} />, requireItems: true },

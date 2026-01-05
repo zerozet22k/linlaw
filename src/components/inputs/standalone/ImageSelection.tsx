@@ -59,6 +59,7 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
               onClick={syncFiles}
               loading={loading}
               style={{
+                height: "100%",
                 backgroundColor: "#1890ff",
                 color: "#fff",
                 border: "none",
@@ -73,6 +74,7 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
               icon={<PictureOutlined />}
               onClick={handleOpenModal}
               style={{
+                height: "100%",
                 backgroundColor: "#52c41a",
                 color: "#fff",
                 border: "none",

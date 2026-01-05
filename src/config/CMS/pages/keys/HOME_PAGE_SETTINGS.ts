@@ -60,10 +60,15 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
         arrayFunctionalities: [ArrayFunctionality.SORTABLE, ArrayFunctionality.FILTERABLE],
         modalBehavior: { [ModalBehaviorType.OPEN_IN_MODAL]: false, [ModalBehaviorType.ITEM_MODAL]: true },
         fields: {
-          image: { label: "Banner Image", formType: FormType.IMAGE_SELECTOR },
           title: { label: "Business Name", formType: FormType.LANGUAGE_JSON_TEXT },
+          slug: {
+            label: "Slug",
+            guide: "Unique URL id (kebab-case). Example: protax-tax-accounting or tour-hotel",
+            formType: FormType.TEXT,
+          },
           subtitle: { label: "Short Tagline", formType: FormType.LANGUAGE_JSON_TEXT },
           description: { label: "Business Description", formType: FormType.LANGUAGE_JSON_TEXT },
+          image: { label: "Banner Image", formType: FormType.IMAGE_SELECTOR },
           website: { label: "Website", formType: FormType.TEXT },
           address: { label: "Address", formType: FormType.TEXTAREA },
           email: { label: "Email", formType: FormType.TEXT },
@@ -257,6 +262,7 @@ export type HOME_PAGE_SETTINGS_TYPES = {
     section?: SectionProps;
     items: {
       title: LanguageJson;
+      slug?: string;
       subtitle?: LanguageJson;
       description?: LanguageJson;
       image: string;

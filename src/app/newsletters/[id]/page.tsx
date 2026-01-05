@@ -1,145 +1,182 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  Spin,
   Alert,
-  Typography,
   Button,
-  List,
-  Row,
-  Col,
   Card,
+  List,
+  Skeleton,
   Space,
+  Tag,
+  Typography,
+  theme,
 } from "antd";
+import {
+  ArrowLeftOutlined,
+  CalendarOutlined,
+  DownloadOutlined,
+  FileTextOutlined,
+  PaperClipOutlined,
+} from "@ant-design/icons";
+
 import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { commonTranslations } from "@/translations";
 
-const { Paragraph } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
-type Attachment = INewsletterAPI["fileAttachments"][0];
+type Attachment = NonNullable<INewsletterAPI["fileAttachments"]>[number];
 
-interface AttachmentPreviewProps {
-  attachment: Attachment;
+function formatDate(d?: string | number | Date) {
+  if (!d) return "";
+  try {
+    const date = d instanceof Date ? d : new Date(d);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
+  } catch {
+    return "";
+  }
 }
+
+function getFileExtension(fileName?: string) {
+  if (!fileName) return "";
+  const parts = fileName.split(".");
+  return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
+}
+
+function humanizeExt(ext: string) {
+  if (!ext) return "";
+  return ext.toUpperCase();
+}
+
+type AttachmentPreviewProps = {
+  attachment: Attachment;
+  onLoad?: () => void;
+};
 
 const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   attachment,
+  onLoad,
 }) => {
-  const getFileExtension = (fileName: string) => {
-    const parts = fileName.split(".");
-    return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
-  };
-
   const ext = getFileExtension(attachment.fileName);
+
+  const frameStyle: React.CSSProperties = {
+    width: "100%",
+    height: "clamp(520px, 70vh, 860px)",
+    border: "none",
+    borderRadius: 12,
+    background: "transparent",
+  };
 
   if (ext === "pdf") {
     return (
       <iframe
         src={attachment.publicUrl}
-        style={{ width: "100%", height: "600px", border: "none" }}
+        style={frameStyle}
         title={attachment.fileName}
+        onLoad={onLoad}
       />
     );
-  } else if (ext === "docx" || ext === "doc") {
+  }
+
+  if (ext === "docx" || ext === "doc") {
+    // Google viewer works for public URLs
     const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
       attachment.publicUrl
     )}&embedded=true`;
+
     return (
       <iframe
         src={viewerUrl}
-        style={{ width: "100%", height: "600px", border: "none" }}
+        style={frameStyle}
         title={attachment.fileName}
+        onLoad={onLoad}
       />
     );
   }
 
   return (
-    <Space direction="vertical">
-      <Paragraph>Preview is not available for this file type.</Paragraph>
-    </Space>
+    <div>
+      <Paragraph style={{ marginBottom: 8 }}>
+        Preview isn’t available for this file type.
+      </Paragraph>
+      <Button
+        type="primary"
+        icon={<DownloadOutlined />}
+        href={attachment.publicUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Download
+      </Button>
+    </div>
   );
 };
 
-interface AttachmentListProps {
-  attachments: Attachment[];
-  selectedAttachment: Attachment | null;
-  onSelect: (attachment: Attachment) => void;
-}
-
-const AttachmentList: React.FC<AttachmentListProps> = ({
-  attachments,
-  selectedAttachment,
-  onSelect,
-}) => (
-  <List
-    bordered
-    dataSource={attachments}
-    renderItem={(attachment: Attachment) => (
-      <List.Item
-        style={{
-          cursor: "pointer",
-          background:
-            selectedAttachment?._id === attachment._id
-              ? "#e6f7ff"
-              : "transparent",
-        }}
-        onClick={() => onSelect(attachment)}
-      >
-        {attachment.fileName}
-      </List.Item>
-    )}
-  />
-);
-
 const NewsletterDetail: React.FC = () => {
   const router = useRouter();
-  const { id } = useParams();
-  const { language } = useLanguage();
-  const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedAttachment, setSelectedAttachment] =
-    useState<Attachment | null>(null);
+  const params = useParams<{ id: string | string[] }>();
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
-  const translatedLoading =
+  const { language } = useLanguage();
+  const { token } = theme.useToken();
+
+  const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(null);
+  const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(
+    null
+  );
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const reqIdRef = useRef(0);
+
+  const tLoading =
     getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const translatedError =
-    getTranslatedText(commonTranslations.error, language) || "Error";
-  const translatedNoData =
+  const tError = getTranslatedText(commonTranslations.error, language) || "Error";
+  const tNoData =
     getTranslatedText(commonTranslations.noData, language) || "No Data";
-  const translatedBack =
-    getTranslatedText(commonTranslations.back, language) || "Back";
-  const translatedDownload =
+  const tBack = getTranslatedText(commonTranslations.back, language) || "Back";
+  const tDownload =
     getTranslatedText(commonTranslations.download, language) || "Download";
-  const translatedNoAttachments =
+  const tEmpty =
     getTranslatedText(commonTranslations.empty, language) ||
     "No attachments available.";
 
   const fetchNewsletter = useCallback(async () => {
     if (!id) return;
+
+    const reqId = ++reqIdRef.current;
     setLoading(true);
+    setError(null);
+
     try {
       const response = await apiClient.get(`/newsletters/${id}`);
+      if (reqId !== reqIdRef.current) return;
+
       if (response.status === 200 && response.data) {
-        setNewsletter(response.data);
-        if (
-          response.data.fileAttachments &&
-          response.data.fileAttachments.length > 0
-        ) {
-          setSelectedAttachment(response.data.fileAttachments[0]);
-        }
+        const data = response.data as INewsletterAPI;
+        setNewsletter(data);
+
+        const first = Array.isArray(data.fileAttachments) ? data.fileAttachments[0] : null;
+        setSelectedAttachment(first ?? null);
       } else {
         throw new Error("Unexpected response format");
       }
     } catch (err) {
+      if (reqId !== reqIdRef.current) return;
       console.error("Error fetching newsletter:", err);
       setError("Failed to load newsletter.");
     } finally {
+      if (reqId !== reqIdRef.current) return;
       setLoading(false);
     }
   }, [id]);
@@ -148,101 +185,296 @@ const NewsletterDetail: React.FC = () => {
     fetchNewsletter();
   }, [fetchNewsletter]);
 
+  // When switching attachments, show skeleton until iframe loads.
+  useEffect(() => {
+    if (!selectedAttachment) return;
+    const ext = getFileExtension(selectedAttachment.fileName);
+    // only show loading for iframe-able previews
+    if (ext === "pdf" || ext === "doc" || ext === "docx") setPreviewLoading(true);
+    else setPreviewLoading(false);
+  }, [selectedAttachment]);
+
+  const attachments = useMemo<Attachment[]>(
+    () => (Array.isArray(newsletter?.fileAttachments) ? newsletter!.fileAttachments : []),
+    [newsletter]
+  );
+
+  const newsletterTitle = useMemo(() => {
+    if (!newsletter) return "";
+    if (typeof newsletter.title === "string") return newsletter.title;
+    return (
+      getTranslatedText(newsletter.title as any, language) ||
+      (newsletter.title as any)?.en ||
+      "Untitled"
+    );
+  }, [newsletter, language]);
+
+  const metaDate = formatDate((newsletter as any)?.createdAt);
+  const metaAttachments = attachments.length;
+
   if (loading) {
     return (
-      <Spin
-        tip={translatedLoading}
-        size="large"
-        style={{ display: "block", margin: "40px auto" }}
-      />
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
+        <Card
+          bordered
+          style={{
+            borderRadius: token.borderRadiusLG,
+            borderColor: token.colorBorderSecondary,
+          }}
+          styles={{ body: { padding: token.paddingLG } }}
+        >
+          <Skeleton active title paragraph={{ rows: 6 }} />
+        </Card>
+      </div>
     );
   }
 
   if (error) {
     return (
       <Alert
-        message={translatedError}
+        message={tError}
         description={error}
         type="error"
         showIcon
-        style={{ margin: "40px auto", maxWidth: "800px" }}
+        style={{ margin: "40px auto", maxWidth: 900 }}
       />
     );
   }
 
   if (!newsletter) {
-    return (
-      <Paragraph style={{ textAlign: "center" }}>{translatedNoData}</Paragraph>
-    );
+    return <Paragraph style={{ textAlign: "center" }}>{tNoData}</Paragraph>;
   }
 
-  const newsletterTitle =
-    typeof newsletter.title === "string"
-      ? newsletter.title
-      : newsletter.title.en || "Untitled";
+  const selectedExt = selectedAttachment ? getFileExtension(selectedAttachment.fileName) : "";
 
   return (
     <div style={{ width: "100%", margin: "0 auto", padding: "40px 20px" }}>
-      <Row gutter={[24, 24]}>
-        {newsletter.fileAttachments && newsletter.fileAttachments.length > 0 ? (
-          <>
-            <Col xs={24} md={6}>
-              <Card
-                title={newsletterTitle}
-                bordered
-                style={{ height: "100%" }}
-                extra={
-                  <Button type="primary" onClick={() => router.back()}>
-                    {translatedBack}
-                  </Button>
-                }
+      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+        {/* Page header */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: token.sizeLG,
+            flexWrap: "wrap",
+            marginBottom: token.marginLG,
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <Title level={3} style={{ margin: 0, lineHeight: 1.2 }}>
+              {newsletterTitle}
+            </Title>
+
+            <div
+              style={{
+                marginTop: 8,
+                display: "flex",
+                gap: token.sizeMD,
+                alignItems: "center",
+                flexWrap: "wrap",
+                color: token.colorTextSecondary,
+                fontSize: 13,
+              }}
+            >
+              {metaDate && (
+                <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                  <CalendarOutlined /> {metaDate}
+                </span>
+              )}
+              <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+                <PaperClipOutlined /> {metaAttachments}
+              </span>
+            </div>
+          </div>
+
+          <Space>
+            <Button icon={<ArrowLeftOutlined />} onClick={() => router.back()}>
+              {tBack}
+            </Button>
+
+            {selectedAttachment && (
+              <Button
+                type="primary"
+                icon={<DownloadOutlined />}
+                href={selectedAttachment.publicUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <AttachmentList
-                  attachments={newsletter.fileAttachments}
-                  selectedAttachment={selectedAttachment}
-                  onSelect={setSelectedAttachment}
+                {tDownload}
+              </Button>
+            )}
+          </Space>
+        </div>
+
+        {/* Content */}
+        {attachments.length === 0 ? (
+          <Card
+            bordered
+            style={{
+              borderRadius: token.borderRadiusLG,
+              borderColor: token.colorBorderSecondary,
+            }}
+            styles={{ body: { padding: token.paddingLG } }}
+          >
+            <Paragraph style={{ margin: 0 }}>{tEmpty}</Paragraph>
+          </Card>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: attachments.length > 1 ? "320px 1fr" : "1fr",
+              gap: token.sizeLG,
+              alignItems: "start",
+            }}
+          >
+            {/* Sidebar (only useful if > 1 attachment) */}
+            {attachments.length > 1 && (
+              <Card
+                bordered
+                style={{
+                  borderRadius: token.borderRadiusLG,
+                  borderColor: token.colorBorderSecondary,
+                  position: "sticky",
+                  top: 90,
+                }}
+                styles={{ body: { padding: token.paddingMD } }}
+              >
+                <Text strong style={{ display: "block", marginBottom: 10 }}>
+                  Attachments
+                </Text>
+
+                <List
+                  dataSource={attachments}
+                  split={false}
+                  renderItem={(att) => {
+                    const active = selectedAttachment?._id === att._id;
+                    const ext = getFileExtension(att.fileName);
+
+                    return (
+                      <List.Item
+                        onClick={() => setSelectedAttachment(att)}
+                        style={{
+                          cursor: "pointer",
+                          borderRadius: 12,
+                          padding: "10px 12px",
+                          marginBottom: 8,
+                          background: active ? token.colorFillSecondary : "transparent",
+                          border: `1px solid ${
+                            active ? token.colorPrimaryBorder : "transparent"
+                          }`,
+                          transition: "background 150ms ease, border-color 150ms ease",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: 10, width: "100%", minWidth: 0 }}>
+                          <div
+                            style={{
+                              width: 34,
+                              height: 34,
+                              borderRadius: 10,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: token.colorFillTertiary,
+                              flex: "0 0 auto",
+                            }}
+                          >
+                            <FileTextOutlined />
+                          </div>
+
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <Text
+                              style={{
+                                display: "block",
+                                fontWeight: active ? 600 : 500,
+                              }}
+                              ellipsis
+                            >
+                              {att.fileName}
+                            </Text>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: 8,
+                                alignItems: "center",
+                                marginTop: 4,
+                                color: token.colorTextTertiary,
+                                fontSize: 12,
+                              }}
+                            >
+                              {ext && <Tag style={{ marginInlineEnd: 0 }}>{humanizeExt(ext)}</Tag>}
+                              {active && (
+                                <Text style={{ fontSize: 12, color: token.colorPrimary }}>
+                                  Selected
+                                </Text>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </List.Item>
+                    );
+                  }}
                 />
               </Card>
-            </Col>
-            <Col xs={24} md={18}>
-              <Card
-                title={`Preview: ${selectedAttachment?.fileName}`}
-                extra={
-                  selectedAttachment && (
-                    <Button
-                      type="primary"
-                      href={selectedAttachment.publicUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {translatedDownload}
-                    </Button>
-                  )
-                }
-                bordered
-              >
-                {selectedAttachment && (
-                  <AttachmentPreview attachment={selectedAttachment} />
-                )}
-              </Card>
-            </Col>
-          </>
-        ) : (
-          <Col span={24}>
+            )}
+
+            {/* Preview */}
             <Card
-              title={newsletterTitle}
               bordered
-              extra={
-                <Button type="primary" onClick={() => router.back()}>
-                  Back
-                </Button>
-              }
+              style={{
+                borderRadius: token.borderRadiusLG,
+                borderColor: token.colorBorderSecondary,
+              }}
+              styles={{ body: { padding: token.paddingLG } }}
             >
-              <Paragraph>{translatedNoAttachments}</Paragraph>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: token.sizeMD,
+                  marginBottom: token.marginMD,
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <Text strong style={{ fontSize: 16 }} ellipsis>
+                    {selectedAttachment?.fileName ?? "Preview"}
+                  </Text>
+                </div>
+
+                {selectedExt ? <Tag>{humanizeExt(selectedExt)}</Tag> : null}
+              </div>
+
+              <div style={{ position: "relative" }}>
+                {previewLoading && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      zIndex: 1,
+                      borderRadius: 12,
+                      background: token.colorBgContainer,
+                    }}
+                  >
+                    <Skeleton active title={false} paragraph={{ rows: 10 }} />
+                  </div>
+                )}
+
+                {selectedAttachment && (
+                  <div style={{ opacity: previewLoading ? 0 : 1, transition: "opacity 160ms ease" }}>
+                    <AttachmentPreview
+                      attachment={selectedAttachment}
+                      onLoad={() => setPreviewLoading(false)}
+                    />
+                  </div>
+                )}
+              </div>
             </Card>
-          </Col>
+          </div>
         )}
-      </Row>
+      </div>
     </div>
   );
 };

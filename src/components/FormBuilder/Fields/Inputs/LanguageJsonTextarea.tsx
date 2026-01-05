@@ -5,8 +5,8 @@ import { Input, theme } from "antd";
 import { lighten, darken } from "polished";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags, languageNames } from "./SupportedLanguageSelector"; // ⬅️ import names
 import { languageInputWrapperStyle, languageInputStyle } from "../../InputStyle";
+import { languageFlags, languageNames } from "@/models/languages";
 
 interface LanguageJsonTextareaProps {
   value?: Record<string, string>;
