@@ -32,8 +32,6 @@ async function handleCreateUserRequest(request: Request, currentUser: User) {
         { status: 400 }
       );
     }
-
-    // Enforce binding restrictions if role_ids are provided.
     if (data.role_ids) {
       const highestEditableRole = getHighestRoleWithPermission(
         currentUser,

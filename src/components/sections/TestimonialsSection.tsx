@@ -33,6 +33,9 @@ const pickInitials = (name: string) =>
     .map((w) => w[0]?.toUpperCase())
     .join("") || "?";
 
+// Stable empty array reference (prevents new [] every render)
+const EMPTY_ITEMS: TestimonialItem[] = [];
+
 const Testimonials: React.FC<TestimonialsProps> = ({
   data,
   language,
@@ -41,23 +44,24 @@ const Testimonials: React.FC<TestimonialsProps> = ({
 }) => {
   const { token } = useToken();
 
-  const raw = Array.isArray(data?.items) ? data.items : [];
-  if (raw.length === 0) return null;
+  const raw: TestimonialItem[] = Array.isArray(data?.items) ? data.items : EMPTY_ITEMS;
 
-  const show = Math.min(slidesToShow, Math.max(1, raw.length));
-
-  // Prepare + translate once (no hooks inside map, cleaner render)
   const items = useMemo(() => {
-    return raw.map((t) => {
+    return raw.map((t, idx) => {
       const name = (getTranslatedText(t.name, language) || "").trim();
       const comment = (getTranslatedText(t.comment, language) || "").trim();
-      const title = typeof t.title === "string" ? t.title.trim() : "";
-      const company = typeof t.company === "string" ? t.company.trim() : "";
+
+      const title = typeof (t as any).title === "string" ? (t as any).title.trim() : "";
+      const company =
+        typeof (t as any).company === "string" ? (t as any).company.trim() : "";
+
       const sub = [title, company].filter(Boolean).join(" · ");
       const avatar = (t as any).avatar as string | undefined;
 
+      const id = (t as any)._id ?? (t as any).id; // prefer stable ids if present
+
       return {
-        key: (t as any)._id || `${name}-${sub}-${comment}` || Math.random().toString(36),
+        key: String(id ?? idx), // NEVER Math.random() for React keys
         name: name || "Anonymous",
         comment: comment || "—",
         sub,
@@ -66,6 +70,10 @@ const Testimonials: React.FC<TestimonialsProps> = ({
     });
   }, [raw, language]);
 
+  // Early return AFTER hooks
+  if (items.length === 0) return null;
+
+  const show = Math.min(slidesToShow, Math.max(1, items.length));
   const contentMax = 1600;
 
   return (
@@ -110,7 +118,6 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                 },
               }}
             >
-              {/* subtle top accent */}
               <div
                 aria-hidden
                 style={{
@@ -123,7 +130,6 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                 }}
               />
 
-              {/* Header */}
               <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
                 <div className="tsAvatarWrap" aria-hidden>
                   <Avatar
@@ -173,7 +179,6 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                 </div>
               </div>
 
-              {/* Quote */}
               <div style={{ position: "relative", flex: 1, minHeight: 0 }}>
                 <span
                   aria-hidden
@@ -209,7 +214,6 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                 </Text>
               </div>
 
-              {/* Bottom separator (keeps it “finished” without chips) */}
               <div
                 aria-hidden
                 style={{
@@ -221,7 +225,6 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                 }}
               />
 
-              {/* tiny footer hint (optional) */}
               <Text style={{ color: token.colorTextTertiary, fontSize: 12.5 }}>
                 Verified client feedback
               </Text>
@@ -240,7 +243,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
         @media (hover: hover) and (pointer: fine) {
           .tsCard.ant-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 18px 46px rgba(15, 23, 42, 0.10);
+            box-shadow: 0 18px 46px rgba(15, 23, 42, 0.1);
             border-color: rgba(15, 23, 42, 0.18);
           }
         }
