@@ -4,7 +4,8 @@ import { Input, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { lighten, darken } from "polished";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags } from "../FormBuilder/Fields/Inputs/SupportedLanguageSelector";
+import { languageFlags } from "@/models/languages";
+
 
 
 interface LanguageTextInputProps {

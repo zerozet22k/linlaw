@@ -3,6 +3,7 @@
 
 import React, { useMemo, useState } from "react";
 import { Collapse, Card, Button, theme, Typography } from "antd";
+import type { CollapseProps } from "antd";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import {
@@ -29,28 +30,146 @@ const clampText = (s: string, n: number) => {
 const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
   const { token } = theme.useToken();
 
-  const [expandedBodies, setExpandedBodies] = useState<Set<number>>(new Set());
+  // track which answers are expanded (for Read More / Read Less)
+  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(new Set());
+
+  // accordion open key
   const [activeKey, setActiveKey] = useState<string | undefined>();
 
-  const items = useMemo(() => (Array.isArray((data as any)?.items) ? (data as any).items : []), [data]);
-  if (items.length === 0) return null;
+  const rawItems = useMemo(
+    () => (Array.isArray((data as any)?.items) ? (data as any).items : []),
+    [data]
+  );
+  if (rawItems.length === 0) return null;
 
   const tReadMore =
     getTranslatedText(commonTranslations.readMore, language) || "Read More";
   const tReadLess =
     getTranslatedText(commonTranslations.readLess, language) || "Read Less";
 
-  const toggleBody = (idx: number) => {
+  const toggleBody = (itemKey: string) => {
     setExpandedBodies((prev) => {
       const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
+      if (next.has(itemKey)) next.delete(itemKey);
+      else next.add(itemKey);
       return next;
     });
   };
 
   const baseShadow =
     (token as any).boxShadowSecondary || "0 8px 24px rgba(0,0,0,0.06)";
+
+  const collapseItems = useMemo<CollapseProps["items"]>(() => {
+    const built: NonNullable<CollapseProps["items"]> = [];
+
+    rawItems.forEach((faq: any, index: number) => {
+      const q = (getTranslatedText(faq.question, language) || "").trim();
+      const a = (getTranslatedText(faq.answer, language) || "").trim();
+      if (!q && !a) return;
+
+      const itemKey = String(faq._id || faq.id || index);
+      const isOpen = activeKey === itemKey;
+
+      const isBodyExpanded = expandedBodies.has(itemKey);
+      const preview = clampText(a, 160);
+      const showToggle = a.length > 160;
+
+      const label = (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 12,
+            width: "100%",
+            padding: "18px 22px",
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 10,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: token.colorFillTertiary,
+              border: `1px solid ${token.colorBorderSecondary}`,
+              color: token.colorTextSecondary,
+              flex: "0 0 auto",
+              marginTop: 1,
+            }}
+          >
+            {isOpen ? <MinusOutlined /> : <PlusOutlined />}
+          </span>
+
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                lineHeight: 1.35,
+                color: token.colorText,
+                wordBreak: "break-word",
+              }}
+            >
+              {q}
+            </div>
+          </div>
+        </div>
+      );
+
+      const children = (
+        <div style={{ padding: "0 22px 18px 62px" }}>
+          <Text
+            style={{
+              display: "block",
+              fontSize: 15,
+              lineHeight: 1.75,
+              color: token.colorTextSecondary,
+              whiteSpace: "pre-line",
+              marginBottom: showToggle ? 8 : 0,
+            }}
+          >
+            {isBodyExpanded ? a : preview}
+          </Text>
+
+          {showToggle && (
+            <Button
+              type="link"
+              onClick={(e) => {
+                // avoid accordion toggling when clicking the link button
+                e.stopPropagation();
+                toggleBody(itemKey);
+              }}
+              style={{
+                padding: 0,
+                height: "auto",
+                fontSize: 14,
+                fontWeight: 500,
+              }}
+            >
+              {isBodyExpanded ? tReadLess : tReadMore}
+            </Button>
+          )}
+        </div>
+      );
+
+      built.push({
+        key: itemKey,
+        label,
+        children,
+        style: {
+          background: "transparent",
+          borderBottom: `1px solid ${token.colorSplit}`,
+        },
+      });
+    });
+
+    return built;
+  }, [rawItems, language, token, activeKey, expandedBodies, tReadMore, tReadLess]);
+
+  if (!collapseItems || collapseItems.length === 0) return null;
 
   return (
     <Card
@@ -68,114 +187,25 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
       styles={{ body: { padding: 0 } }}
     >
       <Collapse
+        className="faq-collapse"
         accordion
         bordered={false}
+        items={collapseItems}
         activeKey={activeKey}
         onChange={(key) => setActiveKey(Array.isArray(key) ? key[0] : key)}
-        style={{
-          background: "transparent",
-        }}
-      >
-        {items.map((faq: any, index: number) => {
-          const q = (getTranslatedText(faq.question, language) || "").trim();
-          const a = (getTranslatedText(faq.answer, language) || "").trim();
-          if (!q && !a) return null;
+        expandIcon={() => null}
+        style={{ background: "transparent" }}
+      />
 
-          const key = String(faq._id || faq.id || index);
-          const isOpen = activeKey === key;
-
-          const isBodyExpanded = expandedBodies.has(index);
-          const preview = clampText(a, 160);
-          const showToggle = a.length > 160;
-
-          const header = (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 12,
-                width: "100%",
-                padding: "18px 22px",
-              }}
-            >
-              <span
-                aria-hidden
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 10,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: token.colorFillTertiary,
-                  border: `1px solid ${token.colorBorderSecondary}`,
-                  color: token.colorTextSecondary,
-                  flex: "0 0 auto",
-                  marginTop: 1,
-                }}
-              >
-                {isOpen ? <MinusOutlined /> : <PlusOutlined />}
-              </span>
-
-              <div style={{ minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 600,
-                    lineHeight: 1.35,
-                    color: token.colorText,
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {q}
-                </div>
-              </div>
-            </div>
-          );
-
-          return (
-            <Collapse.Panel
-              key={key}
-              header={header}
-              showArrow={false}
-              style={{
-                background: "transparent",
-                borderBottom: `1px solid ${token.colorSplit}`,
-              }}
-            >
-              <div style={{ padding: "0 22px 18px 62px" }}>
-                <Text
-                  style={{
-                    display: "block",
-                    fontSize: 15,
-                    lineHeight: 1.75,
-                    color: token.colorTextSecondary,
-                    whiteSpace: "pre-line",
-                    marginBottom: showToggle ? 8 : 0,
-                  }}
-                >
-                  {isBodyExpanded ? a : preview}
-                </Text>
-
-                {showToggle && (
-                  <Button
-                    type="link"
-                    onClick={() => toggleBody(index)}
-                    style={{
-                      padding: 0,
-                      height: "auto",
-                      fontSize: 14,
-                      fontWeight: 500,
-                    }}
-                  >
-                    {isBodyExpanded ? tReadLess : tReadMore}
-                  </Button>
-                )}
-              </div>
-            </Collapse.Panel>
-          );
-        })}
-      </Collapse>
+      {/* Keep your custom padding, remove AntD default header/content paddings */}
+      <style jsx global>{`
+        .faq-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+          padding: 0 !important;
+        }
+        .faq-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
+          padding: 0 !important;
+        }
+      `}</style>
     </Card>
   );
 };

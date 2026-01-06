@@ -11,7 +11,6 @@ const pageName = "home";
 
 export const HOME_PAGE_SETTINGS_KEYS = {
   HERO_BANNER: `${pageName}-hero-banner`,
-
   RELATED_BUSINESS: `${pageName}-related-business`,
   SERVICES_SECTION: `${pageName}-services-section`,
   ABOUT_US_SECTION: `${pageName}-about-us-section`,
@@ -52,86 +51,6 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
     design: JsonDesign.PARENT,
     fields: {
       section: SECTION,
-      items: {
-        label: "Businesses",
-        keyLabel: "Business",
-        type: NestedFieldType.ARRAY,
-        arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-        arrayFunctionalities: [ArrayFunctionality.SORTABLE, ArrayFunctionality.FILTERABLE],
-        modalBehavior: { [ModalBehaviorType.OPEN_IN_MODAL]: false, [ModalBehaviorType.ITEM_MODAL]: true },
-        fields: {
-          title: { label: "Business Name", formType: FormType.LANGUAGE_JSON_TEXT },
-          slug: {
-            label: "Slug",
-            guide: "Unique URL id (kebab-case). Example: protax-tax-accounting or tour-hotel",
-            formType: FormType.TEXT,
-          },
-          subtitle: { label: "Short Tagline", formType: FormType.LANGUAGE_JSON_TEXT },
-          description: { label: "Business Description", formType: FormType.LANGUAGE_JSON_TEXT },
-          image: { label: "Banner Image", formType: FormType.IMAGE_SELECTOR },
-          website: { label: "Website", formType: FormType.TEXT },
-          address: { label: "Address", formType: FormType.TEXTAREA },
-          email: { label: "Email", formType: FormType.TEXT },
-          mapLink: { label: "Map URL", formType: FormType.TEXT },
-          operatingHours: {
-            label: "Operating Hours",
-            keyLabel: "Day",
-            type: NestedFieldType.ARRAY,
-            arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-            fields: {
-              day: {
-                label: "Day",
-                formType: FormType.SELECT,
-                options: [
-                  { label: "Monday", value: "Monday" }, { label: "Tuesday", value: "Tuesday" },
-                  { label: "Wednesday", value: "Wednesday" }, { label: "Thursday", value: "Thursday" },
-                  { label: "Friday", value: "Friday" }, { label: "Saturday", value: "Saturday" },
-                  { label: "Sunday", value: "Sunday" },
-                ],
-              },
-              open: { label: "Opens At", formType: FormType.TEXT },
-              close: { label: "Closes At", formType: FormType.TEXT },
-            },
-          },
-          contacts: {
-            label: "Contact Numbers",
-            keyLabel: "Contact",
-            type: NestedFieldType.ARRAY,
-            arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-            arrayFunctionalities: [ArrayFunctionality.SORTABLE],
-            fields: {
-              name: { label: "Contact Name", formType: FormType.TEXT },
-              number: { label: "Phone Number", formType: FormType.TEXT },
-            },
-          },
-          tags: {
-            label: "Tags",
-            keyLabel: "Tag",
-            type: NestedFieldType.ARRAY,
-            arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-            fields: { value: { label: "Tag", formType: FormType.TEXT } },
-          },
-          socialLinks: {
-            label: "Social Links",
-            keyLabel: "Link",
-            type: NestedFieldType.ARRAY,
-            arrayDesign: ArrayDesign.FLAT_OUTSIDE,
-            fields: {
-              platform: {
-                label: "Platform",
-                formType: FormType.SELECT,
-                options: [
-                  { label: "Facebook", value: "facebook" },
-                  { label: "Instagram", value: "instagram" },
-                  { label: "Twitter", value: "twitter" },
-                  { label: "LinkedIn", value: "linkedin" },
-                ],
-              },
-              url: { label: "URL", formType: FormType.TEXT },
-            },
-          },
-        },
-      },
     },
   },
 
@@ -256,25 +175,8 @@ export type HOME_PAGE_SETTINGS_TYPES = {
     textAlign: TextAlign;
   }[];
 
-
-
   [HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]: {
     section?: SectionProps;
-    items: {
-      title: LanguageJson;
-      slug?: string;
-      subtitle?: LanguageJson;
-      description?: LanguageJson;
-      image: string;
-      website?: string;
-      address?: string;
-      email?: string;
-      mapLink?: string;
-      operatingHours?: { day: string; open: string; close: string }[];
-      socialLinks?: { platform: string; url: string }[];
-      contacts: { name: string; number: string }[];
-      tags?: { value: string }[];
-    }[];
   };[HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION]: {
     section?: SectionProps;
     items: {

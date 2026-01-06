@@ -220,11 +220,6 @@ const SectionList: React.FC<SectionListProps> = ({
                 const bgColorStyle =
                     bgColor ?? (!backgroundImageCss && effectiveSource !== BgMode.VIDEO ? zebraColor : undefined);
 
-
-                const outerAlignItems =
-                    mapAlignItems(itemsAlign) ?? textAlignToFlexAlign(align);
-
-
                 const style: React.CSSProperties = {
                     ...sectionOuterStyle,
                     position: "relative",
@@ -279,6 +274,7 @@ const SectionList: React.FC<SectionListProps> = ({
                     boxSizing: "border-box",
                     paddingBlock: 32,
                     ...(textColor ? { color: textColor } : {}),
+                    marginTop: "-20px",
                 };
 
                 const titleStyle: React.CSSProperties = {
