@@ -40,7 +40,6 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
     () => (Array.isArray((data as any)?.items) ? (data as any).items : []),
     [data]
   );
-  if (rawItems.length === 0) return null;
 
   const tReadMore =
     getTranslatedText(commonTranslations.readMore, language) || "Read More";
@@ -59,7 +58,9 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
   const baseShadow =
     (token as any).boxShadowSecondary || "0 8px 24px rgba(0,0,0,0.06)";
 
-  const collapseItems = useMemo<CollapseProps["items"]>(() => {
+  const collapseItems = useMemo<NonNullable<CollapseProps["items"]>>(() => {
+    if (!rawItems || rawItems.length === 0) return [];
+
     const built: NonNullable<CollapseProps["items"]> = [];
 
     rawItems.forEach((faq: any, index: number) => {
@@ -138,8 +139,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
             <Button
               type="link"
               onClick={(e) => {
-                // avoid accordion toggling when clicking the link button
-                e.stopPropagation();
+                e.stopPropagation(); // avoid accordion toggling
                 toggleBody(itemKey);
               }}
               style={{
@@ -169,7 +169,8 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
     return built;
   }, [rawItems, language, token, activeKey, expandedBodies, tReadMore, tReadLess]);
 
-  if (!collapseItems || collapseItems.length === 0) return null;
+  // ✅ safe early return AFTER all hooks
+  if (rawItems.length === 0 || collapseItems.length === 0) return null;
 
   return (
     <Card
@@ -197,12 +198,14 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
         style={{ background: "transparent" }}
       />
 
-      {/* Keep your custom padding, remove AntD default header/content paddings */}
       <style jsx global>{`
         .faq-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-header {
           padding: 0 !important;
         }
-        .faq-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
+        .faq-collapse.ant-collapse
+          > .ant-collapse-item
+          > .ant-collapse-content
+          > .ant-collapse-content-box {
           padding: 0 !important;
         }
       `}</style>
