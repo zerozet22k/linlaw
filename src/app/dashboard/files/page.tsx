@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   List,
   Card,
@@ -71,62 +71,72 @@ const FileListPage: React.FC = () => {
   const [localSearchState, setLocalSearchState] =
     useState<SearchState>(searchState);
 
-  const debouncedFetchFiles = useCallback(
-    debounce(() => {
-      fetchFiles(localSearchState);
-    }, 300),
-    [localSearchState, fetchFiles]
-  );
+  /**
+   * Debounced fetch for "filter" changes (search/type).
+   * Created via useMemo so eslint doesn't complain about unknown deps.
+   */
+  const debouncedFetchFiles = useMemo(() => {
+    return debounce((state: SearchState) => {
+      fetchFiles(state);
+    }, 300);
+  }, [fetchFiles]);
 
+  // Debounced fetch when search/type changes (page is expected to be 1).
   useEffect(() => {
-    debouncedFetchFiles();
-  }, [localSearchState, debouncedFetchFiles]);
+    debouncedFetchFiles(localSearchState);
+
+    return () => {
+      debouncedFetchFiles.cancel();
+    };
+  }, [debouncedFetchFiles, localSearchState.search, localSearchState.type]); // intentionally not watching page here
+
+  // Immediate fetch when page > 1 changes (infinite scroll / load more).
+  useEffect(() => {
+    if (localSearchState.page <= 1) return;
+    fetchFiles(localSearchState);
+  }, [localSearchState.page, localSearchState.search, localSearchState.type, fetchFiles]);
 
   const fetchMoreOnIntersect = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const entry = entries[0];
-      if (entry.isIntersecting && hasMore && !loading) {
-        setLocalSearchState((prev) => {
-          const nextPage = prev.page + 1;
-          return { ...prev, page: nextPage };
-        });
+      if (entry?.isIntersecting && hasMore && !loading) {
+        setLocalSearchState((prev) => ({ ...prev, page: prev.page + 1 }));
       }
     },
     [hasMore, loading]
   );
 
+  // IntersectionObserver setup/cleanup (capture node to satisfy lint + correctness)
   useEffect(() => {
+    const node = observerRef.current;
+    if (!node) return;
+
     const observer = new IntersectionObserver(fetchMoreOnIntersect, {
       rootMargin: "100px",
     });
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
+    observer.observe(node);
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
+      observer.unobserve(node);
+      observer.disconnect();
     };
   }, [fetchMoreOnIntersect]);
-
-  useEffect(() => {
-    fetchFiles(localSearchState);
-  }, [localSearchState, fetchFiles]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSearch = e.target.value;
 
-    setLocalSearchState((prev) => ({
-      ...prev,
-      search: newSearch,
-      page: 1,
-    }));
+    setLocalSearchState((prev) => {
+      const next: SearchState = { ...prev, search: newSearch, page: 1 };
 
-    if (newSearch === "") {
-      fetchFiles({ ...localSearchState, search: "", page: 1 });
-    }
+      // optional: when clearing search, fetch immediately (feels snappier)
+      if (newSearch === "") {
+        debouncedFetchFiles.cancel();
+        fetchFiles(next);
+      }
+
+      return next;
+    });
   };
 
   const toggleFileSelection = (fileId: string, fileService: string) => {
@@ -135,11 +145,8 @@ const FileListPage: React.FC = () => {
 
     setSelectedFiles((prev) => {
       const newSelection = new Set(prev);
-      if (newSelection.has(fileId)) {
-        newSelection.delete(fileId);
-      } else {
-        newSelection.add(fileId);
-      }
+      if (newSelection.has(fileId)) newSelection.delete(fileId);
+      else newSelection.add(fileId);
       return newSelection;
     });
   };
@@ -196,29 +203,29 @@ const FileListPage: React.FC = () => {
             </Tooltip>,
 
             canDeleteFiles &&
-            (ALLOW_LOCAL_DELETE || file.service !== STORAGE_SERVICES.LOCAL) &&
-            !disableIndividualDelete && (
-              <Popconfirm
-                title="Are you sure you want to delete this file?"
-                onConfirm={(e) => {
-                  e?.stopPropagation();
-                  void handleDeleteSingle(file._id);
-                }}
-                onCancel={(e) => e?.stopPropagation()}
-                okText="Yes"
-                cancelText="No"
-                key="delete"
-              >
-                <Tooltip title="Delete File">
-                  <Button
-                    icon={<DeleteOutlined />}
-                    danger
-                    shape="circle"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </Tooltip>
-              </Popconfirm>
-            ),
+              (ALLOW_LOCAL_DELETE || file.service !== STORAGE_SERVICES.LOCAL) &&
+              !disableIndividualDelete && (
+                <Popconfirm
+                  title="Are you sure you want to delete this file?"
+                  onConfirm={(e) => {
+                    e?.stopPropagation();
+                    void handleDeleteSingle(file._id);
+                  }}
+                  onCancel={(e) => e?.stopPropagation()}
+                  okText="Yes"
+                  cancelText="No"
+                  key="delete"
+                >
+                  <Tooltip title="Delete File">
+                    <Button
+                      icon={<DeleteOutlined />}
+                      danger
+                      shape="circle"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </Tooltip>
+                </Popconfirm>
+              ),
           ]}
         >
           <Card.Meta title={file.name} description={file.service} />
@@ -266,18 +273,20 @@ const FileListPage: React.FC = () => {
           size="large"
           style={{ flex: 1, minWidth: 220, height: 40 }}
         />
+
         <Select
           value={localSearchState.type}
           style={{ width: 150, height: 40 }}
           onChange={(value) => {
-            setLocalSearchState({
-              ...localSearchState,
+            setLocalSearchState((prev) => ({
+              ...prev,
               type: value as FileTypeWithEmpty,
               page: 1,
-            });
+            }));
           }}
           options={fileTypeOptions}
         />
+
         {canSyncFiles && (
           <Tooltip title="Sync Files">
             <Button
@@ -289,6 +298,7 @@ const FileListPage: React.FC = () => {
             />
           </Tooltip>
         )}
+
         {canDeleteFiles && selectedFiles.size > 0 && (
           <Popconfirm
             title={`Delete ${selectedFiles.size} file(s)?`}
@@ -306,6 +316,7 @@ const FileListPage: React.FC = () => {
             </Button>
           </Popconfirm>
         )}
+
         <Text type="secondary" style={{ marginLeft: "auto" }}>
           Selected: {selectedFiles.size} / Showing: {files.length}
         </Text>
@@ -320,22 +331,24 @@ const FileListPage: React.FC = () => {
 
       <div ref={observerRef} style={{ textAlign: "center", marginTop: "20px" }}>
         {loading && <Spin size="large" style={{ margin: "20px 0" }} />}
+
         {!hasMore && !loading && (
           <div>
             <Text type="secondary">No More Items</Text>
           </div>
         )}
+
         {hasMore && !loading && (
           <div>
             <Button
               type="link"
               icon={<DownOutlined />}
               onClick={() => {
+                // no stale fetch call here; page effect handles it
                 setLocalSearchState((prev) => ({
                   ...prev,
                   page: prev.page + 1,
                 }));
-                fetchFiles(localSearchState);
               }}
               style={{ marginTop: 12 }}
             >

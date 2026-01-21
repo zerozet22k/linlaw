@@ -44,15 +44,21 @@ const Testimonials: React.FC<TestimonialsProps> = ({
   const { token } = useToken();
   const screens = Grid.useBreakpoint();
 
-  const raw: TestimonialItem[] = Array.isArray(data?.items) ? data.items : EMPTY_ITEMS;
+  // Make the array reference stable
+  const raw = useMemo<TestimonialItem[]>(
+    () => (Array.isArray(data?.items) ? data.items : EMPTY_ITEMS),
+    [data?.items]
+  );
 
   const items = useMemo(() => {
     return raw.map((t, idx) => {
       const name = (getTranslatedText(t.name, language) || "").trim();
       const comment = (getTranslatedText(t.comment, language) || "").trim();
 
-      const title = typeof (t as any).title === "string" ? (t as any).title.trim() : "";
-      const company = typeof (t as any).company === "string" ? (t as any).company.trim() : "";
+      const title =
+        typeof (t as any).title === "string" ? (t as any).title.trim() : "";
+      const company =
+        typeof (t as any).company === "string" ? (t as any).company.trim() : "";
 
       const sub = [title, company].filter(Boolean).join(" · ");
       const avatar = (t as any).avatar as string | undefined;
@@ -69,35 +75,28 @@ const Testimonials: React.FC<TestimonialsProps> = ({
     });
   }, [raw, language]);
 
-  if (items.length === 0) return null;
-
+  // ✅ Hook must be before any early return
   const responsiveSlides = useMemo(() => {
     if (!screens.sm) return 1;
     if (!screens.md) return 2;
     return slidesToShow;
   }, [screens.sm, screens.md, slidesToShow]);
 
+  // Now you can early-return safely
+  if (items.length === 0) return null;
+
   const show = Math.min(responsiveSlides, Math.max(1, items.length));
 
   const contentMax = 1400;
 
-  
   const sectionPadInline = !screens.sm ? 12 : token.paddingLG;
-
-  
-  
   const slidePad = !screens.sm ? 14 : !screens.md ? 18 : 22;
-
   const cardBodyPad = !screens.sm ? token.paddingMD : token.paddingLG;
-
-  
   const cardMinHeight = !screens.sm ? 240 : !screens.md ? 260 : 280;
 
-  
   const clampChars = !screens.sm ? 260 : 340;
 
-const softShadow = "none";
-
+  const softShadow = "none";
 
   return (
     <section
@@ -133,7 +132,7 @@ const softShadow = "none";
               key={t.key}
               className="tsSlide"
               style={{
-                padding: slidePad, 
+                padding: slidePad,
                 display: "flex",
                 height: "100%",
                 width: "100%",
@@ -149,19 +148,12 @@ const softShadow = "none";
                   height: "100%",
                   borderRadius: token.borderRadiusLG,
                   background: token.colorBgContainer,
-
-                  
                   border: `1px solid ${token.colorBorderSecondary}`,
-
-                  
                   boxShadow: softShadow,
-
                   overflow: "hidden",
                   minHeight: cardMinHeight,
                   display: "flex",
                   flexDirection: "column",
-
-                  
                   outline: "6px solid transparent",
                   backgroundClip: "padding-box",
                 }}
@@ -270,14 +262,12 @@ const softShadow = "none";
                       WebkitBoxOrient: "vertical" as any,
                       WebkitLineClamp: COMMENT_LINES as any,
                       overflow: "hidden",
-
                       fontSize: 15,
                       lineHeight: 1.75,
                       color: token.colorTextSecondary,
                       paddingLeft: 18,
                       paddingTop: 8,
                       whiteSpace: "normal",
-
                       overflowWrap: "anywhere",
                       wordBreak: "break-word",
                       hyphens: "auto",
@@ -316,7 +306,6 @@ const softShadow = "none";
       </CustomCarousel>
 
       <style jsx global>{`
-       
         .tsCard.ant-card {
           transition: box-shadow 160ms ease, border-color 160ms ease;
         }

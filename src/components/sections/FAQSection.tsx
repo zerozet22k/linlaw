@@ -24,13 +24,19 @@ type NormalizedFaq = {
 };
 
 const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
-const clamp = (s: string, n: number) => (s.length > n ? `${s.slice(0, n).trim()}…` : s);
+const clamp = (s: string, n: number) =>
+  s.length > n ? `${s.slice(0, n).trim()}…` : s;
 
-const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, language }) => {
+const FAQSection: React.FC<{ data: FAQData; language: string }> = ({
+  data,
+  language,
+}) => {
   const { token } = theme.useToken();
 
   const [activeKey, setActiveKey] = useState<string>();
-  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(() => new Set());
+  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(
+    () => new Set()
+  );
 
   const rawItems = useMemo(
     () => (Array.isArray((data as any)?.items) ? (data as any).items : []),
@@ -44,8 +50,10 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
         const a = clean(getTranslatedText(faq.answer, language) || "");
         const perks = Array.isArray(faq.list)
           ? faq.list
-            .map((li: any) => clean(getTranslatedText(li?.answer, language) || ""))
-            .filter(Boolean)
+              .map((li: any) =>
+                clean(getTranslatedText(li?.answer, language) || "")
+              )
+              .filter(Boolean)
           : [];
         const key = String(faq._id || faq.id || index);
         return { key, q, a, perks };
@@ -53,13 +61,24 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
       .filter((f: any) => !!f.q || !!f.a || f.perks.length > 0);
   }, [rawItems, language]);
 
-  const tReadMore = clean(getTranslatedText(commonTranslations.readMore, language) || "Read More");
-  const tReadLess = clean(getTranslatedText(commonTranslations.readLess, language) || "Read Less");
+  const tReadMore = clean(
+    getTranslatedText(commonTranslations.readMore, language) || "Read More"
+  );
+  const tReadLess = clean(
+    getTranslatedText(commonTranslations.readLess, language) || "Read Less"
+  );
 
   const toggleBody = (key: string) => {
     setExpandedBodies((prev) => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+
+      // ESLint-friendly: no ternary side-effects
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+
       return next;
     });
   };
@@ -158,7 +177,12 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
                 e.stopPropagation();
                 toggleBody(f.key);
               }}
-              style={{ padding: 0, height: "auto", fontSize: 14, fontWeight: 650 }}
+              style={{
+                padding: 0,
+                height: "auto",
+                fontSize: 14,
+                fontWeight: 650,
+              }}
             >
               {isBodyExpanded ? tReadLess : tReadMore}
             </Button>
