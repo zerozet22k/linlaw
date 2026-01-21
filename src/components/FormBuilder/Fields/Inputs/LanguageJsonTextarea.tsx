@@ -7,6 +7,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
 import { languageInputWrapperStyle, languageInputStyle } from "../../InputStyle";
 import { languageFlags, languageNames } from "@/models/languages";
+import Image from "next/image";
 
 interface LanguageJsonTextareaProps {
   value?: Record<string, string>;
@@ -50,18 +51,27 @@ const LanguageJsonTextarea: React.FC<LanguageJsonTextareaProps> = ({
               width: "100%",
             }}
           >
-            <img
-              src={flagUrl}
-              alt={lang}
+            <div
               style={{
                 width: 28,
                 height: 18,
                 marginTop: 8,
                 borderRadius: 4,
-                objectFit: "cover",
+                overflow: "hidden",
+                position: "relative",
                 boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                flex: "0 0 auto",
               }}
-            />
+            >
+              <Image
+                src={flagUrl}
+                alt={lang}
+                fill
+                sizes="28px"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+
             <Input.TextArea
               placeholder={`Write ${nice} translation`}
               value={value[lang] || ""}

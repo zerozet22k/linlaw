@@ -20,6 +20,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import type { ColumnsType } from "antd/es/table";
+import Image from "next/image";
 
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
@@ -112,11 +113,24 @@ const UsersPage: React.FC = () => {
       dataIndex: "avatar",
       key: "avatar",
       render: (avatar: string) => (
-        <img
-          src={avatar}
-          alt="avatar"
-          style={{ width: 40, height: 40, borderRadius: "50%" }}
-        />
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            overflow: "hidden",
+            position: "relative",
+            background: "#f5f5f5",
+          }}
+        >
+          <Image
+            src={avatar || "/default-avatar.png"} // ensure this exists in /public
+            alt="avatar"
+            fill
+            sizes="40px"
+            style={{ objectFit: "cover" }}
+          />
+        </div>
       ),
     },
     {
@@ -167,7 +181,7 @@ const UsersPage: React.FC = () => {
     },
     {
       title: "Created At",
-      dataIndex: "created_at", // your model uses created_at/updated_at
+      dataIndex: "created_at",
       key: "created_at",
       render: (_: any, rec: UserAPI) =>
         new Date((rec as any).created_at || (rec as any).createdAt).toLocaleString(),

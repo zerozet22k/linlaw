@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Layout, Drawer, Typography, theme } from "antd";
 import Link from "next/link";
+import Image from "next/image";
 import { useMediaQuery } from "react-responsive";
 import { useSettings } from "@/hooks/useSettings";
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
@@ -52,16 +53,26 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
         >
           <div
             className="logo"
-            style={{ display: "flex", justifyContent: "center" }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "10px 12px",
+            }}
           >
-            <Link href="/">
-              <img
-                src={siteLogo}
-                alt={siteName}
-                style={{ width: "100%", objectFit: "contain" }}
-              />
+            <Link href="/" style={{ width: "100%" }}>
+              <div style={{ position: "relative", width: "100%", height: 64 }}>
+                <Image
+                  src={siteLogo}
+                  alt={siteName}
+                  fill
+                  priority
+                  sizes="220px"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
             </Link>
           </div>
+
           <AppMenu
             menuMode="inline"
             isDashboard={true}
@@ -88,20 +99,26 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
         >
           <div
             className="logo"
-            style={{ display: "flex", justifyContent: "center" }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "10px 12px",
+            }}
           >
-            <Link href="/">
-              <img
-                src={siteLogo}
-                alt={siteName}
-                style={{
-                  width: "100%",
-                  padding: "20px 0",
-                  objectFit: "contain",
-                }}
-              />
+            <Link href="/" style={{ width: "100%" }}>
+              <div style={{ position: "relative", width: "100%", height: 72 }}>
+                <Image
+                  src={siteLogo}
+                  alt={siteName}
+                  fill
+                  priority
+                  sizes="220px"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
             </Link>
           </div>
+
           <AppMenu
             menuMode="inline"
             isDashboard={true}
@@ -128,8 +145,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
             height: "84px",
           }}
         >
-          <div></div>
-          {/* Optionally show siteName here */}
+          <div />
           <UserAvatar isMobile={isMobile} toggleDrawer={handleDrawerToggle} />
         </Header>
 

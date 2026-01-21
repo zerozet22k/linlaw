@@ -1,6 +1,12 @@
 "use client";
 
-import React, { CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Button, Input, Space, Tooltip, Typography } from "antd";
 import {
   PictureOutlined,
@@ -16,6 +22,7 @@ import {
   previewImageStyle as defaultPreviewImageStyle,
 } from "../../InputStyle";
 import { FileType } from "@/models/FileModel";
+import Image from "next/image";
 
 const { Text } = Typography;
 
@@ -202,7 +209,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
   // if numeric constraints + ratio, compute actual W/H to preserve ratio and fit height
   const frameWn = typeof frameMaxWRaw === "number" ? frameMaxWRaw : undefined;
-  const frameHnFromProp = typeof frameMaxHRaw === "number" ? frameMaxHRaw : undefined;
+  const frameHnFromProp =
+    typeof frameMaxHRaw === "number" ? frameMaxHRaw : undefined;
 
   const computedFrame = useMemo(() => {
     if (!ratio) return undefined;
@@ -250,6 +258,24 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     return {}; // "none"
   }, [tileFrameAppearance]);
 
+  /**
+   * For Next/Image we need a positioned box to `fill`.
+   * - If caller provided explicit width/height in previewMediaStyle, respect it.
+   * - Otherwise fall back to a reasonable thumbnail size (inline mode).
+   */
+  const inlineThumbBoxStyle: CSSProperties = useMemo(() => {
+    const w = (previewMediaStyle as any)?.width ?? 120;
+    const h = (previewMediaStyle as any)?.height ?? 80;
+    return {
+      position: "relative",
+      width: typeof w === "number" ? w : w,
+      height: typeof h === "number" ? h : h,
+      overflow: "hidden",
+      borderRadius: (mediaStyle as any)?.borderRadius ?? 10,
+      flex: "0 0 auto",
+    };
+  }, [previewMediaStyle, mediaStyle]);
+
   const previewBlock = (() => {
     if (!preview) return null;
 
@@ -288,16 +314,30 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                   style={mediaStyle}
                 />
               ) : (
-                <img
-                  key={value}
-                  src={value}
-                  alt="Preview"
-                  onError={() => setMediaOk(false)}
-                  style={mediaStyle}
-                />
+                <div style={inlineThumbBoxStyle}>
+                  <Image
+                    key={value}
+                    src={value}
+                    alt="Preview"
+                    fill
+                    sizes="(max-width: 768px) 120px, 160px"
+                    style={{
+                      objectFit: objectFit as any,
+                      objectPosition: objectPosition as any,
+                    }}
+                    onError={() => setMediaOk(false)}
+                  />
+                </div>
               )
             ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, opacity: 0.75 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  opacity: 0.75,
+                }}
+              >
                 {icon}
                 <Text type="secondary">{chooseText}</Text>
               </div>
@@ -376,7 +416,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
           }
         : {
             width:
-              frameMaxWRaw != null ? `min(100%, ${toCssSize(frameMaxWRaw)})` : "min(100%, 1100px)",
+              frameMaxWRaw != null
+                ? `min(100%, ${toCssSize(frameMaxWRaw)})`
+                : "min(100%, 1100px)",
             height:
               frameMaxHRaw != null
                 ? `min(100%, ${toCssSize(frameMaxHRaw)})`
@@ -415,7 +457,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
           }}
         >
           {hasValue && mediaOk ? (
-            <div style={frameStyle} onClick={(e) => e.stopPropagation()}>
+            <div
+              style={{ ...frameStyle, position: "relative" }}
+              onClick={(e) => e.stopPropagation()}
+            >
               {isVideo ? (
                 <video
                   key={value}
@@ -430,12 +475,17 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                   style={mediaStyle}
                 />
               ) : (
-                <img
+                <Image
                   key={value}
                   src={value}
                   alt="Preview"
+                  fill
+                  sizes="(max-width: 768px) 92vw, 1100px"
+                  style={{
+                    objectFit: objectFit as any,
+                    objectPosition: objectPosition as any,
+                  }}
                   onError={() => setMediaOk(false)}
-                  style={mediaStyle}
                 />
               )}
             </div>

@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
 import { rgba } from "polished";
+import Image from "next/image";
 
 import "./TeamMemberPage.css";
 
@@ -22,6 +23,7 @@ const TeamMemberPage: React.FC = () => {
 
   useEffect(() => {
     if (!userId) return;
+
     (async () => {
       try {
         const { data } = await apiClient.get<UserAPI>(`/team/${userId}`);
@@ -35,9 +37,9 @@ const TeamMemberPage: React.FC = () => {
     })();
   }, [userId]);
 
-
   if (loading)
     return <Spin size="large" style={{ display: "block", margin: 40 }} />;
+
   if (error || !user)
     return (
       <Alert
@@ -51,6 +53,8 @@ const TeamMemberPage: React.FC = () => {
 
   const glass = rgba(token.colorBgContainer, 0.2);
 
+  const coverSrc = user.cover_image ?? "/images/default-cover.jpg";
+  const alt = `${user.name ?? user.username} cover`;
 
   return (
     <div className="tm-page" style={{ color: token.colorTextBase }}>
@@ -65,26 +69,24 @@ const TeamMemberPage: React.FC = () => {
 
       {/* card */}
       <div className="tm-card" style={{ background: glass }}>
-        <div className="tm-cover">
-          <img
-            src={user.cover_image ?? "/images/default-cover.jpg"}
-            alt={`${user.name ?? user.username} cover`}
+        <div className="tm-cover" style={{ position: "relative" }}>
+          <Image
+            src={coverSrc}
+            alt={alt}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 900px"
+            style={{ objectFit: "cover" }}
           />
         </div>
 
         <div className="tm-details">
-          <Title
-            level={2}
-            style={{ marginBottom: 8, color: token.colorTextHeading }}
-          >
+          <Title level={2} style={{ marginBottom: 8, color: token.colorTextHeading }}>
             {user.name ?? user.username}
           </Title>
 
           {user.position && (
-            <Title
-              level={4}
-              style={{ marginBottom: 16, color: token.colorTextDescription }}
-            >
+            <Title level={4} style={{ marginBottom: 16, color: token.colorTextDescription }}>
               {user.position}
             </Title>
           )}

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Layout, Drawer, Space, Typography, Button, theme } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import Link from "next/link";
+import Image from "next/image";
 
 import { useSettings } from "@/hooks/useSettings";
 import {
@@ -66,10 +67,11 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
   const toggleDrawer = () => setDrawerOpen((o) => !o);
   const showGoTopBtn = routeConfig?.showGoTop && showGoTop;
 
+  const logoSrc = (s.siteLogo || "").trim();
+  const logoAlt = s.siteName || "Logo";
+
   return (
-    <Layout
-      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
-    >
+    <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* thin black bar */}
       <OverlayBar businessInfo={b} />
 
@@ -88,16 +90,18 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
           transition: "background 0.3s ease",
         }}
       >
-        <Link
-          href="/"
-          style={{ display: "flex", alignItems: "center", height: 80 }}
-        >
-          {s.siteLogo ? (
-            <img
-              src={s.siteLogo}
-              alt={s.siteName}
-              style={{ height: 80, objectFit: "contain" }}
-            />
+        <Link href="/" style={{ display: "flex", alignItems: "center", height: 80 }}>
+          {logoSrc ? (
+            <div style={{ position: "relative", height: 80, width: 220 }}>
+              <Image
+                src={logoSrc}
+                alt={logoAlt}
+                fill
+                priority
+                sizes="220px"
+                style={{ objectFit: "contain" }}
+              />
+            </div>
           ) : (
             <span style={{ fontSize: 20, fontWeight: 700 }}>{s.siteName}</span>
           )}
@@ -105,20 +109,14 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
 
         <Space>
           {!isMobile && (
-            <AppMenu
-              menuMode="horizontal"
-              isDashboard={false}
-              isMobile={false}
-            />
+            <AppMenu menuMode="horizontal" isDashboard={false} isMobile={false} />
           )}
           <UserAvatar isMobile={isMobile} toggleDrawer={toggleDrawer} />
         </Space>
       </Header>
 
       {/* main content */}
-      <Content
-        style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
-      >
+      <Content style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         {isMobile && (
           <Drawer
             title="Menu"

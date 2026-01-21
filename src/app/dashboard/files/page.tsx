@@ -81,20 +81,23 @@ const FileListPage: React.FC = () => {
     }, 300);
   }, [fetchFiles]);
 
-  // Debounced fetch when search/type changes (page is expected to be 1).
+  // Debounced fetch when filters change (only when page === 1)
   useEffect(() => {
+    if (localSearchState.page !== 1) return;
+
     debouncedFetchFiles(localSearchState);
 
     return () => {
       debouncedFetchFiles.cancel();
     };
-  }, [debouncedFetchFiles, localSearchState.search, localSearchState.type]); // intentionally not watching page here
+  }, [debouncedFetchFiles, localSearchState]);
 
-  // Immediate fetch when page > 1 changes (infinite scroll / load more).
+  // Immediate fetch when page > 1 changes (infinite scroll / load more)
   useEffect(() => {
     if (localSearchState.page <= 1) return;
+
     fetchFiles(localSearchState);
-  }, [localSearchState.page, localSearchState.search, localSearchState.type, fetchFiles]);
+  }, [localSearchState, fetchFiles]);
 
   const fetchMoreOnIntersect = useCallback(
     (entries: IntersectionObserverEntry[]) => {
