@@ -82,7 +82,7 @@ const RelatedBusinessesSection: React.FC<Props> = ({ limit = 6 }) => {
                 {Array.from({ length: Math.min(6, limit) }).map((_, i) => (
                     <Card
                         key={i}
-                        bordered
+                        variant="outlined"
                         style={{
                             borderRadius: 16,
                             borderColor: token.colorBorderSecondary,

@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Collapse, Card, Button, theme, Typography } from "antd";
+import { Collapse, Button, theme, Typography } from "antd";
 import type { CollapseProps } from "antd";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
@@ -16,182 +16,192 @@ const { Text } = Typography;
 
 type FAQData = HOME_PAGE_SETTINGS_TYPES[typeof K.FAQS_SECTION];
 
-interface FAQSectionProps {
-  data: FAQData;
-  language: string;
-}
-
-const clampText = (s: string, n: number) => {
-  const t = (s || "").trim();
-  if (!t) return "";
-  return t.length > n ? `${t.slice(0, n).trim()}…` : t;
+type NormalizedFaq = {
+  key: string;
+  q: string;
+  a: string;
+  perks: string[];
 };
 
-const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
+const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
+const clamp = (s: string, n: number) => (s.length > n ? `${s.slice(0, n).trim()}…` : s);
+
+const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, language }) => {
   const { token } = theme.useToken();
 
-  // track which answers are expanded (for Read More / Read Less)
-  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(new Set());
-
-  // accordion open key
-  const [activeKey, setActiveKey] = useState<string | undefined>();
+  const [activeKey, setActiveKey] = useState<string>();
+  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(() => new Set());
 
   const rawItems = useMemo(
     () => (Array.isArray((data as any)?.items) ? (data as any).items : []),
     [data]
   );
 
-  const tReadMore =
-    getTranslatedText(commonTranslations.readMore, language) || "Read More";
-  const tReadLess =
-    getTranslatedText(commonTranslations.readLess, language) || "Read Less";
+  const faqs = useMemo<NormalizedFaq[]>(() => {
+    return rawItems
+      .map((faq: any, index: number): NormalizedFaq => {
+        const q = clean(getTranslatedText(faq.question, language) || "");
+        const a = clean(getTranslatedText(faq.answer, language) || "");
+        const perks = Array.isArray(faq.list)
+          ? faq.list
+            .map((li: any) => clean(getTranslatedText(li?.answer, language) || ""))
+            .filter(Boolean)
+          : [];
+        const key = String(faq._id || faq.id || index);
+        return { key, q, a, perks };
+      })
+      .filter((f: any) => !!f.q || !!f.a || f.perks.length > 0);
+  }, [rawItems, language]);
 
-  const toggleBody = (itemKey: string) => {
+  const tReadMore = clean(getTranslatedText(commonTranslations.readMore, language) || "Read More");
+  const tReadLess = clean(getTranslatedText(commonTranslations.readLess, language) || "Read Less");
+
+  const toggleBody = (key: string) => {
     setExpandedBodies((prev) => {
       const next = new Set(prev);
-      if (next.has(itemKey)) next.delete(itemKey);
-      else next.add(itemKey);
+      next.has(key) ? next.delete(key) : next.add(key);
       return next;
     });
   };
 
-  const baseShadow =
-    (token as any).boxShadowSecondary || "0 8px 24px rgba(0,0,0,0.06)";
+  const items = useMemo<NonNullable<CollapseProps["items"]>>(() => {
+    const border = `1px solid ${token.colorBorderSecondary}`;
 
-  const collapseItems = useMemo<NonNullable<CollapseProps["items"]>>(() => {
-    if (!rawItems || rawItems.length === 0) return [];
+    return faqs.map((f) => {
+      const isOpen = activeKey === f.key;
+      const isBodyExpanded = expandedBodies.has(f.key);
 
-    const built: NonNullable<CollapseProps["items"]> = [];
-
-    rawItems.forEach((faq: any, index: number) => {
-      const q = (getTranslatedText(faq.question, language) || "").trim();
-      const a = (getTranslatedText(faq.answer, language) || "").trim();
-      if (!q && !a) return;
-
-      const itemKey = String(faq._id || faq.id || index);
-      const isOpen = activeKey === itemKey;
-
-      const isBodyExpanded = expandedBodies.has(itemKey);
-      const preview = clampText(a, 160);
-      const showToggle = a.length > 160;
+      const preview = clamp(f.a, 200);
+      const showToggle = f.a.length > 200;
 
       const label = (
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
-            gap: 12,
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 14,
+            padding: "16px 18px",
             width: "100%",
-            padding: "18px 22px",
           }}
         >
-          <span
-            aria-hidden
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 10,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: token.colorFillTertiary,
-              border: `1px solid ${token.colorBorderSecondary}`,
-              color: token.colorTextSecondary,
-              flex: "0 0 auto",
-              marginTop: 1,
-            }}
-          >
-            {isOpen ? <MinusOutlined /> : <PlusOutlined />}
-          </span>
-
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 16,
-                fontWeight: 600,
+                fontSize: 15.5,
+                fontWeight: 750,
                 lineHeight: 1.35,
                 color: token.colorText,
                 wordBreak: "break-word",
               }}
             >
-              {q}
+              {f.q}
             </div>
           </div>
+
+          <span
+            aria-hidden
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 12,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: token.colorFillTertiary,
+              border,
+              color: token.colorTextSecondary,
+              flex: "0 0 auto",
+            }}
+          >
+            {isOpen ? <MinusOutlined /> : <PlusOutlined />}
+          </span>
         </div>
       );
 
       const children = (
-        <div style={{ padding: "0 22px 18px 62px" }}>
-          <Text
-            style={{
-              display: "block",
-              fontSize: 15,
-              lineHeight: 1.75,
-              color: token.colorTextSecondary,
-              whiteSpace: "pre-line",
-              marginBottom: showToggle ? 8 : 0,
-            }}
-          >
-            {isBodyExpanded ? a : preview}
-          </Text>
+        <div style={{ padding: "0 18px 16px" }}>
+          {f.a ? (
+            <Text
+              style={{
+                display: "block",
+                fontSize: 14.8,
+                lineHeight: 1.8,
+                color: token.colorTextSecondary,
+                whiteSpace: "pre-line",
+                marginBottom: f.perks.length || showToggle ? 10 : 0,
+              }}
+            >
+              {isBodyExpanded ? f.a : preview}
+            </Text>
+          ) : null}
 
-          {showToggle && (
+          {f.perks.length ? (
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 18,
+                color: token.colorTextSecondary,
+                lineHeight: 1.8,
+              }}
+            >
+              {f.perks.slice(0, 8).map((p, i) => (
+                <li key={`${f.key}-perk-${i}`}>{p}</li>
+              ))}
+            </ul>
+          ) : null}
+
+          {showToggle ? (
             <Button
               type="link"
               onClick={(e) => {
-                e.stopPropagation(); // avoid accordion toggling
-                toggleBody(itemKey);
+                e.stopPropagation();
+                toggleBody(f.key);
               }}
-              style={{
-                padding: 0,
-                height: "auto",
-                fontSize: 14,
-                fontWeight: 500,
-              }}
+              style={{ padding: 0, height: "auto", fontSize: 14, fontWeight: 650 }}
             >
               {isBodyExpanded ? tReadLess : tReadMore}
             </Button>
-          )}
+          ) : null}
         </div>
       );
 
-      built.push({
-        key: itemKey,
+      return {
+        key: f.key,
         label,
         children,
         style: {
-          background: "transparent",
-          borderBottom: `1px solid ${token.colorSplit}`,
+          background: token.colorBgContainer,
+          border,
+          borderRadius: token.borderRadiusLG,
+          marginBottom: 12,
+          overflow: "hidden",
         },
-      });
+      };
     });
+  }, [faqs, token, activeKey, expandedBodies, tReadMore, tReadLess]);
 
-    return built;
-  }, [rawItems, language, token, activeKey, expandedBodies, tReadMore, tReadLess]);
+  if (!items.length) return null;
 
-  // ✅ safe early return AFTER all hooks
-  if (rawItems.length === 0 || collapseItems.length === 0) return null;
+  const shellBorder = `1px solid ${token.colorBorderSecondary}`;
 
   return (
-    <Card
-      bordered={false}
+    <div
       style={{
         width: "100%",
-        maxWidth: 1000,
+        maxWidth: 980,
         margin: "0 auto",
         borderRadius: token.borderRadiusLG,
+        border: shellBorder,
         background: token.colorBgContainer,
-        border: `1px solid ${token.colorBorderSecondary}`,
-        boxShadow: baseShadow,
         overflow: "hidden",
       }}
-      styles={{ body: { padding: 0 } }}
     >
       <Collapse
-        className="faq-collapse"
+        className="faq-clean"
         accordion
         bordered={false}
-        items={collapseItems}
+        items={items}
         activeKey={activeKey}
         onChange={(key) => setActiveKey(Array.isArray(key) ? key[0] : key)}
         expandIcon={() => null}
@@ -199,17 +209,20 @@ const FAQSection: React.FC<FAQSectionProps> = ({ data, language }) => {
       />
 
       <style jsx global>{`
-        .faq-collapse.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+        .faq-clean.ant-collapse > .ant-collapse-item {
+          border-bottom: 0 !important;
+        }
+        .faq-clean.ant-collapse > .ant-collapse-item > .ant-collapse-header {
           padding: 0 !important;
         }
-        .faq-collapse.ant-collapse
+        .faq-clean.ant-collapse
           > .ant-collapse-item
           > .ant-collapse-content
           > .ant-collapse-content-box {
           padding: 0 !important;
         }
       `}</style>
-    </Card>
+    </div>
   );
 };
 

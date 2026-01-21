@@ -24,7 +24,7 @@ const ArrayFlatOutsideCard: React.FC<ArrayFlatOutsideCardProps> = ({
   return (
     <div
       style={{
-        padding: "12px",
+        marginBottom: "16px",
       }}
     >
       <div

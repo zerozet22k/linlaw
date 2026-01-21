@@ -6,7 +6,7 @@ import { useFile } from "@/hooks/useFile";
 import { FileType } from "@/models/FileModel";
 
 
-interface ImageSelectorProps {
+interface ImageSelectionProps {
   value?: string;
   onChange?: (value: string) => void;
   style?: CSSProperties;
@@ -26,7 +26,7 @@ const defaultInputStyle: CSSProperties = {
   border: "1px solid #ccc",
 };
 
-const ImageSelector: React.FC<ImageSelectorProps> = ({
+const ImageSelection: React.FC<ImageSelectionProps> = ({
   value = "",
   onChange,
   style = {},
@@ -88,4 +88,4 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
   );
 };
 
-export default ImageSelector;
+export default ImageSelection;

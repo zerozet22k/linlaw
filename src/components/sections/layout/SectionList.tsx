@@ -30,110 +30,120 @@ import {
 } from "@/utils/cssMaps";
 import { SectionProps } from "@/config/CMS/fields/SECTION_SETTINGS";
 
-
-
 export type SectionListItem = {
     id: string;
     node: React.ReactNode;
+
+    // optional overrides (rarely needed once CMS is consistent)
     title?: LanguageJson | string;
     description?: LanguageJson | string;
+
+    // manual override (still useful for “force show/hide”)
     show?: boolean;
+
     background?: string;
     backgroundImage?: string;
     backgroundSize?: string;
     backgroundPosition?: string;
     backgroundRepeat?: string;
     overlay?: string;
-
-    renderHeader?: boolean;
-    requireItems?: boolean;
-    itemsKey?: string | string[];
 };
 
 type SectionListProps = {
-    items: SectionListItem[];
+    sections: SectionListItem[];
     zebra?: boolean;
     zebraLight?: string;
     zebraDark?: string;
 };
 
+const isBoxSides = (v: unknown): v is BoxSides =>
+    !!v && typeof v === "object" && !Array.isArray(v);
+
+const extractPayload = (node: React.ReactNode): any | undefined => {
+    if (!React.isValidElement(node)) return undefined;
+    const props: any = node.props ?? {};
+    return props.data ?? props.section ?? undefined;
+};
+
+const resolveEffectiveSource = (
+    bgMode: BgMode,
+    section: Partial<SectionProps>,
+    bgImage?: string,
+    gradientFrom?: string,
+    gradientTo?: string
+) => {
+    let effectiveSource = bgMode;
+
+    if (effectiveSource === BgMode.AUTO) {
+        if (section.background?.video?.videoUrl) effectiveSource = BgMode.VIDEO;
+        else if (bgImage) effectiveSource = BgMode.IMAGE;
+        else if (gradientFrom && gradientTo) effectiveSource = BgMode.GRADIENT;
+        else if (section.background?.color?.backgroundColor) effectiveSource = BgMode.COLOR;
+        else effectiveSource = BgMode.NONE;
+    }
+
+    return effectiveSource;
+};
+
 const SectionList: React.FC<SectionListProps> = ({
-    items,
+    sections,
     zebra = true,
     zebraLight = "#ffffff",
     zebraDark = "#f5f5f5",
 }) => {
     const { language } = useLanguage();
+
     const resolveText = (val?: LanguageJson | string) => {
         if (!val) return "";
         if (typeof val === "string") return val.trim();
         return getTranslatedText(val, language) || "";
     };
 
-    const extractPayload = (node: React.ReactNode): any | undefined => {
-        if (!React.isValidElement(node)) return undefined;
-        const props: any = node.props ?? {};
-        return props.data ?? props.section ?? undefined;
-    };
-
-    const hasOwn = (o: unknown, k: string): boolean =>
-        !!o && typeof o === "object" && Object.prototype.hasOwnProperty.call(o, k);
-    const arrLen = (v: unknown) => (Array.isArray(v) ? v.length : 0);
-
-    const ensureNonEmpty = (payload: any, keys: string[]): boolean => {
-        for (const k of keys) {
-            if (!hasOwn(payload, k)) return false;
-            const v = payload[k];
-            if (Array.isArray(v)) {
-                if (v.length === 0) return false;
-            } else if (v == null) {
-                return false;
-            }
-        }
-        return true;
-    };
-
     const autoShouldShow = (item: SectionListItem): boolean => {
         if (typeof item.show === "boolean") return item.show;
+
         const payload = extractPayload(item.node);
         if (!payload) return true;
 
-        if (item.requireItems) {
-            const keys = Array.isArray(item.itemsKey) ? item.itemsKey : [item.itemsKey ?? "items"];
-            return ensureNonEmpty(payload, keys);
-        }
-        const known = ["items", "slides"];
-        for (const k of known) if (hasOwn(payload, k)) return arrLen(payload[k]) > 0;
+        // enabled
+        const sectionLike = (payload?.section ?? payload) as any;
+        if (typeof sectionLike?.enabled === "boolean" && sectionLike.enabled === false) return false;
+
+        // stripping (only when the payload actually has these arrays)
+        const items = (payload as any)?.items;
+        if (Array.isArray(items) && items.length === 0) return false;
+
+        const slides = (payload as any)?.slides;
+        if (Array.isArray(slides) && slides.length === 0) return false;
+
         return true;
     };
 
-    const isBoxSides = (v: unknown): v is BoxSides =>
-        !!v && typeof v === "object" && !Array.isArray(v);
-
-    const visibleItems = items.filter(autoShouldShow);
+    const visible = sections.filter(autoShouldShow);
 
     return (
         <>
-            {visibleItems.map((it, idx) => {
-
+            {visible.map((it, idx) => {
                 const payload = extractPayload(it.node);
                 const section = (payload?.section ?? payload ?? {}) as Partial<SectionProps>;
 
                 const titleText = resolveText(it.title ?? section.content?.title);
                 const descText = resolveText(it.description ?? section.content?.description);
+
                 const align =
                     section.content?.align === TextAlign.LEFT ||
                         section.content?.align === TextAlign.RIGHT ||
                         section.content?.align === TextAlign.CENTER
                         ? section.content.align
                         : TextAlign.CENTER;
-                const textColor = section.content?.textColor || undefined;
-                const contentMaxWidth = normalizeSize(section.content?.contentMaxWidth || 720);
 
+                const textColor = section.content?.textColor || undefined;
 
                 const bgMode = normalizeBgMode(section.background?.mode) || BgMode.AUTO;
+
                 const bgColor =
                     (it.background as string) ?? section.background?.color?.backgroundColor ?? undefined;
+
                 const bgImage = it.backgroundImage ?? section.background?.image?.backgroundImage ?? undefined;
                 const bgSize = it.backgroundSize ?? section.background?.image?.backgroundSize ?? undefined;
                 const bgPos = it.backgroundPosition ?? section.background?.image?.backgroundPosition ?? undefined;
@@ -147,17 +157,16 @@ const SectionList: React.FC<SectionListProps> = ({
                         ? section.background?.gradient?.gradientAngle
                         : undefined;
 
-
                 let overlayCss = it.overlay as string | undefined;
                 if (!overlayCss && section.overlay?.overlayEnabled) {
                     const color = section.overlay.overlayColor || "#000000";
                     const alpha =
-                        typeof section.overlay.overlayOpacity === "number"
-                            ? section.overlay.overlayOpacity
-                            : 0.4;
-                    overlayCss = `linear-gradient(${hexToRgba(color, alpha)}, ${hexToRgba(color, alpha)})`;
+                        typeof section.overlay.overlayOpacity === "number" ? section.overlay.overlayOpacity : 0.4;
+                    overlayCss = `linear-gradient(${hexToRgba(color, alpha)}, ${hexToRgba(
+                        color,
+                        alpha
+                    )})`;
                 }
-
 
                 const minHeight =
                     section.layout?.height?.minHeightEnabled && section.layout?.height?.minHeight
@@ -180,41 +189,30 @@ const SectionList: React.FC<SectionListProps> = ({
                     ? section.layout?.spacing?.padding
                     : undefined;
 
-                const itemsAlign = section.layout?.items?.align as FlexAlignItems | undefined;
-                const itemsJustify = section.layout?.items?.justify as FlexJustifyContent | undefined;
-                const itemsWrap = section.layout?.items?.wrap ?? undefined;
-                const itemsGap = normalizeSize(section.layout?.items?.gap);
-
-
-                let effectiveSource = bgMode;
-                if (effectiveSource === BgMode.AUTO) {
-                    if (section.background?.video?.videoUrl) effectiveSource = BgMode.VIDEO;
-                    else if (bgImage) effectiveSource = BgMode.IMAGE;
-                    else if (gradientFrom && gradientTo) effectiveSource = BgMode.GRADIENT;
-                    else if (bgColor) effectiveSource = BgMode.COLOR;
-                    else effectiveSource = BgMode.NONE;
-                }
-
-
-                let backgroundImageCss: string | undefined;
-                if (effectiveSource === BgMode.IMAGE && bgImage) {
-                    backgroundImageCss = `url(${bgImage})`;
-                } else if (effectiveSource === BgMode.GRADIENT && gradientFrom && gradientTo) {
-                    const angle = Number.isFinite(gradientAngle as number) ? (gradientAngle as number) : 135;
-                    backgroundImageCss = `linear-gradient(${angle}deg, ${gradientFrom}, ${gradientTo})`;
-                }
-                if (effectiveSource !== BgMode.VIDEO && overlayCss) {
-                    backgroundImageCss = backgroundImageCss
-                        ? `${overlayCss}, ${backgroundImageCss}`
-                        : overlayCss;
-                }
-
-
                 const paddingTop = normalizeSize(paddingBox?.top);
                 const paddingRight = normalizeSize(paddingBox?.right);
                 const paddingBottom = normalizeSize(paddingBox?.bottom);
                 const paddingLeft = normalizeSize(paddingBox?.left);
 
+                const itemsAlign = section.layout?.items?.align as FlexAlignItems | undefined;
+                const itemsJustify = section.layout?.items?.justify as FlexJustifyContent | undefined;
+                const itemsWrap = section.layout?.items?.wrap ?? undefined;
+                const itemsGap = normalizeSize(section.layout?.items?.gap);
+
+                const effectiveSource = resolveEffectiveSource(bgMode, section, bgImage, gradientFrom, gradientTo);
+
+                let backgroundImageCss: string | undefined;
+                if (effectiveSource === BgMode.IMAGE && bgImage) {
+                    const safeUrl = String(bgImage).trim().replace(/"/g, '\\"');
+                    backgroundImageCss = `url("${safeUrl}")`;
+                } else if (effectiveSource === BgMode.GRADIENT && gradientFrom && gradientTo) {
+                    const angle = Number.isFinite(gradientAngle as number) ? (gradientAngle as number) : 135;
+                    backgroundImageCss = `linear-gradient(${angle}deg, ${gradientFrom}, ${gradientTo})`;
+                }
+
+                if (effectiveSource !== BgMode.VIDEO && overlayCss) {
+                    backgroundImageCss = backgroundImageCss ? `${overlayCss}, ${backgroundImageCss}` : overlayCss;
+                }
 
                 const zebraColor = zebra ? (idx % 2 === 0 ? zebraLight : zebraDark) : undefined;
                 const bgColorStyle =
@@ -229,28 +227,22 @@ const SectionList: React.FC<SectionListProps> = ({
                     overflowX: "hidden",
                     display: "flex",
                     flexDirection: "column",
-
                     justifyContent:
                         verticalAlign === VerticalAlign.CENTER
                             ? "center"
                             : verticalAlign === VerticalAlign.BOTTOM
                                 ? "flex-end"
                                 : "flex-start",
-
                     backgroundColor: bgColorStyle,
                     color: textColor,
-
                     minHeight,
                     maxHeight,
                     overflow: maxHeight && overflowMode === OverflowMode.CLIP ? "hidden" : undefined,
                     overflowY: maxHeight && overflowMode === OverflowMode.SCROLL ? "auto" : undefined,
-
                     paddingTop,
                     paddingRight,
                     paddingBottom,
                     paddingLeft,
-
-
                     gap: itemsGap ?? undefined,
                 };
 
@@ -262,7 +254,7 @@ const SectionList: React.FC<SectionListProps> = ({
                     if (bgAttach) style.backgroundAttachment = bgAttach as any;
                 }
 
-                const shouldRenderTop = (it.renderHeader ?? true) && (titleText || descText);
+                const shouldRenderTop = !!(titleText || descText);
 
                 const headerWrapStyle: React.CSSProperties = {
                     ...sectionWrapperStyle,
@@ -274,7 +266,7 @@ const SectionList: React.FC<SectionListProps> = ({
                     boxSizing: "border-box",
                     paddingBlock: 32,
                     ...(textColor ? { color: textColor } : {}),
-                    marginTop: "-20px",
+                    marginTop: "20px",
                 };
 
                 const titleStyle: React.CSSProperties = {
@@ -294,19 +286,18 @@ const SectionList: React.FC<SectionListProps> = ({
                     lineHeight: 1.6,
                     letterSpacing: "normal",
                     display: "block",
+                    padding: "0 20px",
                     ...(textColor ? { color: textColor } : {}),
                 };
 
                 const innerContentStyle: React.CSSProperties = {
                     position: "relative",
                     zIndex: 1,
-                    padding: '20px',
                     width: "100%",
                     maxWidth: "100%",
                     boxSizing: "border-box",
                     overflowX: "hidden",
                 };
-
 
                 const hasItemsLayout = Boolean(
                     section.layout?.items?.align ||
@@ -315,27 +306,12 @@ const SectionList: React.FC<SectionListProps> = ({
                     section.layout?.items?.gap != null
                 );
 
-                const effectiveItemsAlign =
-                    mapAlignItems(itemsAlign) ?? textAlignToFlexAlign(align);
+                const effectiveItemsAlign = mapAlignItems(itemsAlign) ?? textAlignToFlexAlign(align);
                 const effectiveItemsJustify =
                     mapJustifyContent(itemsJustify) ??
                     (align === TextAlign.CENTER ? "center" : align === TextAlign.RIGHT ? "flex-end" : "flex-start");
 
-                const itemsWrapStyle: React.CSSProperties | undefined = hasItemsLayout
-                    ? {
-                        display: "flex",
-                        width: "100%",
-                        maxWidth: "100%",
-                        minWidth: 0,
-                        boxSizing: "border-box",
-                        alignItems: effectiveItemsAlign,
-                        justifyContent: effectiveItemsJustify,
-                        flexWrap: itemsWrap ? "wrap" : "nowrap",
-                        gap: itemsGap ?? undefined,
-                    }
-                    : undefined;
-
-                const fallbackRowStyle: React.CSSProperties = {
+                const rowBase: React.CSSProperties = {
                     width: "100%",
                     maxWidth: "100%",
                     minWidth: 0,
@@ -344,9 +320,12 @@ const SectionList: React.FC<SectionListProps> = ({
                     display: "flex",
                     justifyContent: effectiveItemsJustify,
                     alignItems: effectiveItemsAlign,
-                    flexWrap: "wrap",
                     gap: itemsGap ?? undefined,
                 };
+
+                const itemsWrapStyle: React.CSSProperties = hasItemsLayout
+                    ? { ...rowBase, flexWrap: itemsWrap ? "wrap" : "nowrap" }
+                    : { ...rowBase, flexWrap: "wrap" };
 
                 const videoLayer =
                     effectiveSource === BgMode.VIDEO && section.background?.video?.videoUrl ? (
@@ -365,15 +344,14 @@ const SectionList: React.FC<SectionListProps> = ({
                                     objectPosition: bgPos || "center",
                                 }}
                             />
-                            {overlayCss && (
-                                <div style={{ position: "absolute", inset: 0, backgroundImage: overlayCss }} />
-                            )}
+                            {overlayCss && <div style={{ position: "absolute", inset: 0, backgroundImage: overlayCss }} />}
                         </div>
                     ) : null;
 
                 return (
                     <section key={it.id} id={it.id} style={style}>
                         {videoLayer}
+
                         <div style={innerContentStyle}>
                             {shouldRenderTop && (
                                 <div style={headerWrapStyle}>
@@ -381,11 +359,8 @@ const SectionList: React.FC<SectionListProps> = ({
                                     {descText && <p style={descStyle}>{descText}</p>}
                                 </div>
                             )}
-                            {hasItemsLayout ? (
-                                <div style={itemsWrapStyle}>{it.node}</div>
-                            ) : (
-                                <div style={fallbackRowStyle}>{it.node}</div>
-                            )}
+
+                            <div style={itemsWrapStyle}>{it.node}</div>
                         </div>
                     </section>
                 );

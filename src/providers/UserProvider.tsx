@@ -198,7 +198,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     async (infoMessage?: string | React.SyntheticEvent) => {
       const finalMessage =
         typeof infoMessage === "string" ? infoMessage : "Logging out";
-      console.log("loggin out");
       try {
         const refreshToken = localStorage.getItem("refreshToken");
         const deviceName = localStorage.getItem("deviceName");

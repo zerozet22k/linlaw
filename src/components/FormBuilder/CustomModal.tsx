@@ -29,7 +29,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       footer={footer}
       width={width}
       zIndex={zIndex}
-      destroyOnClose
+      destroyOnHidden={true}
     >
       {children}
     </Modal>

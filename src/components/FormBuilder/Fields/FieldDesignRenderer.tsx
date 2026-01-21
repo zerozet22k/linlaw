@@ -1,9 +1,13 @@
 "use client";
+
 import React from "react";
+import { Typography, Tooltip, theme } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+
 import FieldParentCard from "./FieldDesigns/FieldParentCard";
 import FieldDefaultCard from "./FieldDesigns/FieldDefaultCard";
-import { FieldDesign } from "@/config/CMS/settings";
 import FieldRow from "./FieldDesigns/FieldRow";
+import { FieldDesign, RenderSurface } from "@/config/CMS/settings";
 
 type FieldDesignRendererProps = {
   design: FieldDesign;
@@ -12,6 +16,7 @@ type FieldDesignRendererProps = {
   renderItem: () => React.ReactNode;
   extra?: React.ReactNode;
   style?: React.CSSProperties;
+  surface?: RenderSurface;
 };
 
 const FieldDesignRenderer: React.FC<FieldDesignRendererProps> = ({
@@ -21,40 +26,46 @@ const FieldDesignRenderer: React.FC<FieldDesignRendererProps> = ({
   renderItem,
   extra,
   style = {},
+  surface = "body",
 }) => {
-  return renderDesign(design, label, guide, renderItem, extra, style);
-};
+  const { token } = theme.useToken();
 
-const renderDesign = (
-  design: FieldDesign,
-  label?: string,
-  guide?: string,
-  renderItem?: () => React.ReactNode,
-  extra?: React.ReactNode,
-  style?: React.CSSProperties
-) => {
+  if (surface === "header") {
+    return (
+      <div
+        style={{
+
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 10,
+          lineHeight: 1,
+          ...style,
+        }}
+      >
+        <div style={{ display: "inline-flex", alignItems: "center" }}>
+          {renderItem?.()}
+        </div>
+
+        {extra ? (
+          <div style={{ display: "inline-flex", alignItems: "center" }}>
+            {extra}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
 
   switch (design) {
     case FieldDesign.PARENT:
       return (
-        <FieldParentCard
-          label={label}
-          guide={guide}
-          extra={extra}
-          style={style}
-        >
+        <FieldParentCard label={label} guide={guide} extra={extra} style={style}>
           {renderItem?.()}
         </FieldParentCard>
       );
 
     case FieldDesign.CARD:
       return (
-        <FieldDefaultCard
-          label={label}
-          guide={guide}
-          extra={extra}
-          style={style}
-        >
+        <FieldDefaultCard label={label} guide={guide} extra={extra} style={style}>
           {renderItem?.()}
         </FieldDefaultCard>
       );

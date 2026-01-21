@@ -1,3 +1,4 @@
+// InputStyle.ts
 import { CSSProperties } from "react";
 
 // Common dimensions
@@ -36,17 +37,30 @@ export const defaultInputStyle: CSSProperties = {
   ...baseInputStyle,
 };
 
-// Select styles
+// Select styles (wrapper)
 export const defaultSelectStyle: CSSProperties = {
-  ...baseInputStyle,
-  minHeight: commonHeight,
-  height: "auto",
-  display: "flex",
-  alignItems: "center",
+  width: "100%",
   flex: "1 1 0%",
-  padding: 0,
-  lineHeight: commonHeight,
+  minWidth: 0,
+  fontSize: commonFontSize,
 };
+
+// Select inner styles (antd v6)
+export const defaultSelectStyles = {
+  selector: {
+    minHeight: commonHeight,
+    borderRadius: commonBorderRadius,
+    padding: "0 12px",
+    display: "flex",
+    alignItems: "center",
+  },
+  selectionItem: {
+    lineHeight: commonHeight,
+  },
+  placeholder: {
+    lineHeight: commonHeight,
+  },
+} as const;
 
 // Card styles
 export const defaultCardStyle: CSSProperties = {
@@ -116,7 +130,6 @@ export const previewImageStyle: CSSProperties = {
   display: "block",
   maxWidth: "100%",
   maxHeight: "200px",
-  padding: "4px",
   borderRadius: commonBorderRadius,
   border: "1px solid #ccc",
   objectFit: "contain",

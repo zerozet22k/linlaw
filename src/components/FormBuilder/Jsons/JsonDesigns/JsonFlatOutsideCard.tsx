@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Typography, theme } from "antd";
+import { theme } from "antd";
 import FieldTitle from "../../Fields/extra/FieldTitle";
 
 type JsonFlatOutsideCardProps = {
@@ -9,6 +9,9 @@ type JsonFlatOutsideCardProps = {
   children: React.ReactNode;
   extra?: React.ReactNode;
   style?: React.CSSProperties;
+
+  // ✅ new
+  hasBody?: boolean;
 };
 
 const JsonFlatOutsideCard: React.FC<JsonFlatOutsideCardProps> = ({
@@ -17,19 +20,22 @@ const JsonFlatOutsideCard: React.FC<JsonFlatOutsideCardProps> = ({
   children,
   extra,
   style = {},
+  hasBody,
 }) => {
   const { token } = theme.useToken();
 
+  const showHeader = Boolean(label || guide || extra);
+  const showBody = hasBody !== false;
 
   return (
-    <div style={{ marginBottom: "16px", padding: "12px", }}>
-      {(label || extra) && (
+    <div style={{ marginBottom: "16px", padding: "12px" }}>
+      {showHeader && (
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "8px",
+            marginBottom: showBody ? "8px" : 0,
           }}
         >
           {label && <FieldTitle label={label} guide={guide} />}
@@ -37,17 +43,19 @@ const JsonFlatOutsideCard: React.FC<JsonFlatOutsideCardProps> = ({
         </div>
       )}
 
-      <div
-        style={{
-          padding: "12px",
-          border: `2px dashed ${token.colorBorder}`,
-          borderRadius: "10px",
-          backgroundColor: token.colorBgContainer,
-          ...style,
-        }}
-      >
-        {children}
-      </div>
+      {showBody ? (
+        <div
+          style={{
+            padding: "12px",
+            border: `2px dashed ${token.colorBorder}`,
+            borderRadius: "10px",
+            backgroundColor: token.colorBgContainer,
+            ...style,
+          }}
+        >
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 };

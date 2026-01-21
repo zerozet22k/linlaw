@@ -184,7 +184,7 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
       open={visible}
       onCancel={() => !sending && setVisible(false)}
       footer={null}
-      destroyOnClose
+      destroyOnHidden={true}
       width={720}
       maskClosable={!sending}
       styles={{ body: { paddingTop: token.paddingMD } }}

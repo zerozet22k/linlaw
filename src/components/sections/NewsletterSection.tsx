@@ -9,16 +9,10 @@ import {
   Card,
   Skeleton,
   theme,
-  Button,
   Grid,
+  Button,
 } from "antd";
 import Link from "next/link";
-import {
-  ArrowRightOutlined,
-  CalendarOutlined,
-  PaperClipOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { INewsletterAPI } from "@/models/Newsletter";
 import apiClient from "@/utils/api/apiClient";
@@ -28,29 +22,15 @@ import {
   HOME_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { useToken } = theme;
 
 type NewsletterData = HOME_PAGE_SETTINGS_TYPES[typeof K.NEWSLETTER_SECTION];
 
 type Props = {
-  data?: NewsletterData;
+  data?: NewsletterData; // kept for consistency (outer section handles header/title)
   language: string;
 };
-
-function formatDate(d?: string | number | Date) {
-  if (!d) return "";
-  try {
-    const date = d instanceof Date ? d : new Date(d);
-    return date.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    });
-  } catch {
-    return "";
-  }
-}
 
 function resolveLocalized(val: any, language: string): string {
   if (!val) return "";
@@ -62,7 +42,6 @@ function resolveLocalized(val: any, language: string): string {
 }
 
 function extractPreview(item: any, language: string): string {
-  // Try common fields. If none exist, return empty (we'll hide preview block).
   const candidates = [
     item?.excerpt,
     item?.summary,
@@ -84,9 +63,40 @@ function clampText(s: string, max = 140) {
   return t.length > max ? `${t.slice(0, max).trim()}…` : t;
 }
 
-const NewsletterSection: React.FC<Props> = ({ data, language }) => {
+function formatDotDate(d?: string | number | Date) {
+  if (!d) return "";
+  try {
+    const date = d instanceof Date ? d : new Date(d);
+    const yyyy = String(date.getFullYear());
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yyyy}.${mm}.${dd}.`;
+  } catch {
+    return "";
+  }
+}
+
+function getCategoryLabel(item: any, language: string) {
+  return (
+    resolveLocalized(item?.category, language) ||
+    resolveLocalized(item?.type, language) ||
+    resolveLocalized(item?.tag, language) ||
+    "Newsletter"
+  );
+}
+
+// used to pick featured cards by category if API provides it
+function getCategoryKey(item: any) {
+  return String(item?.category ?? item?.type ?? item?.tag ?? "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const NewsletterSection: React.FC<Props> = ({ language }) => {
   const { token } = useToken();
   const screens = Grid.useBreakpoint();
+  const isLgUp = !!screens.lg;
   const isMdUp = !!screens.md;
 
   const [newsletters, setNewsletters] = useState<INewsletterAPI[]>([]);
@@ -122,7 +132,7 @@ const NewsletterSection: React.FC<Props> = ({ data, language }) => {
   const tReadMore =
     getTranslatedText(commonTranslations.readMore, language) || "Read More";
   const tViewAll =
-    getTranslatedText(commonTranslations.viewAll, language) || "View all";
+    getTranslatedText(commonTranslations.viewAll, language) || "View all newsletters";
 
   const sorted = useMemo(() => {
     const arr = Array.isArray(newsletters) ? [...newsletters] : [];
@@ -134,119 +144,302 @@ const NewsletterSection: React.FC<Props> = ({ data, language }) => {
     return arr;
   }, [newsletters]);
 
-  const featured = sorted[0];
-  const rest = sorted.slice(1, isMdUp ? 5 : 4);
+  // 2 big + 3 small (prefer categories if present; otherwise just latest)
+  const { bigLeft, bigRight, small } = useMemo(() => {
+    const arr = sorted;
 
+    const lin = arr.find((x) => getCategoryKey(x) === "lin news");
+    const news = arr.find((x) => getCategoryKey(x) === "newsletter");
+
+    const left = lin ?? arr[0];
+    const right = news ?? arr.find((x) => x?._id !== left?._id) ?? arr[1];
+
+    const rest = arr
+      .filter((x) => x?._id !== left?._id && x?._id !== right?._id)
+      .slice(0, 3);
+
+    return { bigLeft: left, bigRight: right, small: rest };
+  }, [sorted]);
+
+  // IMPORTANT: no inner title/header (outer section handles it)
   const containerStyle: React.CSSProperties = {
     width: "100%",
-    maxWidth: 1200,
+    maxWidth: 980,
     margin: "0 auto",
+    paddingInline: isMdUp ? 0 : token.paddingMD,
   };
 
-  const layoutStyle: React.CSSProperties = {
+  const gridTopStyle: React.CSSProperties = {
     display: "grid",
-    gridTemplateColumns: isMdUp ? "1.35fr 0.65fr" : "1fr",
+    gridTemplateColumns: isMdUp ? "1fr 1fr" : "1fr",
     gap: token.sizeLG,
     alignItems: "stretch",
   };
 
-  const softBorder = `1px solid ${token.colorBorderSecondary}`;
-  const softShadow = (token as any).boxShadowSecondary || "0 10px 26px rgba(0,0,0,0.08)";
+  const gridBottomStyle: React.CSSProperties = {
+    display: "grid",
+    gridTemplateColumns: isLgUp ? "1fr 1fr 1fr" : isMdUp ? "1fr 1fr" : "1fr",
+    gap: token.sizeLG,
+    alignItems: "stretch",
+    marginTop: token.marginLG,
+  };
 
-  const chipStyle: React.CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "6px 10px",
-    borderRadius: 999,
-    border: softBorder,
-    background: token.colorFillQuaternary,
+  // Glassy look (works well over background image)
+  const glassBorder = "1px solid rgba(255,255,255,0.28)";
+  const glassShadow = "0 18px 40px rgba(0,0,0,0.25)";
+
+  const darkCardStyle: React.CSSProperties = {
+    borderRadius: token.borderRadiusLG,
+    border: glassBorder,
+    overflow: "hidden",
+    height: isMdUp ? 260 : "auto",
+    background: "rgba(10, 20, 30, 0.45)",
+    backdropFilter: "blur(10px)",
+    WebkitBackdropFilter: "blur(10px)",
+    transition: "transform 160ms ease, box-shadow 160ms ease",
+  };
+
+  const lightCardStyle: React.CSSProperties = {
+    borderRadius: token.borderRadiusLG,
+    border: "1px solid rgba(255,255,255,0.18)",
+    overflow: "hidden",
+    height: isMdUp ? 210 : "auto",
+    background: "rgba(255, 255, 255, 0.72)",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    transition: "transform 160ms ease, box-shadow 160ms ease",
+  };
+
+  const labelStyleDark: React.CSSProperties = {
+    display: "inline-block",
+    fontWeight: 700,
+    textDecoration: "underline",
+    textUnderlineOffset: 3,
+    color: "#fff",
+    opacity: 0.95,
+    marginBottom: 10,
+  };
+
+  const labelStyleLight: React.CSSProperties = {
+    display: "inline-block",
+    fontWeight: 700,
+    textDecoration: "underline",
+    textUnderlineOffset: 3,
+    color: token.colorText,
+    opacity: 0.9,
+    marginBottom: 10,
+  };
+
+  const dateStyleDark: React.CSSProperties = {
+    marginTop: "auto",
+    fontWeight: 700,
+    color: "#fff",
+    opacity: 0.9,
+  };
+
+  const dateStyleLight: React.CSSProperties = {
+    marginTop: "auto",
+    fontWeight: 700,
     color: token.colorTextSecondary,
-    fontSize: 12.5,
-    lineHeight: 1,
-    whiteSpace: "nowrap",
   };
 
-  const featuredCardStyle: React.CSSProperties = {
-    borderRadius: token.borderRadiusLG,
-    border: softBorder,
-    background: token.colorBgContainer,
-    overflow: "hidden",
-    height: "100%",
-    transition: "transform 160ms ease, box-shadow 160ms ease",
+  const hoverHandlers = {
+    onMouseEnter: (e: any) => {
+      e.currentTarget.style.transform = "translateY(-2px)";
+      e.currentTarget.style.boxShadow = glassShadow;
+    },
+    onMouseLeave: (e: any) => {
+      e.currentTarget.style.transform = "";
+      e.currentTarget.style.boxShadow = "";
+    },
   };
 
-  const featuredTopStyle: React.CSSProperties = {
-    padding: token.paddingLG,
-    background: `linear-gradient(135deg, ${token.colorFillTertiary}, ${token.colorBgContainer})`,
-    borderBottom: softBorder,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: token.sizeMD,
+  const renderBigCard = (item: any) => {
+    if (!item) return null;
+
+    const id = item?._id;
+    const title = resolveLocalized(item?.title, language) || "Untitled";
+    const preview = clampText(extractPreview(item, language), 170);
+    const date = formatDotDate(item?.createdAt);
+    const cat = getCategoryLabel(item, language);
+
+    return (
+      <Link
+        href={`/newsletters/${id}`}
+        style={{ textDecoration: "none", display: "block" }}
+        aria-label={`Open newsletter: ${title}`}
+      >
+        <Card
+          variant="borderless"
+          hoverable
+          style={darkCardStyle}
+          styles={{ body: { padding: 0, height: "100%" } }}
+          {...hoverHandlers}
+        >
+          <div
+            style={{
+              padding: 26,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            <Text style={labelStyleDark}>{cat}</Text>
+
+            <div
+              style={{
+                fontSize: isMdUp ? 28 : 22,
+                fontWeight: 850,
+                lineHeight: 1.15,
+                color: "#fff",
+                letterSpacing: -0.2,
+              }}
+            >
+              {title}
+            </div>
+
+            {preview && (
+              <Text
+                style={{
+                  color: "#fff",
+                  opacity: 0.92,
+                  lineHeight: 1.65,
+                  fontSize: 14.5,
+                }}
+              >
+                {preview}
+              </Text>
+            )}
+
+            <Text style={dateStyleDark}>{date}</Text>
+
+            <Text
+              style={{
+                marginTop: 6,
+                color: "#fff",
+                opacity: 0.9,
+                fontWeight: 700,
+                textDecoration: "underline",
+                textUnderlineOffset: 3,
+              }}
+            >
+              {tReadMore}
+            </Text>
+          </div>
+        </Card>
+      </Link>
+    );
   };
 
-  const listWrapStyle: React.CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: token.sizeSM,
-    height: "100%",
-  };
+  const renderSmallCard = (item: any) => {
+    if (!item) return null;
 
-  const listItemStyle: React.CSSProperties = {
-    borderRadius: token.borderRadiusLG,
-    border: softBorder,
-    background: token.colorBgContainer,
-    overflow: "hidden",
-    transition: "transform 160ms ease, box-shadow 160ms ease",
+    const id = item?._id;
+    const title = resolveLocalized(item?.title, language) || "Untitled";
+    const preview = clampText(extractPreview(item, language), 95);
+    const date = formatDotDate(item?.createdAt);
+    const cat = getCategoryLabel(item, language);
+
+    return (
+      <Link
+        href={`/newsletters/${id}`}
+        style={{ textDecoration: "none", display: "block" }}
+        aria-label={`Open newsletter: ${title}`}
+      >
+        <Card
+          variant="borderless"
+          hoverable
+          style={lightCardStyle}
+          styles={{ body: { padding: 24, height: "100%" } }}
+          {...hoverHandlers}
+        >
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            <Text style={labelStyleLight}>{cat}</Text>
+
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 850,
+                lineHeight: 1.2,
+                color: token.colorText,
+              }}
+            >
+              {title}
+            </div>
+
+            {preview && (
+              <Text
+                style={{
+                  color: token.colorTextSecondary,
+                  lineHeight: 1.6,
+                  fontSize: 14,
+                }}
+              >
+                {preview}
+              </Text>
+            )}
+
+            <Text style={dateStyleLight}>{date}</Text>
+          </div>
+        </Card>
+      </Link >
+    );
   };
 
   if (!loading && !error && sorted.length === 0) return null;
 
   if (loading) {
     return (
-      <div data-component="NewsletterSection" aria-busy="true" style={containerStyle}>
-        <div style={layoutStyle}>
-          <Card bordered={false} style={featuredCardStyle} styles={{ body: { padding: 0 } }}>
-            <div style={featuredTopStyle}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <FileTextOutlined style={{ fontSize: 18, color: token.colorPrimary }} />
-                <Text style={{ fontWeight: 700, color: token.colorText }}>Latest Newsletter</Text>
-              </div>
-              <span style={{ ...chipStyle, opacity: 0.6 }}>
-                <CalendarOutlined /> —
-              </span>
-            </div>
-            <div style={{ padding: token.paddingLG }}>
+      <div
+        data-component="NewsletterSection"
+        aria-busy="true"
+        style={containerStyle}
+      >
+        <div style={gridTopStyle}>
+          {Array.from({ length: 2 }).map((_, i) => (
+            <Card
+              key={i}
+              variant="borderless"
+              style={darkCardStyle}
+              styles={{ body: { padding: 26 } }}
+            >
               <Skeleton active title paragraph={{ rows: 3 }} />
-              <div style={{ marginTop: token.marginMD, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <span style={{ ...chipStyle, opacity: 0.6 }}>
-                  <PaperClipOutlined /> —
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          <div style={listWrapStyle}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Card
-                key={i}
-                bordered={false}
-                style={listItemStyle}
-                styles={{ body: { padding: token.paddingMD } }}
-              >
-                <Skeleton active title={{ width: "70%" }} paragraph={{ rows: 1 }} />
-              </Card>
-            ))}
-          </div>
+            </Card>
+          ))}
         </div>
-      </div>
+
+        <div style={gridBottomStyle}>
+          {Array.from({ length: isLgUp ? 3 : isMdUp ? 2 : 3 }).map((_, i) => (
+            <Card
+              key={i}
+              variant="borderless"
+              style={lightCardStyle}
+              styles={{ body: { padding: 24 } }}
+            >
+              <Skeleton active title paragraph={{ rows: 2 }} />
+            </Card>
+          ))
+          }
+        </div >
+      </div >
     );
   }
 
   if (error) {
     return (
-      <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
+      <div
+        data-component="NewsletterSection"
+        aria-busy="false"
+        style={containerStyle}
+      >
         <Alert
           message="Error"
           description={error}
@@ -258,204 +451,60 @@ const NewsletterSection: React.FC<Props> = ({ data, language }) => {
     );
   }
 
-  if (!featured) {
+  if (!bigLeft) {
     return (
-      <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
+      <div
+        data-component="NewsletterSection"
+        aria-busy="false"
+        style={containerStyle}
+      >
         <Empty description="No newsletters found." />
       </div>
     );
   }
 
-  const featuredTitle = resolveLocalized((featured as any).title, language) || "Untitled";
-  const featuredDate = formatDate((featured as any).createdAt);
-  const featuredFiles = Array.isArray((featured as any).fileAttachments)
-    ? (featured as any).fileAttachments.length
-    : 0;
-  const featuredPreview = clampText(extractPreview(featured, language), 220);
-
   return (
-    <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
-      <div style={layoutStyle}>
-        {/* Featured */}
-        <Link
-          href={`/newsletters/${(featured as any)._id}`}
-          style={{ textDecoration: "none", display: "block", height: "100%" }}
-          aria-label={`Open newsletter: ${featuredTitle}`}
-        >
-          <Card
-            bordered={false}
-            style={featuredCardStyle}
-            styles={{ body: { padding: 0, height: "100%" } }}
-            hoverable
-            onMouseEnter={(e) => {
-              (e.currentTarget as any).style.transform = "translateY(-2px)";
-              (e.currentTarget as any).style.boxShadow = softShadow;
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as any).style.transform = "";
-              (e.currentTarget as any).style.boxShadow = "";
+    <div
+      data-component="NewsletterSection"
+      aria-busy="false"
+      style={containerStyle}
+    >
+      <div style={gridTopStyle}>
+        {renderBigCard(bigLeft)}
+        {renderBigCard(bigRight)}
+      </div>
+
+      <div style={gridBottomStyle}>{small.map((it) => renderSmallCard(it))}</div>
+
+      {/* View all button */}
+      <div
+        style={{
+          marginTop: token.marginLG,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <Link href="/newsletters" style={{ textDecoration: "none" }}>
+          <Button
+            size="large"
+            type="primary"
+            style={{
+              borderRadius: token.borderRadiusLG,
+              fontWeight: 800,
+              paddingInline: 22,
+              height: 46,
             }}
           >
-            <div style={featuredTopStyle}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                <FileTextOutlined style={{ fontSize: 18, color: token.colorPrimary }} />
-                <Text
-                  style={{
-                    fontWeight: 800,
-                    color: token.colorText,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: "100%",
-                  }}
-                >
-                  Featured
-                </Text>
-              </div>
-
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                {featuredDate && (
-                  <span style={chipStyle}>
-                    <CalendarOutlined /> {featuredDate}
-                  </span>
-                )}
-                {featuredFiles > 0 && (
-                  <span style={chipStyle}>
-                    <PaperClipOutlined /> {featuredFiles}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div style={{ padding: token.paddingLG }}>
-              <Title
-                level={4}
-                style={{
-                  margin: 0,
-                  marginBottom: token.marginSM,
-                  lineHeight: 1.2,
-                  color: token.colorText,
-                }}
-              >
-                {featuredTitle}
-              </Title>
-
-              {featuredPreview && (
-                <Text
-                  style={{
-                    display: "block",
-                    color: token.colorTextSecondary,
-                    fontSize: 15,
-                    lineHeight: 1.7,
-                    marginBottom: token.marginLG,
-                  }}
-                >
-                  {featuredPreview}
-                </Text>
-              )}
-
-              <Button type="primary" icon={<ArrowRightOutlined />} size="large">
-                {tReadMore}
-              </Button>
-            </div>
-          </Card>
+            {tViewAll}
+          </Button>
         </Link>
-
-        {/* Latest list */}
-        <div style={listWrapStyle}>
-          {rest.length === 0 ? (
-            <Card bordered={false} style={listItemStyle} styles={{ body: { padding: token.paddingLG } }}>
-              <Text style={{ color: token.colorTextSecondary }}>No more newsletters.</Text>
-            </Card>
-          ) : (
-            rest.map((item) => {
-              const id = (item as any)._id;
-              const title = resolveLocalized((item as any).title, language) || "Untitled";
-              const created = formatDate((item as any).createdAt);
-              const files = Array.isArray((item as any).fileAttachments)
-                ? (item as any).fileAttachments.length
-                : 0;
-
-              return (
-                <Link
-                  key={id}
-                  href={`/newsletters/${id}`}
-                  style={{ textDecoration: "none", display: "block" }}
-                  aria-label={`Open newsletter: ${title}`}
-                >
-                  <Card
-                    bordered={false}
-                    style={listItemStyle}
-                    styles={{ body: { padding: token.paddingMD } }}
-                    hoverable
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as any).style.transform = "translateY(-1px)";
-                      (e.currentTarget as any).style.boxShadow = softShadow;
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as any).style.transform = "";
-                      (e.currentTarget as any).style.boxShadow = "";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-                      <div style={{ minWidth: 0 }}>
-                        <Text
-                          style={{
-                            display: "block",
-                            fontWeight: 700,
-                            color: token.colorText,
-                            fontSize: 14.5,
-                            lineHeight: 1.25,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            maxWidth: "100%",
-                          }}
-                        >
-                          {title}
-                        </Text>
-
-                        <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
-                          {created && (
-                            <span style={{ ...chipStyle, padding: "5px 9px", fontSize: 12 }}>
-                              <CalendarOutlined /> {created}
-                            </span>
-                          )}
-                          {files > 0 && (
-                            <span style={{ ...chipStyle, padding: "5px 9px", fontSize: 12 }}>
-                              <PaperClipOutlined /> {files}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <ArrowRightOutlined style={{ color: token.colorTextTertiary, marginTop: 4 }} />
-                    </div>
-                  </Card>
-                </Link>
-              );
-            })
-          )}
-
-          <div style={{ marginTop: "auto", paddingTop: token.paddingSM }}>
-            <Link href="/newsletters" style={{ textDecoration: "none" }}>
-              <Button
-                block
-                size="large"
-                type="default"
-                icon={<ArrowRightOutlined />}
-                style={{
-                  borderRadius: token.borderRadiusLG,
-                  border: softBorder,
-                  fontWeight: 700,
-                }}
-              >
-                {tViewAll}
-              </Button>
-            </Link>
-          </div>
-        </div>
       </div>
+
+      <style jsx global>{`
+        .ant-card-hoverable {
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 };

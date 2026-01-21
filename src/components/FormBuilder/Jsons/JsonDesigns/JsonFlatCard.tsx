@@ -9,6 +9,9 @@ type JsonFlatCardProps = {
   children: React.ReactNode;
   extra?: React.ReactNode;
   style?: React.CSSProperties;
+
+  // ✅ new: lets parent hide the body entirely (header-only layout)
+  hasBody?: boolean;
 };
 
 const JsonFlatCard: React.FC<JsonFlatCardProps> = ({
@@ -17,8 +20,12 @@ const JsonFlatCard: React.FC<JsonFlatCardProps> = ({
   children,
   extra,
   style = {},
+  hasBody,
 }) => {
   const { token } = theme.useToken();
+
+  const showHeader = Boolean(label || guide || extra);
+  const showBody = hasBody !== false;
 
   return (
     <div
@@ -30,11 +37,11 @@ const JsonFlatCard: React.FC<JsonFlatCardProps> = ({
         backgroundColor: token.colorBgContainer,
         display: "flex",
         flexDirection: "column",
-        gap: "8px",
+        gap: showHeader && showBody ? "8px" : 0,
         ...style,
       }}
     >
-      {(label || extra) && (
+      {showHeader && (
         <div
           style={{
             display: "flex",
@@ -47,7 +54,7 @@ const JsonFlatCard: React.FC<JsonFlatCardProps> = ({
         </div>
       )}
 
-      {children}
+      {showBody ? children : null}
     </div>
   );
 };

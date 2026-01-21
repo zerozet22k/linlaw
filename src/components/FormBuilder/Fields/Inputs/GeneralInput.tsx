@@ -1,11 +1,13 @@
+// GeneralInput.tsx
 import React, { CSSProperties } from "react";
-import { Input, Switch, Select, Upload } from "antd";
+import { Input, Switch, Select, Upload, Space } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { FormType } from "@/config/CMS/settings";
 import {
   defaultWrapperStyle,
   defaultInputStyle,
   defaultSelectStyle,
+  defaultSelectStyles,
 } from "../../InputStyle";
 
 type GeneralInputProps = {
@@ -32,28 +34,34 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
     case FormType.COLOR:
       return (
         <div style={commonWrapperStyle}>
-          <Input
-            type="color"
-            value={value || "#000000"}
-            onChange={(e) => onChange(e.target.value)}
-            style={{
-              width: 40,
-              height: 36,
-              padding: 0,
-              borderRadius: 8,
-              border: "1px solid #ccc",
-              cursor: "pointer",
-            }}
-          />
-          <span>{value || "#000000"}</span>
+          <Space align="center" size={10}>
+            <Input
+              type="color"
+              value={value || "#000000"}
+              onChange={(e) => onChange(e.target.value)}
+              style={{
+                width: 40,
+                height: 36,
+                padding: 0,
+                borderRadius: 10,
+                border: "1px solid rgba(0,0,0,0.15)",
+                cursor: "pointer",
+              }}
+            />
+            <span style={{ opacity: 0.85 }}>{value || "#000000"}</span>
+          </Space>
         </div>
       );
 
     case FormType.BOOLEAN:
       return (
         <div style={commonWrapperStyle}>
-          <Switch checked={!!value} onChange={onChange} />
-          <span>{value ? "Enabled" : "Disabled"}</span>
+          <Space align="center" size={10}>
+            <Switch checked={!!value} onChange={onChange} />
+            <span style={{ opacity: 0.85 }}>
+              {value ? "Enabled" : "Disabled"}
+            </span>
+          </Space>
         </div>
       );
 
@@ -69,7 +77,7 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
           >
             <Input
               prefix={<UploadOutlined />}
-              placeholder={value ? value.name : "Upload a file"}
+              placeholder={value ? value.name : "Upload"}
               readOnly
               style={defaultInputStyle}
             />
@@ -81,17 +89,14 @@ const GeneralInput: React.FC<GeneralInputProps> = ({
       return (
         <div style={commonWrapperStyle}>
           <Select
-            value={value || ""}
+            value={value ?? undefined}
             onChange={onChange}
-            placeholder="Select an option"
+            placeholder="Select"
             style={defaultSelectStyle}
-          >
-            {options.map((opt) => (
-              <Select.Option key={opt.value} value={opt.value}>
-                {opt.label}
-              </Select.Option>
-            ))}
-          </Select>
+            styles={defaultSelectStyles}
+            options={options}
+            popupMatchSelectWidth={false}
+          />
         </div>
       );
 

@@ -1,16 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback, useState } from "react";
-import {
-  Modal,
-  List,
-  Card,
-  Spin,
-  Input,
-  Button,
-  Empty,
-  Typography,
-} from "antd";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Modal, List, Card, Spin, Input, Button, Empty, Typography } from "antd";
 import { EyeOutlined, UploadOutlined } from "@ant-design/icons";
 import { useFile } from "@/hooks/useFile";
 import debounce from "lodash/debounce";
@@ -25,7 +16,13 @@ const LazyImage = ({ src, alt }: { src: string; alt: string }) => (
     src={src}
     alt={alt}
     loading="lazy"
-    style={{ height: 150, objectFit: "cover", borderRadius: "8px" }}
+    style={{
+      width: "100%",
+      height: 150,
+      objectFit: "cover",
+      borderRadius: 8,
+      display: "block",
+    }}
   />
 );
 
@@ -44,10 +41,13 @@ const FileSelectionModal = ({
   fileType = "",
   zIndex = 1000,
 }: FileSelectionModalProps) => {
-  const { files, loading, hasMore, fetchFiles, clearFiles, uploadedFiles } =
-    useFile();
+  const { files, loading, hasMore, fetchFiles, clearFiles } = useFile();
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  // Separate "what user is typing" from "what we query with"
+  const [searchInput, setSearchInput] = useState("");
+
   const [localSearchState, setLocalSearchState] = useState({
     search: "",
     page: 1,
@@ -56,54 +56,78 @@ const FileSelectionModal = ({
 
   const scrollableContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Set local search state and fetch files on search or page change
-  const debouncedSearch = useCallback(
-    debounce((query: string) => {
-      setLocalSearchState((prev) => ({
-        ...prev,
-        search: query,
-        page: 1, // Reset page to 1 when search changes
-      }));
-    }, 300),
-    []
+  // Prevent page from jumping multiple times before loading updates
+  const pagingRef = useRef(false);
+
+  // ✅ recreate when fileType changes; also force correct type
+  const applySearchDebounced = useMemo(
+    () =>
+      debounce((query: string) => {
+        setLocalSearchState((prev) => ({
+          ...prev,
+          search: query,
+          page: 1,
+          type: fileType,
+        }));
+
+        pagingRef.current = false;
+
+        const el = scrollableContainerRef.current;
+        if (el) el.scrollTop = 0;
+      }, 300),
+    [fileType]
   );
 
+  // ✅ cleanup on unmount
   useEffect(() => {
-    if (isOpen) {
-      clearFiles();
-      setLocalSearchState((prev) => ({ ...prev, search: "", page: 1 }));
-    }
-  }, [isOpen, clearFiles]);
-
-  // Call the fetch function only when the search state changes
-  useEffect(() => {
-    fetchFiles(localSearchState);
-  }, [localSearchState, fetchFiles]);
-
-  const handleScroll = useCallback(() => {
-    const container = scrollableContainerRef.current;
-    if (!container || loading || !hasMore) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      setLocalSearchState((prev) => {
-        const nextPage = prev.page + 1;
-        return { ...prev, page: nextPage };
-      });
-    }
-  }, [loading, hasMore]);
-
-  useEffect(() => {
-    const container = scrollableContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-    }
     return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
+      applySearchDebounced.cancel();
     };
-  }, [handleScroll]);
+  }, [applySearchDebounced]);
+
+  // ✅ cancel debounce when modal closes (prevents late updates)
+  useEffect(() => {
+    if (!isOpen) applySearchDebounced.cancel();
+  }, [isOpen, applySearchDebounced]);
+
+  // When modal opens OR fileType changes, reset state properly
+  useEffect(() => {
+    if (!isOpen) return;
+
+    clearFiles();
+    setSearchInput("");
+    setLocalSearchState({ search: "", page: 1, type: fileType });
+    pagingRef.current = false;
+
+    const el = scrollableContainerRef.current;
+    if (el) el.scrollTop = 0;
+  }, [isOpen, fileType, clearFiles]);
+
+  // Fetch whenever query state changes (page/search/type)
+  useEffect(() => {
+    if (!isOpen) return;
+    fetchFiles(localSearchState);
+  }, [isOpen, localSearchState, fetchFiles]);
+
+  // Release paging gate when a fetch completes
+  useEffect(() => {
+    if (!loading) pagingRef.current = false;
+  }, [loading]);
+
+  const handleScroll: React.UIEventHandler<HTMLDivElement> = (e) => {
+    const container = e.currentTarget;
+
+    if (loading || !hasMore) return;
+    if (pagingRef.current) return;
+
+    const nearBottom =
+      container.scrollTop + container.clientHeight >= container.scrollHeight - 120;
+
+    if (!nearBottom) return;
+
+    pagingRef.current = true;
+    setLocalSearchState((prev) => ({ ...prev, page: prev.page + 1 }));
+  };
 
   return (
     <>
@@ -127,30 +151,32 @@ const FileSelectionModal = ({
           type="primary"
           icon={<UploadOutlined />}
           onClick={() => setIsUploadModalOpen(true)}
-          style={{ marginBottom: "16px", borderRadius: "8px" }}
+          style={{ marginBottom: 16, borderRadius: 8 }}
         >
           Upload File
         </Button>
 
         <Input
           placeholder={`Search ${fileType || "files"}...`}
-          value={localSearchState.search}
+          value={searchInput}
           onChange={(e) => {
-            const newSearch = e.target.value;
-            setLocalSearchState({ ...localSearchState, search: newSearch });
-            debouncedSearch(newSearch);
+            const q = e.target.value;
+            setSearchInput(q);
+            applySearchDebounced(q);
           }}
           size="large"
-          style={{ marginBottom: "16px", borderRadius: "8px" }}
+          style={{ marginBottom: 16, borderRadius: 8 }}
+          allowClear
         />
 
         <div
           ref={scrollableContainerRef}
+          onScroll={handleScroll}
           style={{
             flex: 1,
             overflowY: "auto",
-            padding: "8px",
-            borderRadius: "8px",
+            padding: 8,
+            borderRadius: 8,
           }}
         >
           {files.length === 0 && !loading ? (
@@ -159,8 +185,9 @@ const FileSelectionModal = ({
             <List
               grid={{ gutter: 16, column: 4 }}
               dataSource={files}
+              rowKey={(file) => file._id ?? file.publicUrl}
               renderItem={(file) => (
-                <List.Item key={file._id}>
+                <List.Item>
                   <Card
                     hoverable
                     cover={<LazyImage src={file.publicUrl} alt={file.name} />}
@@ -181,23 +208,34 @@ const FileSelectionModal = ({
                         border: "none",
                       }}
                     />
-        
-                   <p style={{ overflow: "hidden" }}>{file.name}</p>
+                    <Text
+                      style={{
+                        display: "block",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {file.name}
+                    </Text>
                   </Card>
                 </List.Item>
               )}
             />
           )}
+
           {loading && (
-            <Spin
-              size="large"
-              style={{ display: "block", margin: "16px auto" }}
-            />
+            <Spin size="large" style={{ display: "block", margin: "16px auto" }} />
+          )}
+
+          {!loading && files.length > 0 && !hasMore && (
+            <div style={{ textAlign: "center", padding: 12, opacity: 0.65 }}>
+              End reached
+            </div>
           )}
         </div>
       </Modal>
 
-      {/* Upload File Modal */}
       <Modal
         title="Upload New File"
         open={isUploadModalOpen}
@@ -205,12 +243,7 @@ const FileSelectionModal = ({
         footer={null}
         width="60%"
         zIndex={zIndex + 10}
-        styles={{
-          body: {
-            height: "auto",
-            overflow: "hidden",
-          },
-        }}
+        styles={{ body: { height: "auto", overflow: "hidden" } }}
       >
         <FileUploader />
       </Modal>

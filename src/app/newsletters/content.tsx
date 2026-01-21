@@ -200,7 +200,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
             {Array.from({ length: 5 }).map((_, i) => (
               <Card
                 key={i}
-                bordered
+                variant="outlined"
                 style={{
                   borderRadius: token.borderRadiusLG,
                   borderColor: token.colorBorderSecondary,
@@ -235,7 +235,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
                     aria-label={`Open newsletter: ${title}`}
                   >
                     <Card
-                      bordered
+                      variant="outlined"
                       hoverable
                       style={{
                         borderRadius: token.borderRadiusLG,

@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic"; // Force dynamic rendering
-
+import 'antd/dist/antd.css';
 import React from "react";
 import { Metadata } from "next";
 import SettingService from "@/services/SettingService";

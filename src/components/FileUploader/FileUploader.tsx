@@ -119,7 +119,7 @@ export default function FileUploader() {
         showUploadList={false}
         beforeUpload={beforeUpload}
         onChange={handleChange}
-        customRequest={() => {}}
+        customRequest={() => { }}
         style={{
           padding: 20,
           borderRadius: 8,
@@ -138,7 +138,7 @@ export default function FileUploader() {
 
       {localFiles.length > 0 && (
         <>
-          <Divider orientation="left">Staged Files</Divider>
+          <Divider titlePlacement="start">Staged Files</Divider>
           <List
             bordered
             dataSource={localFiles}

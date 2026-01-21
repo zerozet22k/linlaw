@@ -216,7 +216,7 @@ const NewsletterDetail: React.FC = () => {
     return (
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
         <Card
-          bordered
+          variant="outlined"
           style={{
             borderRadius: token.borderRadiusLG,
             borderColor: token.colorBorderSecondary,
@@ -310,7 +310,7 @@ const NewsletterDetail: React.FC = () => {
         {/* Content */}
         {attachments.length === 0 ? (
           <Card
-            bordered
+            variant="outlined"
             style={{
               borderRadius: token.borderRadiusLG,
               borderColor: token.colorBorderSecondary,
@@ -328,10 +328,9 @@ const NewsletterDetail: React.FC = () => {
               alignItems: "start",
             }}
           >
-            {/* Sidebar (only useful if > 1 attachment) */}
             {attachments.length > 1 && (
               <Card
-                bordered
+                variant="outlined"
                 style={{
                   borderRadius: token.borderRadiusLG,
                   borderColor: token.colorBorderSecondary,
@@ -360,9 +359,8 @@ const NewsletterDetail: React.FC = () => {
                           padding: "10px 12px",
                           marginBottom: 8,
                           background: active ? token.colorFillSecondary : "transparent",
-                          border: `1px solid ${
-                            active ? token.colorPrimaryBorder : "transparent"
-                          }`,
+                          border: `1px solid ${active ? token.colorPrimaryBorder : "transparent"
+                            }`,
                           transition: "background 150ms ease, border-color 150ms ease",
                         }}
                       >
@@ -419,9 +417,8 @@ const NewsletterDetail: React.FC = () => {
               </Card>
             )}
 
-            {/* Preview */}
             <Card
-              bordered
+              variant="outlined"
               style={{
                 borderRadius: token.borderRadiusLG,
                 borderColor: token.colorBorderSecondary,

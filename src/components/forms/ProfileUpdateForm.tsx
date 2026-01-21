@@ -73,7 +73,7 @@ const ProfileUpdateForm: React.FC<ProfileUpdateFormProps> = ({
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       maskClosable={false}
       centered
     >

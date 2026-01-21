@@ -10,6 +10,9 @@ type JsonDefaultCardProps = {
   children: React.ReactNode;
   extra?: React.ReactNode;
   style?: React.CSSProperties;
+
+  // ✅ new
+  hasBody?: boolean;
 };
 
 const JsonDefaultCard: React.FC<JsonDefaultCardProps> = ({
@@ -18,13 +21,28 @@ const JsonDefaultCard: React.FC<JsonDefaultCardProps> = ({
   children,
   extra,
   style = {},
+  hasBody,
 }) => {
   const { token } = theme.useToken();
+  const showBody = hasBody !== false;
 
   return (
     <Card
       title={<FieldTitle label={label} guide={guide} />}
       extra={extra}
+      styles={{
+        body: showBody
+          ? undefined
+          : {
+              display: "none",
+              padding: 0,
+            },
+        header: showBody
+          ? undefined
+          : {
+              borderBottom: 0,
+            },
+      }}
       style={{
         borderRadius: "12px",
         padding: "16px",
@@ -34,7 +52,7 @@ const JsonDefaultCard: React.FC<JsonDefaultCardProps> = ({
         ...style,
       }}
     >
-      {children}
+      {showBody ? children : null}
     </Card>
   );
 };

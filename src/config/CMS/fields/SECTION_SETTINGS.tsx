@@ -5,7 +5,6 @@ import {
     ChildNestedJsonField,
     ModalBehaviorType,
 
-    // enums + options
     TEXT_ALIGN_OPTIONS,
     VERTICAL_ALIGN_OPTIONS,
     BG_MODE_OPTIONS,
@@ -31,8 +30,9 @@ import {
 } from "../settings";
 import type { LanguageJson } from "@/utils/getTranslatedText";
 
-/** EXACT data shape produced by the form */
 export type SectionProps = {
+    enabled?: boolean;
+
     content?: {
         title?: LanguageJson;
         description?: LanguageJson;
@@ -51,7 +51,11 @@ export type SectionProps = {
             backgroundRepeat?: BgRepeat;
             backgroundAttachment?: BgAttachment;
         };
-        gradient?: { gradientFrom?: string; gradientTo?: string; gradientAngle?: number };
+        gradient?: {
+            gradientFrom?: string;
+            gradientTo?: string;
+            gradientAngle?: number;
+        };
         video?: {
             videoUrl?: string;
             videoPoster?: string;
@@ -77,7 +81,6 @@ export type SectionProps = {
             verticalAlign?: VerticalAlign;
         };
         spacing?: {
-            /** Single source of truth */
             padding?: BoxSides;
         };
         overflow?: { overflowMode?: OverflowMode };
@@ -98,33 +101,56 @@ export const SECTION = {
         [ModalBehaviorType.OPEN_IN_MODAL]: true,
         [ModalBehaviorType.ITEM_MODAL]: false,
     },
+    slots: {
+        extra: ["enabled"],
+    },
+
     fields: {
-        /* CONTENT */
+        enabled: {
+            label: "Enabled",
+            guide: "Turn this section on/off.",
+            formType: FormType.SWITCH,
+        },
+
         content: {
             label: "Content",
             type: NestedFieldType.JSON,
             design: JsonDesign.FLAT,
             fields: {
                 title: { label: "Title", formType: FormType.LANGUAGE_JSON_TEXT },
-                description: { label: "Subtitle", formType: FormType.LANGUAGE_JSON_TEXTAREA },
-                align: { label: "Text Align", formType: FormType.SELECT, options: TEXT_ALIGN_OPTIONS },
+                description: {
+                    label: "Subtitle",
+                    formType: FormType.LANGUAGE_JSON_TEXTAREA,
+                },
+                align: {
+                    label: "Text Align",
+                    formType: FormType.SELECT,
+                    options: TEXT_ALIGN_OPTIONS,
+                },
                 textColor: { label: "Text Color", formType: FormType.COLOR },
                 contentMaxWidth: { label: "Content Max Width", formType: FormType.SIZE },
             },
         } satisfies ChildNestedJsonField,
 
-        /* BACKGROUND */
         background: {
             label: "Background",
             type: NestedFieldType.JSON,
             design: JsonDesign.FLAT,
+            openInModalPlacement: "header",
+
+            modalBehavior: {
+                [ModalBehaviorType.OPEN_IN_MODAL]: true,
+                [ModalBehaviorType.ITEM_MODAL]: false,
+            },
             fields: {
                 mode: {
                     label: "Mode",
-                    guide: "Auto picks the first available: video → image → gradient → color → none.",
+                    guide:
+                        "Auto picks the first available: video → image → gradient → color → none.",
                     formType: FormType.SELECT,
                     options: BG_MODE_OPTIONS,
                 },
+
                 color: {
                     label: "Color",
                     type: NestedFieldType.JSON,
@@ -133,18 +159,32 @@ export const SECTION = {
                         backgroundColor: { label: "Background Color", formType: FormType.COLOR },
                     },
                 } satisfies ChildNestedJsonField,
+
                 image: {
                     label: "Image",
                     type: NestedFieldType.JSON,
                     design: JsonDesign.FLAT,
                     fields: {
                         backgroundImage: { label: "Image", formType: FormType.IMAGE_SELECTOR },
-                        backgroundSize: { label: "Size", formType: FormType.SELECT, options: BG_SIZE_OPTIONS },
+                        backgroundSize: {
+                            label: "Size",
+                            formType: FormType.SELECT,
+                            options: BG_SIZE_OPTIONS,
+                        },
                         backgroundPosition: { label: "Position", formType: FormType.TEXT },
-                        backgroundRepeat: { label: "Repeat", formType: FormType.SELECT, options: BG_REPEAT_OPTIONS },
-                        backgroundAttachment: { label: "Attachment", formType: FormType.SELECT, options: BG_ATTACH_OPTIONS },
+                        backgroundRepeat: {
+                            label: "Repeat",
+                            formType: FormType.SELECT,
+                            options: BG_REPEAT_OPTIONS,
+                        },
+                        backgroundAttachment: {
+                            label: "Attachment",
+                            formType: FormType.SELECT,
+                            options: BG_ATTACH_OPTIONS,
+                        },
                     },
                 } satisfies ChildNestedJsonField,
+
                 gradient: {
                     label: "Gradient",
                     type: NestedFieldType.JSON,
@@ -155,23 +195,26 @@ export const SECTION = {
                         gradientAngle: { label: "Angle (deg)", formType: FormType.NUMBER },
                     },
                 } satisfies ChildNestedJsonField,
+
                 video: {
                     label: "Video",
                     type: NestedFieldType.JSON,
                     design: JsonDesign.FLAT,
                     fields: {
-                        videoUrl: { label: "URL", formType: FormType.URL },
+                        videoUrl: { label: "URL", formType: FormType.VIDEO_SELECTOR },
                         videoPoster: { label: "Poster", formType: FormType.IMAGE_SELECTOR },
                         videoAutoplay: { label: "Autoplay", formType: FormType.BOOLEAN },
                         videoMuted: { label: "Muted", formType: FormType.BOOLEAN },
                         videoLoop: { label: "Loop", formType: FormType.BOOLEAN },
-                        videoPlaysInline: { label: "Plays Inline (iOS)", formType: FormType.BOOLEAN },
+                        videoPlaysInline: {
+                            label: "Plays Inline (iOS)",
+                            formType: FormType.BOOLEAN,
+                        },
                     },
                 } satisfies ChildNestedJsonField,
             },
         } satisfies ChildNestedJsonField,
 
-        /* OVERLAY */
         overlay: {
             label: "Overlay",
             type: NestedFieldType.JSON,
@@ -187,7 +230,6 @@ export const SECTION = {
             },
         } satisfies ChildNestedJsonField,
 
-        /* LAYOUT */
         layout: {
             label: "Layout",
             type: NestedFieldType.JSON,
@@ -202,7 +244,11 @@ export const SECTION = {
                         minHeight: { label: "Min Height", formType: FormType.SIZE },
                         maxHeightEnabled: { label: "Force Max Height", formType: FormType.BOOLEAN },
                         maxHeight: { label: "Max Height", formType: FormType.SIZE },
-                        verticalAlign: { label: "Vertical Align", formType: FormType.SELECT, options: VERTICAL_ALIGN_OPTIONS },
+                        verticalAlign: {
+                            label: "Vertical Align",
+                            formType: FormType.SELECT,
+                            options: VERTICAL_ALIGN_OPTIONS,
+                        },
                     },
                 } satisfies ChildNestedJsonField,
 
@@ -220,7 +266,11 @@ export const SECTION = {
                     type: NestedFieldType.JSON,
                     design: JsonDesign.FLAT,
                     fields: {
-                        overflowMode: { label: "Overflow Mode", formType: FormType.SELECT, options: OVERFLOW_MODE_OPTIONS },
+                        overflowMode: {
+                            label: "Overflow Mode",
+                            formType: FormType.SELECT,
+                            options: OVERFLOW_MODE_OPTIONS,
+                        },
                     },
                 } satisfies ChildNestedJsonField,
 
@@ -229,8 +279,16 @@ export const SECTION = {
                     type: NestedFieldType.JSON,
                     design: JsonDesign.FLAT,
                     fields: {
-                        align: { label: "Align Items", formType: FormType.SELECT, options: FLEX_ALIGN_ITEMS_OPTIONS },
-                        justify: { label: "Justify Items", formType: FormType.SELECT, options: FLEX_JUSTIFY_CONTENT_OPTIONS },
+                        align: {
+                            label: "Align Items",
+                            formType: FormType.SELECT,
+                            options: FLEX_ALIGN_ITEMS_OPTIONS,
+                        },
+                        justify: {
+                            label: "Justify Items",
+                            formType: FormType.SELECT,
+                            options: FLEX_JUSTIFY_CONTENT_OPTIONS,
+                        },
                         wrap: { label: "Wrap", formType: FormType.BOOLEAN },
                         gap: { label: "Gap", guide: 'e.g. "16px" or "1rem"', formType: FormType.SIZE },
                     },

@@ -2,6 +2,7 @@ export enum FormType {
   TEXT = "text",
   NUMBER = "number",
   BOOLEAN = "boolean",
+  SWITCH = "switch",
   URL = "url",
   FILE = "file",
   SELECT = "select",
@@ -10,6 +11,7 @@ export enum FormType {
   TEXTAREA = "textarea",
   CUSTOM_FILE = "custom-file",
   IMAGE_SELECTOR = "image-selector",
+  VIDEO_SELECTOR = "video-selector",
   ICON_SELECTOR = "icon-selector",
   ROLE_SELECTOR = "role-selector",
   USER_SELECTOR = "user-selector",
@@ -144,8 +146,6 @@ export const OVERFLOW_MODE_OPTIONS: { label: string; value: OverflowModeValue }[
   { label: "Clip (hide overflow)", value: OverflowMode.CLIP },
   { label: "Scrollable (inner scroll)", value: OverflowMode.SCROLL },
 ];
-
-
 export enum FlexAlignItems {
   START = "start",
   CENTER = "center",
@@ -209,12 +209,78 @@ export type ModalBehavior = {
 };
 
 export enum JsonDesign {
+  CARD = "card",
   FLAT = "flat",
   FLAT_OUTSIDE = "flat_outside",
-  CARD = "card",
   PARENT = "parent",
+  PAGE_SECTION = "page_section",
   NONE = "none",
 }
+
+export enum HorizontalSide {
+  AUTO = "auto",
+  LEFT = "left",
+  RIGHT = "right",
+}
+export type HorizontalSideValue =
+  | HorizontalSide.AUTO
+  | HorizontalSide.LEFT
+  | HorizontalSide.RIGHT;
+
+export const HORIZONTAL_SIDE_OPTIONS: { label: string; value: HorizontalSideValue }[] = [
+  { label: "Auto", value: HorizontalSide.AUTO },
+  { label: "Left", value: HorizontalSide.LEFT },
+  { label: "Right", value: HorizontalSide.RIGHT },
+];
+
+export enum FlowDirection {
+  AUTO = "auto",
+  LTR = "ltr",
+  RTL = "rtl",
+}
+export type FlowDirectionValue =
+  | FlowDirection.AUTO
+  | FlowDirection.LTR
+  | FlowDirection.RTL;
+
+export const FLOW_DIRECTION_OPTIONS: { label: string; value: FlowDirectionValue }[] = [
+  { label: "Auto", value: FlowDirection.AUTO },
+  { label: "Left → Right", value: FlowDirection.LTR },
+  { label: "Right → Left", value: FlowDirection.RTL },
+];
+
+export enum ButtonVariant {
+  PRIMARY = "primary",
+  DEFAULT = "default",
+  DASHED = "dashed",
+  LINK = "link",
+  TEXT = "text",
+}
+export type ButtonVariantValue =
+  | ButtonVariant.PRIMARY
+  | ButtonVariant.DEFAULT
+  | ButtonVariant.DASHED
+  | ButtonVariant.LINK
+  | ButtonVariant.TEXT;
+
+export const BUTTON_VARIANT_OPTIONS: { label: string; value: ButtonVariantValue }[] = [
+  { label: "Primary", value: ButtonVariant.PRIMARY },
+  { label: "Default", value: ButtonVariant.DEFAULT },
+  { label: "Dashed", value: ButtonVariant.DASHED },
+  { label: "Link", value: ButtonVariant.LINK },
+  { label: "Text", value: ButtonVariant.TEXT },
+];
+
+export enum LinkTargetMode {
+  SAME_TAB = "same_tab",
+  NEW_TAB = "new_tab",
+}
+export type LinkTargetModeValue = LinkTargetMode.SAME_TAB | LinkTargetMode.NEW_TAB;
+
+export const LINK_TARGET_OPTIONS: { label: string; value: LinkTargetModeValue }[] = [
+  { label: "Same tab", value: LinkTargetMode.SAME_TAB },
+  { label: "New tab", value: LinkTargetMode.NEW_TAB },
+];
 
 export enum ArrayDesign {
   FLAT = "flat",
@@ -247,7 +313,14 @@ export enum FieldDesign {
   PARENT = "parent",
   ROW = "row",
 }
+export type SlotsShape = {
+  body?: readonly string[];
+  extra?: readonly string[];
+  hidden?: readonly string[];
+};
 
+export type OpenInModalPlacement = "header" | "body";
+export type RenderSurface = OpenInModalPlacement ;
 interface BaseParentField {
   label?: string;
   guide?: string;
@@ -278,13 +351,12 @@ export interface FieldInfo extends BaseParentField {
 
 export interface NestedJsonField extends BaseParentField {
   design?: JsonDesign;
-  modalBehavior?: ModalBehavior;
   type: NestedFieldType.JSON;
-  fields: Record<
-    string,
-    ChildFieldInfo | ChildNestedJsonField | ChildNestedArrayField
-  >;
+  fields: Record<string, ChildFieldInfo | ChildNestedJsonField | ChildNestedArrayField>;
   jsonFunctionalities?: JsonFunctionality[];
+  slots?: SlotsShape;
+  modalBehavior?: ModalBehavior;
+  openInModalPlacement?: OpenInModalPlacement;
 }
 
 export interface NestedArrayField extends BaseParentField {
@@ -309,14 +381,12 @@ export interface ChildFieldInfo extends BaseChildField {
 export interface ChildNestedJsonField extends BaseChildField {
   visibility?: "public" | "private";
   design?: JsonDesign;
-  modalBehavior?: ModalBehavior;
-
   type: NestedFieldType.JSON;
-  fields: Record<
-    string,
-    ChildFieldInfo | ChildNestedJsonField | ChildNestedArrayField
-  >;
+  fields: Record<string, ChildFieldInfo | ChildNestedJsonField | ChildNestedArrayField>;
   jsonFunctionalities?: JsonFunctionality[];
+  slots?: SlotsShape;
+  modalBehavior?: ModalBehavior;
+  openInModalPlacement?: OpenInModalPlacement;
 }
 
 export interface ChildNestedArrayField extends BaseChildField {

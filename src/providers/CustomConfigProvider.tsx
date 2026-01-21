@@ -30,6 +30,7 @@ const CustomConfigProvider: React.FC<CustomConfigProviderProps> = ({
     <ConfigProvider
       theme={{
         algorithm: algorithm,
+        zeroRuntime: true
       }}
     >
       {children}

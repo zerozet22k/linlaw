@@ -1,22 +1,22 @@
-import { useState, useCallback } from "react";
+"use client";
+
+import { useState, useCallback, useRef } from "react";
 import { FileTypeWithEmpty } from "@/models/FileModel";
 
 export const useFileModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileType, setFileType] = useState<FileTypeWithEmpty>("");
   const [modalZIndex, setModalZIndex] = useState(1000);
-  const [onSelectFileCallback, setOnSelectFileCallback] = useState<
-    ((fileUrl: string) => void) | null
-  >(null);
 
-  // Open Modal with provided callback, file type and zIndex
+  const onSelectRef = useRef<((fileUrl: string) => void) | null>(null);
+
   const openModal = useCallback(
     (
       onSelectFile: (fileUrl: string) => void,
       type: FileTypeWithEmpty = "",
       zIndex = 1000
     ) => {
-      setOnSelectFileCallback(() => onSelectFile);
+      onSelectRef.current = onSelectFile;
       setFileType(type);
       setModalZIndex(zIndex);
       setIsModalOpen(true);
@@ -24,21 +24,14 @@ export const useFileModal = () => {
     []
   );
 
-  // Close Modal
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
   }, []);
 
-  // Handle file selection and execute callback
-  const handleSelectFile = useCallback(
-    (fileUrl: string) => {
-      if (onSelectFileCallback) {
-        onSelectFileCallback(fileUrl);
-      }
-      setIsModalOpen(false);
-    },
-    [onSelectFileCallback]
-  );
+  const handleSelectFile = useCallback((fileUrl: string) => {
+    onSelectRef.current?.(fileUrl);
+    setIsModalOpen(false);
+  }, []);
 
   return {
     isModalOpen,

@@ -1,10 +1,9 @@
 "use client";
-import React, { CSSProperties } from "react";
-import { Typography, theme } from "antd";
-import { lighten, darken } from "polished";
 
-import ImageSelector from "./ImageSelector";
-import { defaultCardStyle } from "../../InputStyle";
+import React, { CSSProperties, useMemo } from "react";
+import { Typography } from "antd";
+import MediaSelector from "./MediaSelector";
+import { FileType } from "@/models/FileModel";
 
 interface ResponsiveImagesValue {
   desktop?: string;
@@ -18,88 +17,95 @@ interface ResponsiveImagesInputProps {
   style?: CSSProperties;
 }
 
+const BASE_W = 1920;
+const BASE_H = 1080;
+const ASPECT = BASE_W / BASE_H;
+
+function frameFromHeight(h: number) {
+  return {
+    width: Math.round(h * ASPECT),
+    height: Math.round(h),
+  };
+}
+
 const ResponsiveImagesInput: React.FC<ResponsiveImagesInputProps> = ({
   value = {},
   onChange,
   style,
 }) => {
-  const { token } = theme.useToken();
-
-  const baseColor = token.colorBgContainer;
-  const lightShade = lighten(0.05, baseColor);
-  const darkShade = darken(0.1, baseColor);
-
   const handleChange = (key: keyof ResponsiveImagesValue, url: string) => {
-    onChange?.({
-      ...value,
-      [key]: url,
-    });
+    onChange?.({ ...value, [key]: url });
   };
 
-  const desktopPreviewContainerStyle: CSSProperties = {
-    textAlign: "left",
-  };
 
-  const desktopPreviewImageStyle: CSSProperties = {
-    width: "160px",
-    height: "90px",
-    objectFit: "cover",
-  };
+  const OUTER_PREVIEW_HEIGHT = 280;
 
-  const tabletPreviewContainerStyle: CSSProperties = {
-    textAlign: "center",
-  };
-  const tabletPreviewImageStyle: CSSProperties = {
-    width: "120px",
-    height: "80px",
-    objectFit: "cover",
-  };
 
-  const mobilePreviewContainerStyle: CSSProperties = {
-    textAlign: "center",
-  };
-  const mobilePreviewImageStyle: CSSProperties = {
-    width: "80px",
-    height: "100px",
-    objectFit: "cover",
-  };
+  const rows = useMemo(
+    () =>
+      [
+        {
+          key: "desktop" as const,
+          label: "Desktop Image",
+          previewHeight: OUTER_PREVIEW_HEIGHT,
+          frameH: 236,
+          objectFit: "cover" as const,
+          objectPosition: "center" as const,
+        },
+        {
+          key: "tablet" as const,
+          label: "Tablet Image",
+          previewHeight: OUTER_PREVIEW_HEIGHT,
+          frameH: 210,
+          objectFit: "cover" as const,
+          objectPosition: "center" as const,
+        },
+        {
+          key: "mobile" as const,
+          label: "Mobile Image",
+          previewHeight: OUTER_PREVIEW_HEIGHT,
+          frameH: 185,
+          objectFit: "cover" as const,
+          objectPosition: "center" as const,
+        },
+      ].map((r) => {
+        const frame = frameFromHeight(r.frameH);
+        return {
+          ...r,
+          tileFrameStyle: {
+            width: frame.width,
+            height: frame.height,
+          } satisfies CSSProperties,
+        };
+      }),
+    []
+  );
 
   return (
-    <div
-      style={{
-        ...defaultCardStyle,
-        padding: "12px",
-        backgroundColor: lightShade,
-        border: `2px dashed ${darkShade}`,
-        ...style,
-      }}
-    >
-      <Typography.Text strong>Desktop Image</Typography.Text>
-      <ImageSelector
-        value={value.desktop || ""}
-        onChange={(url) => handleChange("desktop", url)}
-        preview={true}
-        previewContainerStyle={desktopPreviewContainerStyle}
-        previewImageStyle={desktopPreviewImageStyle}
-      />
+    <div style={{ display: "flex", flexDirection: "column", gap: 14, ...style }}>
+      {rows.map((row) => (
+        <div key={row.key}>
+          <Typography.Text strong>{row.label}</Typography.Text>
 
-      <Typography.Text strong>Tablet Image</Typography.Text>
-      <ImageSelector
-        value={value.tablet || ""}
-        onChange={(url) => handleChange("tablet", url)}
-        preview={true}
-        previewContainerStyle={tabletPreviewContainerStyle}
-        previewImageStyle={tabletPreviewImageStyle}
-      />
-
-      <Typography.Text strong>Mobile Image</Typography.Text>
-      <ImageSelector
-        value={value.mobile || ""}
-        onChange={(url) => handleChange("mobile", url)}
-        preview={true}
-        previewContainerStyle={mobilePreviewContainerStyle}
-        previewImageStyle={mobilePreviewImageStyle}
-      />
+          <div style={{ marginTop: 8 }}>
+            <MediaSelector
+              value={value[row.key] || ""}
+              onChange={(url) => handleChange(row.key, url)}
+              fileType={FileType.IMAGE}
+              preview
+              previewMode="tile"
+              showField={false}
+              placeholder={row.label.replace(" Image", "")}
+              previewHeight={row.previewHeight}
+              tileFrameStyle={row.tileFrameStyle}
+              previewMediaStyle={{
+                objectFit: row.objectFit,
+                objectPosition: row.objectPosition,
+              }}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

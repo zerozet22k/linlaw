@@ -11,7 +11,7 @@ export default function FileUploadPage() {
     <div style={{ maxWidth: 800, margin: "40px auto", padding: "20px" }}>
       <Card
         title={<Title level={3}>File Upload Page</Title>}
-        bordered={false}
+        variant="borderless"
         style={{
           borderRadius: 10,
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",

@@ -15,7 +15,6 @@ export async function GET(
 
   const repo = new RelatedBusinessRepository();
   const business = await repo.findById(new Types.ObjectId(params.id));
-  console.log(business,params.id)
   if (!business) {
     return NextResponse.json({ message: "Not found" }, { status: 404 });
   }

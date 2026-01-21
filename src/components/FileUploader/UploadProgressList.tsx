@@ -13,7 +13,7 @@ export default function UploadProgressList() {
     <>
       {pendingFiles.length > 0 && (
         <>
-          <Divider orientation="left">Uploading Files</Divider>
+          <Divider titlePlacement="start">Uploading Files</Divider>
           <List
             bordered
             dataSource={pendingFiles}
@@ -34,7 +34,7 @@ export default function UploadProgressList() {
 
       {uploadedFiles.length > 0 && (
         <>
-          <Divider orientation="left">Uploaded Files</Divider>
+          <Divider titlePlacement="start">Uploaded Files</Divider>
           <List
             bordered
             dataSource={uploadedFiles}
@@ -58,7 +58,7 @@ export default function UploadProgressList() {
 
       {failedFiles.length > 0 && (
         <>
-          <Divider orientation="left">Failed Files</Divider>
+          <Divider titlePlacement="start">Failed Files</Divider>
           <List
             bordered
             dataSource={failedFiles}

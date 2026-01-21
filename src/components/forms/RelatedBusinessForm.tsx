@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import LanguageJsonTextInput from "../inputs/standalone/LanguageJsonTextInput";
 import LanguageJsonTextarea from "../inputs/standalone/LanguageJsonTextarea";
-import ImageSelector from "@/components/inputs/standalone/ImageSelection";
+import ImageSelection from "@/components/inputs/standalone/ImageSelection";
 
 const DAY_OPTIONS = [
     "Monday",
@@ -164,7 +164,6 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
     };
 
     const onFinish = async (values: any) => {
-        // hard validate EN title (source-of-truth)
         const en = getEn(values.title);
         if (!en) {
             message.error("Title (EN) is required.");
@@ -388,7 +387,7 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
                                             },
                                         ]}
                                     >
-                                        <ImageSelector />
+                                        <ImageSelection />
                                     </Form.Item>
                                 </Col>
 

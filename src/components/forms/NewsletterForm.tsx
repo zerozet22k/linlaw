@@ -186,7 +186,6 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
       title={currentNewsletter?._id ? "Edit Newsletter" : "Create Newsletter"}
       style={{ maxWidth: 700, margin: "20px auto", padding: 24 }}
     >
-      {/* Main Newsletter Form */}
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Title"
@@ -205,11 +204,9 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
       </Form>
 
       <Divider />
-
-      {/* Attachment Section: Visible only when newsletter exists */}
       {currentNewsletter?._id && (
         <Card type="inner" title="Attachments" style={{ marginTop: 16 }}>
-          <Space direction="vertical" style={{ width: "100%" }}>
+          <Space orientation="vertical" style={{ width: "100%" }}>
             <Space>
               <Upload beforeUpload={handleBeforeUpload} showUploadList={false}>
                 <Button icon={<UploadOutlined />}>Select File</Button>
@@ -229,7 +226,7 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
             )}
             {currentNewsletter.fileAttachments?.length > 0 && (
               <>
-                <Divider orientation="left">Existing Attachments</Divider>
+                <Divider titlePlacement="start">Existing Attachments</Divider>
                 {currentNewsletter.fileAttachments.map((attachment) => (
                   <Space
                     key={attachment._id}
@@ -255,8 +252,9 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
             )}
           </Space>
         </Card>
-      )}
-    </Card>
+      )
+      }
+    </Card >
   );
 };
 

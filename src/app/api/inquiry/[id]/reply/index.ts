@@ -24,7 +24,6 @@ async function handleAddReplyRequest(
     }
 
     const existingInquiry = await inquiryService.getInquiryById(params.id);
-    console.log('u smoking',params.id)
     if (!existingInquiry) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }

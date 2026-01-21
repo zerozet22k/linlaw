@@ -7,6 +7,7 @@ import {
   ChildNestedJsonField,
   ChildNestedArrayField,
   NestedFieldType,
+  RenderSurface,
 } from "@/config/CMS/settings";
 
 type CombinedFieldProps = {
@@ -15,6 +16,7 @@ type CombinedFieldProps = {
   values: any;
   onChange: (key: string, value: any, type: string) => void;
   zIndex?: number;
+  surface?: RenderSurface;
 };
 
 const isFieldInfo = (
@@ -27,6 +29,7 @@ const CombinedField: React.FC<CombinedFieldProps> = ({
   values,
   onChange,
   zIndex = 1000,
+  surface = "body",
 }) => {
   if ("fields" in config) {
     if (config.type === NestedFieldType.ARRAY) {
@@ -36,6 +39,7 @@ const CombinedField: React.FC<CombinedFieldProps> = ({
           value={values || []}
           onChange={(value) => onChange(keyPrefix, value, "array")}
           zIndex={zIndex + 1}
+      
         />
       );
     }
@@ -43,10 +47,11 @@ const CombinedField: React.FC<CombinedFieldProps> = ({
     if (config.type === NestedFieldType.JSON) {
       return (
         <JsonFieldRenderer
-          config={config}
+          config={config as any}
           value={values || {}}
           onChange={(value) => onChange(keyPrefix, value, "json")}
           zIndex={zIndex + 1}
+          surface={surface}
         />
       );
     }
@@ -58,10 +63,9 @@ const CombinedField: React.FC<CombinedFieldProps> = ({
         config={config}
         value={values}
         onChange={(value) => onChange(keyPrefix, value, config.formType)}
-        style={{
-          position: "relative",
-        }}
+        style={{ position: "relative" }}
         zIndex={zIndex + 1}
+        surface={surface}  
       />
     );
   }
