@@ -92,13 +92,13 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
       >
         <Link href="/" style={{ display: "flex", alignItems: "center", height: 80 }}>
           {logoSrc ? (
-            <div style={{ position: "relative", height: 80, width: 220 }}>
+            <div style={{ position: "relative", height: 80, width: 80 }}>
               <Image
                 src={logoSrc}
                 alt={logoAlt}
                 fill
                 priority
-                sizes="220px"
+                sizes="80px"
                 style={{ objectFit: "contain" }}
               />
             </div>

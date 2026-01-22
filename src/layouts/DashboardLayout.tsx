@@ -49,24 +49,21 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           styles={{ body: { padding: 0, background: colorBgContainer } }}
           onClose={handleDrawerToggle}
           open={drawerVisible}
-          width={220}
+          size={200}
         >
           <div
             className="logo"
             style={{
               display: "flex",
-              justifyContent: "center",
-              padding: "10px 12px",
             }}
           >
             <Link href="/" style={{ width: "100%" }}>
-              <div style={{ position: "relative", width: "100%", height: 64 }}>
+              <div style={{ position: "relative", width: "100%", height: 200 }}>
                 <Image
                   src={siteLogo}
                   alt={siteName}
                   fill
                   priority
-                  sizes="220px"
                   style={{ objectFit: "contain" }}
                 />
               </div>
@@ -85,7 +82,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           collapsible
           collapsed={collapsed}
           onCollapse={setCollapsed}
-          width={220}
+          width={200}
           collapsedWidth={80}
           style={{
             overflow: "auto",
@@ -102,17 +99,17 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
             style={{
               display: "flex",
               justifyContent: "center",
-              padding: "10px 12px",
+              padding: "4px",
             }}
           >
             <Link href="/" style={{ width: "100%" }}>
-              <div style={{ position: "relative", width: "100%", height: 72 }}>
+              <div style={{ position: "relative", width: "100%", height: collapsed ? 80 : 200 }}>
                 <Image
                   src={siteLogo}
                   alt={siteName}
                   fill
                   priority
-                  sizes="220px"
+                  sizes="200px"
                   style={{ objectFit: "contain" }}
                 />
               </div>
@@ -130,7 +127,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
 
       <Layout
         style={{
-          marginLeft: isMobile ? 0 : collapsed ? 80 : 220,
+          marginLeft: isMobile ? 0 : collapsed ? 80 : 80,
           transition: "margin-left 0.2s ease",
         }}
       >

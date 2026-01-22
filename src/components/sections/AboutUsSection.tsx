@@ -72,6 +72,7 @@ export default function AboutUsSection({ data, language }: Props) {
         margin: "0 auto",
         paddingInline: padInline,
         boxSizing: "border-box",
+        
       }}
     >
       <div
