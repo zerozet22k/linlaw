@@ -127,7 +127,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
 
       <Layout
         style={{
-          marginLeft: isMobile ? 0 : collapsed ? 80 : 80,
+          marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
           transition: "margin-left 0.2s ease",
         }}
       >
