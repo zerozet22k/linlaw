@@ -21,20 +21,11 @@ import { useLanguage } from "@/hooks/useLanguage";
 import SectionList, { SectionListItem } from "@/components/sections/layout/SectionList";
 import RelatedBusinessesSection from "@/components/sections/RelatedBusinessesSection";
 import PromoShowcaseSection from "@/components/sections/PromoShowcaseSection";
+import { IDS } from "./pageid";
 
 const { Content } = Layout;
 
-const IDS = {
-  PROMO_SHOWCASE: "promo-showcase",
-  RELATED_BUSINESSES: "related-businesses",
-  SERVICES: "services",
-  ABOUT: "about",
-  FAQ: "faq",
-  NEWSLETTERS: "news",
-  TESTIMONIALS: "testimonials",
-  CONTACT: "contact",
-  CONTACT_INFO: "contact-info",
-} as const;
+;
 
 type Props = { data: HOME_PAGE_SETTINGS_TYPES };
 
@@ -58,6 +49,7 @@ const HomePageContent: React.FC<Props> = ({ data }) => {
     { id: IDS.NEWSLETTERS, node: <NewsletterSection data={newsletters} language={language} /> },
     { id: IDS.FAQ, node: <FAQSection data={faq} language={language} /> },
     { id: IDS.TESTIMONIALS, node: <TestimonialsSection data={testimonials} language={language} /> },
+    { id: IDS.CONTACT, node: <ClickToAction /> },
   ];
 
 
@@ -66,7 +58,6 @@ const HomePageContent: React.FC<Props> = ({ data }) => {
       <Content style={{ margin: 0 }}>
         <HeroSliderSection slides={heroSlides} delay={5000} />
         <SectionList sections={sections} zebra />
-        <ClickToAction />
       </Content>
     </Layout>
   );
