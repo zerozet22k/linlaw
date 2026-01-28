@@ -5,6 +5,7 @@ import { Layout, Typography } from "antd";
 import ClickToAction from "../sections/ClickToAction";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
+import { cssUrl } from "@/utils/cssUrl";
 
 const { Title, Paragraph } = Typography;
 const { Content } = Layout;
@@ -36,7 +37,10 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
             height: 350,
             ...(pageContent?.backgroundImage
               ? {
-                background: `url('${pageContent.backgroundImage}') center/cover no-repeat`,
+                backgroundImage: cssUrl(pageContent.backgroundImage),
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
               }
               : {}),
             position: "relative",
@@ -102,7 +106,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
         </div>
       </Content>
 
-      <div style={{ width: "100%" , paddingTop: "0px", paddingBottom: "30px" }}>
+      <div style={{ width: "100%", paddingTop: "0px", paddingBottom: "30px" }}>
         <ClickToAction />
       </div>
     </Layout>

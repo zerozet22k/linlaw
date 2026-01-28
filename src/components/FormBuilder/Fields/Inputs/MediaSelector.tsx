@@ -195,7 +195,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const hasCustomSize =
     previewMediaStyle?.width != null || previewMediaStyle?.height != null;
 
-  const objectFit = (previewMediaStyle as any)?.objectFit ?? "cover";
+  const objectFit = (previewMediaStyle as any)?.objectFit ?? "contain";
   const objectPosition = (previewMediaStyle as any)?.objectPosition ?? "center";
 
   // inner frame constraints

@@ -29,16 +29,17 @@ import {
     hexToRgba,
 } from "@/utils/cssMaps";
 import { SectionProps } from "@/config/CMS/fields/SECTION_SETTINGS";
+import { cssUrl } from "@/utils/cssUrl";
 
 export type SectionListItem = {
     id: string;
     node: React.ReactNode;
 
-    // optional overrides (rarely needed once CMS is consistent)
+
     title?: LanguageJson | string;
     description?: LanguageJson | string;
 
-    // manual override (still useful for “force show/hide”)
+
     show?: boolean;
 
     background?: string;
@@ -105,11 +106,11 @@ const SectionList: React.FC<SectionListProps> = ({
         const payload = extractPayload(item.node);
         if (!payload) return true;
 
-        // enabled
+
         const sectionLike = (payload?.section ?? payload) as any;
         if (typeof sectionLike?.enabled === "boolean" && sectionLike.enabled === false) return false;
 
-        // stripping (only when the payload actually has these arrays)
+
         const items = (payload as any)?.items;
         if (Array.isArray(items) && items.length === 0) return false;
 
@@ -203,8 +204,7 @@ const SectionList: React.FC<SectionListProps> = ({
 
                 let backgroundImageCss: string | undefined;
                 if (effectiveSource === BgMode.IMAGE && bgImage) {
-                    const safeUrl = String(bgImage).trim().replace(/"/g, '\\"');
-                    backgroundImageCss = `url("${safeUrl}")`;
+                    backgroundImageCss = cssUrl(bgImage);
                 } else if (effectiveSource === BgMode.GRADIENT && gradientFrom && gradientTo) {
                     const angle = Number.isFinite(gradientAngle as number) ? (gradientAngle as number) : 135;
                     backgroundImageCss = `linear-gradient(${angle}deg, ${gradientFrom}, ${gradientTo})`;

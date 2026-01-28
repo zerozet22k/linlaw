@@ -1,0 +1,292 @@
+"filename", "language", "JSON", "JSON with Comments", "Markdown", "TypeScript", "JavaScript", "Batch", "TypeScript JSX", "HTML", "XML", "PostCSS", "comment", "blank", "total"
+"c:\Code\2024\linlaw\.eslintrc.json", "JSON with Comments", 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"c:\Code\2024\linlaw\README.md", "Markdown", 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 6, 14
+"c:\Code\2024\linlaw\cors.json", "JSON", 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"c:\Code\2024\linlaw\next.config.mjs", "JavaScript", 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 3, 20
+"c:\Code\2024\linlaw\package-lock.json", "JSON", 8229, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8230
+"c:\Code\2024\linlaw\package.json", "JSON", 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 101
+"c:\Code\2024\linlaw\postcss.config.mjs", "JavaScript", 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 1, 2, 10
+"c:\Code\2024\linlaw\public\images\googlec6edda4dd1f1d963.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Code\2024\linlaw\public\images\logo.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"c:\Code\2024\linlaw\public\images\site.webmanifest", "JSON", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Code\2024\linlaw\push_all.bat", "Batch", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 4, 26
+"c:\Code\2024\linlaw\src\ThirdPartyServices\FirebaseService.ts", "TypeScript", 0, 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 18, 110
+"c:\Code\2024\linlaw\src\ThirdPartyServices\PusherService.ts", "TypeScript", 0, 0, 0, 79, 0, 0, 0, 0, 0, 0, 0, 13, 92
+"c:\Code\2024\linlaw\src\app\api\auth\login\route.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 14, 72
+"c:\Code\2024\linlaw\src\app\api\auth\logout\route.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 2, 10, 59
+"c:\Code\2024\linlaw\src\app\api\auth\refresh\route.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 1, 17, 119
+"c:\Code\2024\linlaw\src\app\api\auth\signup\route.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 13, 72
+"c:\Code\2024\linlaw\src\app\api\contact-us\route.ts", "TypeScript", 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 2, 12, 64
+"c:\Code\2024\linlaw\src\app\api\data\route.ts", "TypeScript", 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 0, 12, 107
+"c:\Code\2024\linlaw\src\app\api\files\[id]\route.ts", "TypeScript", 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 7, 55
+"c:\Code\2024\linlaw\src\app\api\files\route.ts", "TypeScript", 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 8, 58
+"c:\Code\2024\linlaw\src\app\api\files\signedUrl\route.ts", "TypeScript", 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 6, 37
+"c:\Code\2024\linlaw\src\app\api\files\sync\route.ts", "TypeScript", 0, 0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 10, 56
+"c:\Code\2024\linlaw\src\app\api\inquiry\[id]\reply\[replyId].ts", "TypeScript", 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 0, 11, 73
+"c:\Code\2024\linlaw\src\app\api\inquiry\[id]\reply\index.ts", "TypeScript", 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 9, 74
+"c:\Code\2024\linlaw\src\app\api\inquiry\[id]\route.ts", "TypeScript", 0, 0, 0, 143, 0, 0, 0, 0, 0, 0, 3, 20, 166
+"c:\Code\2024\linlaw\src\app\api\inquiry\route.ts", "TypeScript", 0, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 13, 76
+"c:\Code\2024\linlaw\src\app\api\me\getSignedUrl\route.ts", "TypeScript", 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 8, 57
+"c:\Code\2024\linlaw\src\app\api\me\route.ts", "TypeScript", 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 14, 81
+"c:\Code\2024\linlaw\src\app\api\newsletters\[newsletterId]\attachment\[attachmentId]\route.ts", "TypeScript", 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 4, 87
+"c:\Code\2024\linlaw\src\app\api\newsletters\[newsletterId]\attachment\route.ts", "TypeScript", 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 4, 48
+"c:\Code\2024\linlaw\src\app\api\newsletters\[newsletterId]\attachment\signurl\route.ts", "TypeScript", 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 5, 45
+"c:\Code\2024\linlaw\src\app\api\newsletters\[newsletterId]\route.ts", "TypeScript", 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 5, 105
+"c:\Code\2024\linlaw\src\app\api\newsletters\route.ts", "TypeScript", 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 4, 59
+"c:\Code\2024\linlaw\src\app\api\pages\route.ts", "TypeScript", 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 3, 9, 62
+"c:\Code\2024\linlaw\src\app\api\related-businesses\id\[id]\route.ts", "TypeScript", 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 15, 76
+"c:\Code\2024\linlaw\src\app\api\related-businesses\route.ts", "TypeScript", 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 2, 10, 62
+"c:\Code\2024\linlaw\src\app\api\related-businesses\slug\[slug]\route.ts", "TypeScript", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 1, 7, 24
+"c:\Code\2024\linlaw\src\app\api\roles\[id]\route.ts", "TypeScript", 0, 0, 0, 134, 0, 0, 0, 0, 0, 0, 3, 8, 145
+"c:\Code\2024\linlaw\src\app\api\roles\route.ts", "TypeScript", 0, 0, 0, 87, 0, 0, 0, 0, 0, 0, 0, 6, 93
+"c:\Code\2024\linlaw\src\app\api\send-emails\route.ts", "TypeScript", 0, 0, 0, 75, 0, 0, 0, 0, 0, 0, 0, 8, 83
+"c:\Code\2024\linlaw\src\app\api\settings\key\[key]\route.ts", "TypeScript", 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 6, 39
+"c:\Code\2024\linlaw\src\app\api\settings\public\route.ts", "TypeScript", 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 5, 23
+"c:\Code\2024\linlaw\src\app\api\settings\route.ts", "TypeScript", 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 10, 64
+"c:\Code\2024\linlaw\src\app\api\setup\route.ts", "TypeScript", 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 7, 47
+"c:\Code\2024\linlaw\src\app\api\team\[id]\route.ts", "TypeScript", 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 4, 25
+"c:\Code\2024\linlaw\src\app\api\team\route.ts", "TypeScript", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 8, 45
+"c:\Code\2024\linlaw\src\app\api\users\[id]\getSignedUrl\route.ts", "TypeScript", 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 9, 66
+"c:\Code\2024\linlaw\src\app\api\users\[id]\route.ts", "TypeScript", 0, 0, 0, 164, 0, 0, 0, 0, 0, 0, 9, 13, 186
+"c:\Code\2024\linlaw\src\app\api\users\route.ts", "TypeScript", 0, 0, 0, 87, 0, 0, 0, 0, 0, 0, 1, 9, 97
+"c:\Code\2024\linlaw\src\app\careers\content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 376, 0, 0, 0, 0, 48, 424
+"c:\Code\2024\linlaw\src\app\careers\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 1, 6, 27
+"c:\Code\2024\linlaw\src\app\content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 1, 14, 67
+"c:\Code\2024\linlaw\src\app\dashboard\files\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 316, 0, 0, 0, 9, 43, 368
+"c:\Code\2024\linlaw\src\app\dashboard\files\upload\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 4, 26
+"c:\Code\2024\linlaw\src\app\dashboard\newsletters\[newsletterId]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 7, 107
+"c:\Code\2024\linlaw\src\app\dashboard\newsletters\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 4, 15
+"c:\Code\2024\linlaw\src\app\dashboard\newsletters\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 278, 0, 0, 0, 3, 17, 298
+"c:\Code\2024\linlaw\src\app\dashboard\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 194, 0, 0, 0, 4, 26, 224
+"c:\Code\2024\linlaw\src\app\dashboard\pages\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 0, 22, 150
+"c:\Code\2024\linlaw\src\app\dashboard\related-businesses\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 9, 110
+"c:\Code\2024\linlaw\src\app\dashboard\related-businesses\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 4, 11
+"c:\Code\2024\linlaw\src\app\dashboard\related-businesses\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 243, 0, 0, 0, 1, 22, 266
+"c:\Code\2024\linlaw\src\app\dashboard\roles\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 7, 108
+"c:\Code\2024\linlaw\src\app\dashboard\roles\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 3, 14
+"c:\Code\2024\linlaw\src\app\dashboard\roles\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 210, 0, 0, 0, 1, 14, 225
+"c:\Code\2024\linlaw\src\app\dashboard\send-emails\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 247, 0, 0, 0, 0, 15, 262
+"c:\Code\2024\linlaw\src\app\dashboard\settings\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 137, 0, 0, 0, 1, 26, 164
+"c:\Code\2024\linlaw\src\app\dashboard\users\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 7, 108
+"c:\Code\2024\linlaw\src\app\dashboard\users\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 3, 10
+"c:\Code\2024\linlaw\src\app\dashboard\users\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 276, 0, 0, 0, 1, 15, 292
+"c:\Code\2024\linlaw\src\app\inquiry\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 274, 0, 0, 0, 6, 27, 307
+"c:\Code\2024\linlaw\src\app\inquiry\create\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 13, 94
+"c:\Code\2024\linlaw\src\app\inquiry\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 156, 0, 0, 0, 0, 8, 164
+"c:\Code\2024\linlaw\src\app\layout-content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 5, 20
+"c:\Code\2024\linlaw\src\app\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 1, 12, 100
+"c:\Code\2024\linlaw\src\app\login\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 10, 110
+"c:\Code\2024\linlaw\src\app\newsletters\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 426, 0, 0, 0, 5, 49, 480
+"c:\Code\2024\linlaw\src\app\newsletters\content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 293, 0, 0, 0, 4, 37, 334
+"c:\Code\2024\linlaw\src\app\newsletters\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 7, 32
+"c:\Code\2024\linlaw\src\app\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 6, 25
+"c:\Code\2024\linlaw\src\app\pageid.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 10
+"c:\Code\2024\linlaw\src\app\profile\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 11, 104
+"c:\Code\2024\linlaw\src\app\related-businesses\[slug]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 454, 0, 0, 0, 6, 51, 511
+"c:\Code\2024\linlaw\src\app\related-businesses\content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 137, 0, 0, 0, 1, 28, 166
+"c:\Code\2024\linlaw\src\app\related-businesses\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 1, 9, 38
+"c:\Code\2024\linlaw\src\app\signup\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 138, 0, 0, 0, 0, 14, 152
+"c:\Code\2024\linlaw\src\app\team-members\[id]\TeamMemberPage.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 6, 8, 90
+"c:\Code\2024\linlaw\src\app\team-members\[id]\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 2, 18, 104
+"c:\Code\2024\linlaw\src\app\team-members\content.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 228, 0, 0, 0, 0, 21, 249
+"c:\Code\2024\linlaw\src\app\team-members\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 6, 31
+"c:\Code\2024\linlaw\src\components\FileUploader\FileUploader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 175, 0, 0, 0, 0, 21, 196
+"c:\Code\2024\linlaw\src\components\FileUploader\UploadProgressList.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 6, 79
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayChildDesignRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 106, 0, 0, 0, 0, 10, 116
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayChildDesigns\ArrayChildCardDesign.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 4, 45
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayChildDesigns\ArrayChildListDesign.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 4, 48
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayChildDesigns\ArrayChildNoneDesign.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 4, 36
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayChildDesigns\ArrayChildTableDesign.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 2, 7, 85
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayDesignRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 117, 0, 0, 0, 0, 11, 128
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayDesigns\ArrayDefaultCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 4, 44
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayDesigns\ArrayFlatCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 7, 62
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayDesigns\ArrayFlatOutsideCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 63, 0, 0, 0, 0, 7, 70
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayDesigns\ArrayNoneCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 5, 42
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayDesigns\ArrayParentCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 5, 47
+"c:\Code\2024\linlaw\src\components\FormBuilder\Arrays\ArrayFieldRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 114, 0, 0, 0, 0, 15, 129
+"c:\Code\2024\linlaw\src\components\FormBuilder\CombinedField.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 68, 0, 0, 0, 0, 9, 77
+"c:\Code\2024\linlaw\src\components\FormBuilder\CustomModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 4, 40
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\FieldDesignRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 74, 0, 0, 0, 0, 13, 87
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\FieldDesigns\FieldDefaultCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 4, 41
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\FieldDesigns\FieldParentCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 6, 44
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\FieldDesigns\FieldRow.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 4, 36
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\FieldRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 165, 0, 0, 0, 0, 20, 185
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\BoxSidesInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 20, 129
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\DateInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 8, 50
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\DateTimeInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 8, 53
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\GeneralInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 131, 0, 0, 0, 1, 10, 142
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\IconSelector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 5, 69
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\LanguageJsonTextInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 77, 0, 0, 0, 0, 9, 86
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\LanguageJsonTextarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 84, 0, 0, 0, 1, 9, 94
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\MediaSelector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 497, 0, 0, 0, 39, 72, 608
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\ResponsiveImagesInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 14, 114
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\RoleSelector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 95, 0, 0, 0, 3, 13, 111
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\SizeInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 113, 0, 0, 0, 3, 11, 127
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\SupportedLanguageSelector.module.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 0, 3, 29
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\SupportedLanguageSelector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 95, 0, 0, 0, 0, 11, 106
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\SwitchInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 15, 70
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\TimeInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 8, 52
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\UserSelector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 87, 0, 0, 0, 0, 10, 97
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\UsersSelector.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 228, 0, 0, 0, 12, 18, 258
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\Inputs\sortable\SortableTag.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 5, 33
+"c:\Code\2024\linlaw\src\components\FormBuilder\Fields\extra\FieldTitle.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 4, 46
+"c:\Code\2024\linlaw\src\components\FormBuilder\InputStyle.ts", "TypeScript", 0, 0, 0, 114, 0, 0, 0, 0, 0, 0, 13, 17, 144
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonChildDesignRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 7, 107
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonDesignRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 167, 0, 0, 0, 0, 26, 193
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonDesigns\JsonDefaultCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 1, 6, 61
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonDesigns\JsonFlatCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 1, 8, 63
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonDesigns\JsonFlatOutsideCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 1, 8, 64
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonDesigns\JsonNone.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 5, 22
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonDesigns\JsonParentCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 56, 0, 0, 0, 1, 7, 64
+"c:\Code\2024\linlaw\src\components\FormBuilder\Jsons\JsonFieldRenderer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 194, 0, 0, 0, 0, 23, 217
+"c:\Code\2024\linlaw\src\components\FormBuilder\SortableItem.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 6, 43
+"c:\Code\2024\linlaw\src\components\RelatedBusinessCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 318, 0, 0, 0, 4, 28, 350
+"c:\Code\2024\linlaw\src\components\forms\NewsletterForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 235, 0, 0, 0, 6, 21, 262
+"c:\Code\2024\linlaw\src\components\forms\ProfileUpdateForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 114, 0, 0, 0, 0, 17, 131
+"c:\Code\2024\linlaw\src\components\forms\RelatedBusinessForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 598, 0, 0, 0, 4, 57, 659
+"c:\Code\2024\linlaw\src\components\forms\RoleForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 324, 0, 0, 0, 0, 30, 354
+"c:\Code\2024\linlaw\src\components\forms\SetupForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 242, 0, 0, 0, 0, 21, 263
+"c:\Code\2024\linlaw\src\components\forms\UserForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 277, 0, 0, 0, 1, 28, 306
+"c:\Code\2024\linlaw\src\components\inputs\ImageCropper.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 26, 172
+"c:\Code\2024\linlaw\src\components\inputs\LanguageTextInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 10, 86
+"c:\Code\2024\linlaw\src\components\inputs\ProfileAvatar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 254, 0, 0, 0, 9, 22, 285
+"c:\Code\2024\linlaw\src\components\inputs\PublicAPIDynamicDropdown.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 88, 0, 0, 0, 0, 11, 99
+"c:\Code\2024\linlaw\src\components\inputs\PublicAPIDynamicMultiSelect.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 202, 0, 0, 0, 3, 18, 223
+"c:\Code\2024\linlaw\src\components\inputs\RichTextEditor.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Code\2024\linlaw\src\components\inputs\RichTextEditor.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 26, 0, 0, 0, 0, 5, 31
+"c:\Code\2024\linlaw\src\components\inputs\standalone\ImageSelection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 80, 0, 0, 0, 1, 11, 92
+"c:\Code\2024\linlaw\src\components\inputs\standalone\LanguageJsonTextInput.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 10, 76
+"c:\Code\2024\linlaw\src\components\inputs\standalone\LanguageJsonTextarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 75, 0, 0, 0, 0, 11, 86
+"c:\Code\2024\linlaw\src\components\inputs\standalone\LanguageSelection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 7, 71
+"c:\Code\2024\linlaw\src\components\inputs\standalone\RoleSelection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 4, 23
+"c:\Code\2024\linlaw\src\components\inputs\standalone\UserSelection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 4, 23
+"c:\Code\2024\linlaw\src\components\loaders\InlineLoader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 7, 54
+"c:\Code\2024\linlaw\src\components\loaders\LoadingSpin.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 5, 30
+"c:\Code\2024\linlaw\src\components\loaders\LoadingSpinner.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 34, 0, 0, 0, 0, 5, 39
+"c:\Code\2024\linlaw\src\components\loaders\ProtectedPage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 5, 14
+"c:\Code\2024\linlaw\src\components\loaders\SubLoader.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 27, 0, 0, 0, 0, 4, 31
+"c:\Code\2024\linlaw\src\components\modals\FileSelectionModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 213, 0, 0, 0, 8, 34, 255
+"c:\Code\2024\linlaw\src\components\sections\AboutUsSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 375, 0, 0, 0, 6, 35, 416
+"c:\Code\2024\linlaw\src\components\sections\ClickToAction.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 803, 0, 0, 0, 0, 74, 877
+"c:\Code\2024\linlaw\src\components\sections\CustomCarousel.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 143, 0, 0, 0, 1, 19, 163
+"c:\Code\2024\linlaw\src\components\sections\FAQSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 2, 28, 254
+"c:\Code\2024\linlaw\src\components\sections\HeroSliderSection.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 176, 21, 39, 236
+"c:\Code\2024\linlaw\src\components\sections\HeroSliderSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 1, 20, 130
+"c:\Code\2024\linlaw\src\components\sections\NewsletterSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 448, 0, 0, 0, 6, 59, 513
+"c:\Code\2024\linlaw\src\components\sections\PromoShowcaseSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 333, 0, 0, 0, 1, 36, 370
+"c:\Code\2024\linlaw\src\components\sections\RelatedBusinessesSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 21, 114
+"c:\Code\2024\linlaw\src\components\sections\ServicesSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 173, 0, 0, 0, 0, 19, 192
+"c:\Code\2024\linlaw\src\components\sections\TeamSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 135, 0, 0, 0, 2, 20, 157
+"c:\Code\2024\linlaw\src\components\sections\TestimonialsSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 292, 0, 0, 0, 3, 33, 328
+"c:\Code\2024\linlaw\src\components\sections\layout\SectionList.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 310, 0, 0, 0, 0, 63, 373
+"c:\Code\2024\linlaw\src\components\sections\layout\sectionStyles.ts", "TypeScript", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 3, 26
+"c:\Code\2024\linlaw\src\components\ui\FileThumbnail.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 4, 58
+"c:\Code\2024\linlaw\src\components\ui\ImageComponent.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 6, 44
+"c:\Code\2024\linlaw\src\components\ui\PageWrapper.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 108, 0, 0, 0, 0, 9, 117
+"c:\Code\2024\linlaw\src\components\ui\SocialLink.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 6, 28
+"c:\Code\2024\linlaw\src\components\ui\SocialLinks.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 7, 56
+"c:\Code\2024\linlaw\src\components\ui\UserAvatar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 0, 9, 101
+"c:\Code\2024\linlaw\src\config\CMS\fields\SECTION_SETTINGS.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 277, 0, 0, 0, 0, 23, 300
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\CAREER_PAGE_SETTINGS.ts", "TypeScript", 0, 0, 0, 191, 0, 0, 0, 0, 0, 0, 0, 21, 212
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\HOME_PAGE_SETTINGS.ts", "TypeScript", 0, 0, 0, 478, 0, 0, 0, 0, 0, 0, 4, 43, 525
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\NEWSLETTER_PAGE_SETTINGS.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 1, 7, 44
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\RELATED_BUSINESSES_PAGE_SETTINGS.ts", "TypeScript", 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 7, 50
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\TEAM_PAGE_SETTINGS.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 8, 88
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\shared\sharedPageConfig.ts", "TypeScript", 0, 0, 0, 94, 0, 0, 0, 0, 0, 0, 0, 5, 99
+"c:\Code\2024\linlaw\src\config\CMS\pages\keys\shared\sharedPageTypes.ts", "TypeScript", 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 29
+"c:\Code\2024\linlaw\src\config\CMS\pages\pageKeys.ts", "TypeScript", 0, 0, 0, 67, 0, 0, 0, 0, 0, 0, 0, 13, 80
+"c:\Code\2024\linlaw\src\config\CMS\settings\index.ts", "TypeScript", 0, 0, 0, 405, 0, 0, 0, 0, 0, 0, 0, 53, 458
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\DESIGN_SCHEMA_KEYS.ts", "TypeScript", 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 6, 40
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\FIREBASE_SETTINGS_KEYS.ts", "TypeScript", 0, 0, 0, 108, 0, 0, 0, 0, 0, 0, 0, 4, 112
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\GLOBAL_SETTINGS_KEYS.ts", "TypeScript", 0, 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 8, 85
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\LANGUAGE_SETTINGS_KEYS.ts", "TypeScript", 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 4, 19
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\MAIL_KEYS.ts", "TypeScript", 0, 0, 0, 57, 0, 0, 0, 0, 0, 0, 0, 4, 61
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\MESSAGING_SERVICE_KEYS.ts", "TypeScript", 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 4, 51
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\PUSHER_SETTINGS_KEYS.ts", "TypeScript", 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 5, 55
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\SEO_SETTINGS_KEYS.ts", "TypeScript", 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 4, 46
+"c:\Code\2024\linlaw\src\config\CMS\settings\keys\SOCIAL_MEDIA_KEYS.ts", "TypeScript", 0, 0, 0, 204, 0, 0, 0, 0, 0, 0, 1, 4, 209
+"c:\Code\2024\linlaw\src\config\CMS\settings\settingKeys.ts", "TypeScript", 0, 0, 0, 119, 0, 0, 0, 0, 0, 0, 0, 17, 136
+"c:\Code\2024\linlaw\src\config\navigations\IconMapper.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 10, 53
+"c:\Code\2024\linlaw\src\config\navigations\menu.ts", "TypeScript", 0, 0, 0, 194, 0, 0, 0, 0, 0, 0, 0, 5, 199
+"c:\Code\2024\linlaw\src\config\navigations\navigationMenu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 110, 0, 0, 0, 0, 12, 122
+"c:\Code\2024\linlaw\src\config\permissions.ts", "TypeScript", 0, 0, 0, 204, 0, 0, 0, 0, 0, 0, 2, 19, 225
+"c:\Code\2024\linlaw\src\config\routes.ts", "TypeScript", 0, 0, 0, 314, 0, 0, 0, 0, 0, 0, 0, 22, 336
+"c:\Code\2024\linlaw\src\contexts\FileContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 10, 59
+"c:\Code\2024\linlaw\src\contexts\LanguageContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 5, 24
+"c:\Code\2024\linlaw\src\contexts\LayoutContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 5, 23
+"c:\Code\2024\linlaw\src\contexts\SettingsContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 20
+"c:\Code\2024\linlaw\src\contexts\UserContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 4, 18
+"c:\Code\2024\linlaw\src\db\index.ts", "TypeScript", 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 12, 59
+"c:\Code\2024\linlaw\src\hooks\useFetchFiles.ts", "TypeScript", 0, 0, 0, 175, 0, 0, 0, 0, 0, 0, 10, 36, 221
+"c:\Code\2024\linlaw\src\hooks\useFile.ts", "TypeScript", 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 3, 12
+"c:\Code\2024\linlaw\src\hooks\useFileModal.ts", "TypeScript", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 8, 45
+"c:\Code\2024\linlaw\src\hooks\useFileUpload.ts", "TypeScript", 0, 0, 0, 156, 0, 0, 0, 0, 0, 0, 0, 32, 188
+"c:\Code\2024\linlaw\src\hooks\useFirebaseConfig.ts", "TypeScript", 0, 0, 0, 46, 0, 0, 0, 0, 0, 0, 0, 8, 54
+"c:\Code\2024\linlaw\src\hooks\useLanguage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 4, 22
+"c:\Code\2024\linlaw\src\hooks\useLayout.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"c:\Code\2024\linlaw\src\hooks\useSettings.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"c:\Code\2024\linlaw\src\hooks\useUser.ts", "TypeScript", 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"c:\Code\2024\linlaw\src\layouts\DashboardLayout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 155, 0, 0, 0, 0, 15, 170
+"c:\Code\2024\linlaw\src\layouts\MainLayout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 136, 0, 0, 0, 5, 22, 163
+"c:\Code\2024\linlaw\src\layouts\OverlayBar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 242, 0, 0, 0, 5, 25, 272
+"c:\Code\2024\linlaw\src\middlewares\authMiddleware.ts", "TypeScript", 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 13, 96
+"c:\Code\2024\linlaw\src\middlewares\verifyServerAuth.ts", "TypeScript", 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 14, 72
+"c:\Code\2024\linlaw\src\models\CacheModel.ts", "TypeScript", 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 3, 16
+"c:\Code\2024\linlaw\src\models\FileModel.ts", "TypeScript", 0, 0, 0, 99, 0, 0, 0, 0, 0, 0, 0, 13, 112
+"c:\Code\2024\linlaw\src\models\InquiryModel.ts", "TypeScript", 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 0, 16, 97
+"c:\Code\2024\linlaw\src\models\Newsletter.ts", "TypeScript", 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 11, 72
+"c:\Code\2024\linlaw\src\models\PageModel.ts", "TypeScript", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 8, 27
+"c:\Code\2024\linlaw\src\models\RelatedBusinessModel.ts", "TypeScript", 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 22, 104
+"c:\Code\2024\linlaw\src\models\RoleModel.ts", "TypeScript", 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 8, 52
+"c:\Code\2024\linlaw\src\models\SettingModel.ts", "TypeScript", 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 8, 31
+"c:\Code\2024\linlaw\src\models\TeamBlock.ts", "TypeScript", 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 3, 12
+"c:\Code\2024\linlaw\src\models\UserModel.ts", "TypeScript", 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 14, 86
+"c:\Code\2024\linlaw\src\models\Users\DeviceToken.ts", "TypeScript", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 4, 21
+"c:\Code\2024\linlaw\src\models\constants.ts", "TypeScript", 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 3
+"c:\Code\2024\linlaw\src\models\index.ts", "TypeScript", 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 1, 7
+"c:\Code\2024\linlaw\src\models\languages.ts", "TypeScript", 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 22
+"c:\Code\2024\linlaw\src\providers\AppProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 7, 38
+"c:\Code\2024\linlaw\src\providers\CustomConfigProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 7, 42
+"c:\Code\2024\linlaw\src\providers\FileProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 13, 116
+"c:\Code\2024\linlaw\src\providers\LanguageProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 45, 0, 0, 0, 0, 9, 54
+"c:\Code\2024\linlaw\src\providers\LayoutProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 12, 65
+"c:\Code\2024\linlaw\src\providers\PusherProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 9, 59
+"c:\Code\2024\linlaw\src\providers\SettingsProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 14, 100
+"c:\Code\2024\linlaw\src\providers\UserProvider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 232, 0, 0, 0, 1, 22, 255
+"c:\Code\2024\linlaw\src\repositories\CacheRepository.ts", "TypeScript", 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 9, 41
+"c:\Code\2024\linlaw\src\repositories\FileRepository.ts", "TypeScript", 0, 0, 0, 138, 0, 0, 0, 0, 0, 0, 0, 23, 161
+"c:\Code\2024\linlaw\src\repositories\InquiryRepository.ts", "TypeScript", 0, 0, 0, 118, 0, 0, 0, 0, 0, 0, 0, 22, 140
+"c:\Code\2024\linlaw\src\repositories\NewsletterRepository.ts", "TypeScript", 0, 0, 0, 159, 0, 0, 0, 0, 0, 0, 1, 15, 175
+"c:\Code\2024\linlaw\src\repositories\PageRepository.ts", "TypeScript", 0, 0, 0, 84, 0, 0, 0, 0, 0, 0, 0, 17, 101
+"c:\Code\2024\linlaw\src\repositories\RelatedBusinessRepository.ts", "TypeScript", 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 1, 17, 86
+"c:\Code\2024\linlaw\src\repositories\RoleRepository.ts", "TypeScript", 0, 0, 0, 95, 0, 0, 0, 0, 0, 0, 5, 19, 119
+"c:\Code\2024\linlaw\src\repositories\SettingRepository.ts", "TypeScript", 0, 0, 0, 114, 0, 0, 0, 0, 0, 0, 0, 20, 134
+"c:\Code\2024\linlaw\src\repositories\UserRepository.ts", "TypeScript", 0, 0, 0, 199, 0, 0, 0, 0, 0, 0, 0, 35, 234
+"c:\Code\2024\linlaw\src\repositories\index.ts", "TypeScript", 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 0, 5, 32
+"c:\Code\2024\linlaw\src\router\LayoutRouter.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 109, 0, 0, 0, 0, 20, 129
+"c:\Code\2024\linlaw\src\services\FileService.ts", "TypeScript", 0, 0, 0, 196, 0, 0, 0, 0, 0, 0, 0, 44, 240
+"c:\Code\2024\linlaw\src\services\InquiryService.ts", "TypeScript", 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 0, 11, 64
+"c:\Code\2024\linlaw\src\services\MailService.ts", "TypeScript", 0, 0, 0, 137, 0, 0, 0, 0, 0, 0, 0, 12, 149
+"c:\Code\2024\linlaw\src\services\NewsletterService.ts", "TypeScript", 0, 0, 0, 120, 0, 0, 0, 0, 0, 0, 0, 14, 134
+"c:\Code\2024\linlaw\src\services\PageService.ts", "TypeScript", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 7, 31
+"c:\Code\2024\linlaw\src\services\RoleService.ts", "TypeScript", 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 0, 16, 86
+"c:\Code\2024\linlaw\src\services\SettingService.ts", "TypeScript", 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 12, 41
+"c:\Code\2024\linlaw\src\services\UserService.ts", "TypeScript", 0, 0, 0, 273, 0, 0, 0, 0, 0, 0, 4, 49, 326
+"c:\Code\2024\linlaw\src\styles\carousel.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 2, 7, 52
+"c:\Code\2024\linlaw\src\styles\globals.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 2, 6, 34
+"c:\Code\2024\linlaw\src\translations\index.ts", "TypeScript", 0, 0, 0, 1014, 0, 0, 0, 0, 0, 0, 0, 7, 1021
+"c:\Code\2024\linlaw\src\types\types.d.ts", "TypeScript", 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 3, 12
+"c:\Code\2024\linlaw\src\utils\api\apiClient.ts", "TypeScript", 0, 0, 0, 110, 0, 0, 0, 0, 0, 0, 6, 22, 138
+"c:\Code\2024\linlaw\src\utils\cssMaps.ts", "TypeScript", 0, 0, 0, 146, 0, 0, 0, 0, 0, 0, 6, 25, 177
+"c:\Code\2024\linlaw\src\utils\cssUrl.ts", "TypeScript", 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 1, 7
+"c:\Code\2024\linlaw\src\utils\filesUtil.ts", "TypeScript", 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 0, 9, 81
+"c:\Code\2024\linlaw\src\utils\firebaseClient.ts", "TypeScript", 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 3, 10
+"c:\Code\2024\linlaw\src\utils\getTranslatedText.ts", "TypeScript", 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 2, 13
+"c:\Code\2024\linlaw\src\utils\hasRenderableChildren.ts", "TypeScript", 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 1, 8, 28
+"c:\Code\2024\linlaw\src\utils\mime.json", "JSON", 491, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 492
+"c:\Code\2024\linlaw\src\utils\roleUtils.ts", "TypeScript", 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 4, 20
+"c:\Code\2024\linlaw\src\utils\server\handleError.ts", "TypeScript", 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\Code\2024\linlaw\src\utils\server\sendPaymentEmail.ts", "TypeScript", 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 4, 37
+"c:\Code\2024\linlaw\tailwind.config.ts", "TypeScript", 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 3, 21
+"c:\Code\2024\linlaw\tsconfig.json", "JSON with Comments", 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 27
+"Total", "-", 8829, 34, 8, 9741, 23, 22, 19347, 1, 1, 347, 300, 3715, 42368
