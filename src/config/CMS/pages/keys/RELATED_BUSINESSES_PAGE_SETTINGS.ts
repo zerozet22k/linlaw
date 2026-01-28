@@ -41,7 +41,7 @@ export const RELATED_BUSINESSES_PAGE_SETTINGS: GeneralConfig<
 };
 
 export type RELATED_BUSINESSES_PAGE_SETTINGS_TYPES = {
-    [RELATED_BUSINESSES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
+    [RELATED_BUSINESSES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]?: SharedPageContentType;
     [RELATED_BUSINESSES_PAGE_SETTINGS_KEYS.SECTIONS]: {
         maxBusinessesCount: number;
         includeInactive: number;

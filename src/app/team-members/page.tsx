@@ -2,28 +2,28 @@ export const dynamic = "force-dynamic";
 
 import React from "react";
 import TeamContent from "./content";
-import PageService from "@/services/PageService";
-import { TEAM_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 
-const getDefaultTeamData = () => ({
-  [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
-    maxMembersCount: 8,
-    members: [],
-    positionOrder: [],
-    intraPositionSort: "manual",
-  },
-});
+import {
+  TEAM_PAGE_SETTINGS_KEYS,
+  type TEAM_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 
-const fetchTeamData = async () => {
-  const pageService = new PageService();
-  const fetchedData = await pageService.getPagesByKeys(
-    Object.values(TEAM_PAGE_SETTINGS_KEYS)
-  );
-  return { ...getDefaultTeamData(), ...fetchedData };
-};
-
+import { getPageSettings } from "@/utils/server/pageSettings";
+import { valuesOf } from "@/utils/typed";
 const TeamMembersPage = async () => {
-  const data = await fetchTeamData();
+  const defaults: TEAM_PAGE_SETTINGS_TYPES = {
+    [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
+      maxMembersCount: 8,
+      teamGroups: [
+      ],
+    },
+  };
+
+  const data = await getPageSettings({
+    keys: valuesOf(TEAM_PAGE_SETTINGS_KEYS),
+    defaults,
+  });
+
   return <TeamContent data={data} />;
 };
 

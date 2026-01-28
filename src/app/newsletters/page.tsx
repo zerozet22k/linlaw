@@ -1,30 +1,29 @@
+/* NEWSLETTER_PAGE_SETTINGS */
 export const dynamic = "force-dynamic";
 
 import React from "react";
 import NewsletterContent from "./content";
-import PageService from "@/services/PageService";
-import { NEWSLETTER_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 
-const getDefaultNewsletterData = () => ({
-  [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
-    maxNewslettersCount: 8,
-  },
-});
+import {
+  NEWSLETTER_PAGE_SETTINGS_KEYS,
+  type NEWSLETTER_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 
-const fetchNewsletterData = async () => {
-  const pageService = new PageService();
-  const fetchedData = await pageService.getPagesByKeys(
-    Object.values(NEWSLETTER_PAGE_SETTINGS_KEYS)
-  );
-
-  return {
-    ...getDefaultNewsletterData(),
-    ...fetchedData,
-  };
-};
+import { getPageSettings } from "@/utils/server/pageSettings";
+import { valuesOf } from "@/utils/typed";
 
 const NewsletterPage = async () => {
-  const data = await fetchNewsletterData();
+  const defaults: NEWSLETTER_PAGE_SETTINGS_TYPES = {
+    [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
+      maxNewslettersCount: 50,
+    },
+  };
+
+  const data = await getPageSettings({
+    keys: valuesOf(NEWSLETTER_PAGE_SETTINGS_KEYS),
+    defaults,
+  });
+
   return <NewsletterContent data={data} />;
 };
 

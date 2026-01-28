@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { commonTranslations } from "@/translations";
-import { ROUTE_KEYS } from "@/config/routes";
+import { ROUTE_KEYS } from "@/config/navigations/routes";
 import { body } from "framer-motion/client";
 
 const { Title, Text } = Typography;

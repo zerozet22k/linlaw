@@ -2,25 +2,29 @@
 export const dynamic = "force-dynamic";
 
 import React from "react";
-import PageService from "@/services/PageService";
-import { CAREER_PAGE_SETTINGS_KEYS } from "@/config/CMS/pages/keys/CAREER_PAGE_SETTINGS";
 import CareersContent from "./content";
 
-const getDefaultCareersData = () => ({
-    [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: { items: [] },
-});
+import {
+  CAREER_PAGE_SETTINGS_KEYS,
+  type CAREER_PAGE_SETTINGS_TYPES,
+} from "@/config/CMS/pages/keys/CAREER_PAGE_SETTINGS";
 
-const fetchCareersData = async () => {
-    const pageService = new PageService();
-    const fetched = await pageService.getPagesByKeys(
-        Object.values(CAREER_PAGE_SETTINGS_KEYS)
-    );
-    return { ...getDefaultCareersData(), ...fetched };
-};
-
+import { getPageSettings } from "@/utils/server/pageSettings";
+import { valuesOf } from "@/utils/typed";
 const CareersPage = async () => {
-    const data = await fetchCareersData();
-    return <CareersContent data={data} />;
+  const defaults: CAREER_PAGE_SETTINGS_TYPES = {
+    [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: {
+      section: undefined,
+      items: [],
+    },
+  };
+
+  const data = await getPageSettings({
+    keys: valuesOf(CAREER_PAGE_SETTINGS_KEYS),
+    defaults,
+  });
+
+  return <CareersContent data={data} />;
 };
 
 export default CareersPage;

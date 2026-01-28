@@ -1,67 +1,39 @@
-export const dynamic = "force-dynamic"; // Force dynamic rendering
-import 'antd/dist/antd.css';
+export const dynamic = "force-dynamic";
+
+import "antd/dist/antd.css";
 import React from "react";
-import { Metadata } from "next";
-import SettingService from "@/services/SettingService";
-import UserService from "@/services/UserService";
+import type { Metadata } from "next";
+import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
+
 import { SettingsProvider } from "@/providers/SettingsProvider";
-import { SettingsInterface } from "@/config/CMS/settings/settingKeys";
-import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
-import { SEO_SETTINGS_KEYS } from "@/config/CMS/settings/keys/SEO_SETTINGS_KEYS";
 import LayoutContent from "./layout-content";
+import { getPublicSettings, getSiteName, getSiteUrl, getSeo, toAbsoluteUrl } from "@/utils/server/publicSiteSettings";
 
-async function getSettings(): Promise<Partial<SettingsInterface>> {
-  try {
-    const settingService = new SettingService();
-    const userService = new UserService();
 
-    const fetchedSettings = await settingService.getPublicSettings();
-    await userService.syncRolePermissions(true);
-
-    return fetchedSettings || {};
-  } catch (error) {
-    console.error("Failed to fetch settings:", error);
-    return {};
-  }
-}
-
-// Generate dynamic metadata for SEO
 export async function generateMetadata(): Promise<Metadata> {
-  const settings: Partial<SettingsInterface> = await getSettings();
+  const settings = await getPublicSettings();
 
-  const siteName =
-    settings[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteName?.trim() ||
-    process.env.NEXT_PUBLIC_SITE_NAME?.trim() ||
-    "Default Site Name";
-
-  const description =
-    settings[SEO_SETTINGS_KEYS.SEO_SETTINGS]?.metaDescription?.trim() ||
-    "Default description for SEO.";
-
-  const keywords = settings[SEO_SETTINGS_KEYS.SEO_SETTINGS]?.keywords
-    ?.trim()
-    .split(",") || ["default", "keywords"];
-
-  const ogImage =
-    settings[SEO_SETTINGS_KEYS.SEO_SETTINGS]?.ogImage?.trim() ||
-    process.env.NEXT_PUBLIC_OG_IMAGE?.trim() ||
-    "/default-og-image.png";
+  const siteName = getSiteName(settings);
+  const siteUrl = getSiteUrl(settings);
+  const { description, keywords, ogImageRaw } = getSeo(settings);
+  const ogImage = toAbsoluteUrl(ogImageRaw, siteUrl);
 
   return {
+    metadataBase: new URL(siteUrl),
+    alternates: { canonical: siteUrl },
     title: siteName,
     description,
     keywords,
+
     openGraph: {
       title: siteName,
       description,
-      images: [
-        {
-          url: ogImage,
-        },
-      ],
+      images: [{ url: ogImage }],
       type: "website",
-      url: process.env.NEXT_PUBLIC_SITE_URL || "https://example.com",
+      url: siteUrl,
     },
+
     twitter: {
       card: "summary_large_image",
       title: siteName,
@@ -76,23 +48,37 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const settings: Partial<SettingsInterface> = await getSettings();
+  const settings = await getPublicSettings({ syncRoles: true });
+
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID?.trim();
 
   return (
     <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          padding: 0,
-          width: "100%",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <head>
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}', { anonymize_ip: true });
+              `}
+            </Script>
+          </>
+        )}
+      </head>
+
+      <body style={{ margin: 0, padding: 0, width: "100%", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <SettingsProvider settings={settings}>
           <LayoutContent>{children}</LayoutContent>
         </SettingsProvider>
+
+        <Analytics />
       </body>
     </html>
   );

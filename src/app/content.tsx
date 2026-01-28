@@ -21,7 +21,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import SectionList, { SectionListItem } from "@/components/sections/layout/SectionList";
 import RelatedBusinessesSection from "@/components/sections/RelatedBusinessesSection";
 import PromoShowcaseSection from "@/components/sections/PromoShowcaseSection";
-import { IDS } from "./pageid";
+import { IDS } from "../utils/pageid";
 
 const { Content } = Layout;
 

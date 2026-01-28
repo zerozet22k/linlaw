@@ -1,5 +1,5 @@
 import { APP_PERMISSIONS } from "../permissions";
-import { ROUTES, ROUTE_KEYS, PARENT_KEYS } from "../routes";
+import { ROUTES, ROUTE_KEYS, PARENT_KEYS } from "./routes";
 
 export interface NavigationMenuItem {
   key: string;

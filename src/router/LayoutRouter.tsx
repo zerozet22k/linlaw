@@ -7,7 +7,7 @@ import MainLayout from "../layouts/MainLayout";
 import "@/styles/globals.css";
 import { useUser } from "@/hooks/useUser";
 import LoadingSpin from "@/components/loaders/LoadingSpin";
-import { ROUTES } from "@/config/routes";
+import { ROUTES } from "@/config/navigations/routes";
 import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
 import { LayoutProvider } from "@/providers/LayoutProvider";
 import { useSettings } from "@/hooks/useSettings";

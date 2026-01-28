@@ -11,7 +11,7 @@ import {
   GLOBAL_SETTINGS_KEYS as G,
   GLOBAL_SETTINGS_TYPES,
 } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
-import { RouteConfig } from "@/config/routes";
+import { RouteConfig } from "@/config/navigations/routes";
 import { useLayout } from "@/hooks/useLayout";
 
 import UserAvatar from "@/components/ui/UserAvatar";

@@ -75,7 +75,7 @@ export const TEAM_PAGE_SETTINGS: GeneralConfig<typeof TEAM_PAGE_SETTINGS_KEYS> =
 };
 
 export type TEAM_PAGE_SETTINGS_TYPES = {
-  [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
+  [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]?: SharedPageContentType;
   [TEAM_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxMembersCount?: number;
     teamGroups: Array<{

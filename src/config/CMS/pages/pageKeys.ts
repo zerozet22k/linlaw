@@ -22,7 +22,7 @@ import {
   CAREER_PAGE_SETTINGS_TYPES,
 } from "./keys/CAREER_PAGE_SETTINGS";
 import { RELATED_BUSINESSES_PAGE_SETTINGS, RELATED_BUSINESSES_PAGE_SETTINGS_KEYS, RELATED_BUSINESSES_PAGE_SETTINGS_TYPES } from "./keys/RELATED_BUSINESSES_PAGE_SETTINGS";
-
+import { valuesOf } from "@/utils/typed";
 
 export const PAGE_SETTINGS_KEYS = {
   ...HOME_PAGE_SETTINGS_KEYS,
@@ -63,12 +63,12 @@ export type ValidPageSettingKey =
   | keyof CAREER_PAGE_SETTINGS_TYPES | keyof RELATED_BUSINESSES_PAGE_SETTINGS_TYPES;
 
 export const pageGroupedKeys = {
-  HomePage: Object.values(HOME_PAGE_SETTINGS_KEYS),
-  TeamPage: Object.values(TEAM_PAGE_SETTINGS_KEYS),
-  NewsletterPage: Object.values(NEWSLETTER_PAGE_SETTINGS_KEYS),
-  CareersPage: Object.values(CAREER_PAGE_SETTINGS_KEYS),
-  RelatedBusinessesPage: Object.values(RELATED_BUSINESSES_PAGE_SETTINGS_KEYS),
-};
+  HomePage: valuesOf(HOME_PAGE_SETTINGS_KEYS),
+  TeamPage: valuesOf(TEAM_PAGE_SETTINGS_KEYS),
+  NewsletterPage: valuesOf(NEWSLETTER_PAGE_SETTINGS_KEYS),
+  CareersPage: valuesOf(CAREER_PAGE_SETTINGS_KEYS),
+  RelatedBusinessesPage: valuesOf(RELATED_BUSINESSES_PAGE_SETTINGS_KEYS),
+} as const;
 
 export const pageTabLabels: Record<string, string> = {
   HomePage: "Home Page",

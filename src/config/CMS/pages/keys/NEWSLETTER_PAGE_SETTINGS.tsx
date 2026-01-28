@@ -36,7 +36,7 @@ export const NEWSLETTER_PAGE_SETTINGS: GeneralConfig<
 };
 
 export type NEWSLETTER_PAGE_SETTINGS_TYPES = {
-  [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
+  [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]?: SharedPageContentType;
   [NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]: {
     maxNewslettersCount: number;
   };

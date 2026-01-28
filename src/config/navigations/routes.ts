@@ -1,5 +1,5 @@
 import path from "path";
-import { APP_PERMISSIONS, AppPermissionType } from "./permissions";
+import { APP_PERMISSIONS, AppPermissionType } from "../permissions";
 
 export const PARENT_KEYS = {
   USERS: { key: "users", icon: "TeamOutlined", label: "Users" },

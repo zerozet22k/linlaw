@@ -15,14 +15,12 @@ class PageService {
   }
 
   async getPagesByKeys<K extends keyof PagesInterface>(
-    keys: K[]
+    keys: readonly K[]
   ): Promise<Pick<PagesInterface, K>> {
-    return await pageRepository.findByKeys(keys);
+    return await pageRepository.findByKeys(keys as K[]);
   }
 
-  async upsertPages(
-    updates: Partial<PagesInterface>
-  ): Promise<PagesInterface> {
+  async upsertPages(updates: Partial<PagesInterface>): Promise<PagesInterface> {
     return await pageRepository.upsertPagesStructured(updates);
   }
 }

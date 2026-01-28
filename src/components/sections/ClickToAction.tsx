@@ -32,7 +32,7 @@ import { useSettings } from "@/hooks/useSettings";
 import { getTranslatedText } from "@/utils/getTranslatedText";
 import { contactTranslations } from "@/translations";
 import apiClient from "@/utils/api/apiClient";
-import { IDS } from "@/app/pageid";
+import { IDS } from "@/utils/pageid";
 
 
 const { Title, Text } = Typography;

@@ -170,7 +170,7 @@ export const CAREER_PAGE_SETTINGS: GeneralConfig<typeof CAREER_PAGE_SETTINGS_KEY
 };
 
 export type CAREER_PAGE_SETTINGS_TYPES = {
-    [CAREER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: SharedPageContentType;
+    [CAREER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]?: SharedPageContentType;
 
     [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: {
         section?: SectionProps;
