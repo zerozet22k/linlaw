@@ -3,20 +3,26 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { Menu, MenuProps } from "antd";
+import { usePathname, useSearchParams } from "next/navigation";
+
 import { useUser } from "@/hooks/useUser";
 import { UserAPI } from "@/models/UserModel";
 import { hasPermission } from "../permissions";
-import { usePathname, useSearchParams } from "next/navigation";
+
 import {
   dashboardMenu,
   mainMenu,
   NavigationMenuItem,
 } from "@/config/navigations/menu";
 import { DynamicIcon } from "./IconMapper";
+
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
-import { DEFAULT_LANG } from "@/i18n/languages";
+import { DEFAULT_LANG, type SupportedLanguage } from "@/i18n/languages";
 
+// -----------------------------
+// menu build helpers
+// -----------------------------
 const buildMenu = (
   user: UserAPI | null,
   menuConfig: NavigationMenuItem[]
@@ -47,6 +53,7 @@ const buildMenu = (
 const flattenMenu = (menuData: NavigationMenuItem[]) =>
   menuData.flatMap((item) => [item, ...(item.children || [])]);
 
+// currentPathWithHash should be `${pathname}${hash}` (NO query)
 export const getSelectedKey = (
   user: UserAPI | null,
   currentPathWithHash: string,
@@ -55,12 +62,12 @@ export const getSelectedKey = (
   const menuData = buildMenu(user, isDashboard ? dashboardMenu : mainMenu);
   const flat = flattenMenu(menuData);
 
-  // 1) Exact match first (this is what fixes "/#services" etc.)
+  // 1) Exact match first (fixes "/#services", "/#about")
   const exact = flat.find((item) => item.link === currentPathWithHash)?.key;
   if (exact) return exact;
 
   // 2) Prefix match for detail pages ("/newsletters/123" => "/newsletters")
-  //    - Never allow "/" to match everything
+  //    - Avoid "/" matching everything
   //    - Skip hash-links for prefix matching (only exact match for those)
   const prefixCandidates = flat
     .filter((item) => !!item.link)
@@ -73,6 +80,47 @@ export const getSelectedKey = (
   )?.key;
 };
 
+// -----------------------------
+// hash tracking (history patch)
+// -----------------------------
+let historyPatched = false;
+const patchHistoryOnce = (onChange: () => void) => {
+  if (typeof window === "undefined") return () => {};
+  if (historyPatched) return () => {};
+  historyPatched = true;
+
+  const fire = () => onChange();
+
+  const origPush = window.history.pushState;
+  const origReplace = window.history.replaceState;
+
+  const wrap =
+    (fn: typeof window.history.pushState) =>
+    function (this: History, ...args: Parameters<typeof fn>) {
+      const ret = fn.apply(this, args as any);
+      fire();
+      return ret;
+    };
+
+  window.history.pushState = wrap(origPush);
+  window.history.replaceState = wrap(origReplace);
+
+  window.addEventListener("popstate", fire);
+  window.addEventListener("hashchange", fire);
+
+  return () => {
+    // restore (still safe even if multiple components mount/unmount over time)
+    window.history.pushState = origPush;
+    window.history.replaceState = origReplace;
+    window.removeEventListener("popstate", fire);
+    window.removeEventListener("hashchange", fire);
+    historyPatched = false;
+  };
+};
+
+// -----------------------------
+// component
+// -----------------------------
 interface AppMenuProps {
   menuMode?: MenuProps["mode"];
   isDashboard: boolean;
@@ -91,8 +139,8 @@ const AppMenu: React.FC<AppMenuProps> = ({
   const searchParams = useSearchParams();
   const { language } = useLanguage();
 
-  // --- hash tracking (Next often updates URL via history API, not always firing hashchange) ---
-  const [hash, setHash] = useState("");
+  // Hash state that updates even when Next changes URL via history API
+  const [hash, setHash] = useState<string>("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -100,38 +148,17 @@ const AppMenu: React.FC<AppMenuProps> = ({
     const update = () => setHash(window.location.hash || "");
     update();
 
-    const origPush = window.history.pushState;
-    const origReplace = window.history.replaceState;
-
-    const wrap =
-      (fn: typeof window.history.pushState) =>
-      function (this: History, ...args: Parameters<typeof fn>) {
-        const ret = fn.apply(this, args as any);
-        update();
-        return ret;
-      };
-
-    window.history.pushState = wrap(origPush);
-    window.history.replaceState = wrap(origReplace);
-
-    window.addEventListener("popstate", update);
-    window.addEventListener("hashchange", update);
-
-    return () => {
-      window.history.pushState = origPush;
-      window.history.replaceState = origReplace;
-      window.removeEventListener("popstate", update);
-      window.removeEventListener("hashchange", update);
-    };
+    const cleanup = patchHistoryOnce(update);
+    return cleanup;
   }, []);
 
-  const currentPathWithHash = `${pathname}${hash}`;
+  const currentPathWithHash = `${pathname}${hash}`; // "/#services"
 
-  // keep lang in links (so clicking menu doesn’t drop it)
+  // carry lang in links so menu clicks don’t drop it
   const langToCarry = useMemo(() => {
     const fromUrl = searchParams?.get("lang") || "";
-    if (fromUrl) return fromUrl;
-    return language !== DEFAULT_LANG ? language : "";
+    if (fromUrl) return fromUrl as SupportedLanguage;
+    return (language !== DEFAULT_LANG ? language : "") as SupportedLanguage;
   }, [searchParams, language]);
 
   const withLang = useCallback(
@@ -139,7 +166,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
       if (!langToCarry || langToCarry === DEFAULT_LANG) return href;
 
       const [pathPart, hashPart] = href.split("#");
-      const url = new URL(pathPart || "/", "http://local"); // safe on server/client
+      const url = new URL(pathPart || "/", "http://local"); // safe parser
 
       if (!url.searchParams.get("lang")) url.searchParams.set("lang", langToCarry);
 

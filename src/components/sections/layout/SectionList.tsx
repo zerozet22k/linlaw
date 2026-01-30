@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
 import {
@@ -34,7 +34,7 @@ import { cssUrl } from "@/utils/components/cssUrl";
 export type LanguageJson = Record<string, string>;
 
 export type SectionListItem = {
-  id: string;
+  id: string; // "services" or "#services" or "/#services"
   node: React.ReactNode;
 
   title?: LanguageJson | string;
@@ -55,6 +55,12 @@ type SectionListProps = {
   zebra?: boolean;
   zebraLight?: string;
   zebraDark?: string;
+
+  // offset for fixed header when jumping
+  scrollMarginTop?: number | string;
+
+  // ✅ key feature: when scrolling, keep URL hash synced to active section
+  syncHashOnScroll?: boolean;
 };
 
 const isBoxSides = (v: unknown): v is BoxSides =>
@@ -88,11 +94,37 @@ const resolveEffectiveSource = (
 
 const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
 
+// "services", "#services", "/#services", " Services " -> "services"
+const normalizeDomId = (raw: string) => {
+  const s = String(raw ?? "").trim();
+  if (!s) return "";
+
+  let x = s.replace(/^\/?#/, "").replace(/^#/, "");
+  x = x.split("?")[0].split("&")[0];
+
+  x = x
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-_:.]/g, "");
+
+  return x;
+};
+
+const parsePx = (v: number | string | undefined) => {
+  if (v == null) return 0;
+  if (typeof v === "number") return v;
+  const n = parseInt(String(v).replace(/[^\d-]/g, ""), 10);
+  return Number.isFinite(n) ? n : 0;
+};
+
 const SectionList: React.FC<SectionListProps> = ({
   sections,
   zebra = true,
   zebraLight = "#ffffff",
   zebraDark = "#f5f5f5",
+  scrollMarginTop = 96,
+  syncHashOnScroll = true,
 }) => {
   const { language } = useLanguage();
 
@@ -119,13 +151,113 @@ const SectionList: React.FC<SectionListProps> = ({
     return true;
   };
 
-  const visible = sections.filter(autoShouldShow);
+  const visible = useMemo(() => sections.filter(autoShouldShow), [sections]);
+
+  const idList = useMemo(() => {
+    return visible.map((it) => normalizeDomId(it.id)).filter(Boolean);
+  }, [visible]);
+
+  // ✅ 1) On initial load with #hash, ensure we land on it (even if sections mount late)
+  const didInitialHashScroll = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (didInitialHashScroll.current) return;
+
+    const raw = (window.location.hash || "").replace(/^#/, "").trim();
+    if (!raw) return;
+
+    const targetId = normalizeDomId(raw);
+    if (!targetId) return;
+
+    const tryScroll = () => {
+      const el = document.getElementById(targetId);
+      if (!el) return false;
+      el.scrollIntoView({ behavior: "auto", block: "start" });
+      didInitialHashScroll.current = true;
+      return true;
+    };
+
+    if (tryScroll()) return;
+
+    const raf = requestAnimationFrame(() => {
+      tryScroll();
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, [idList.join("|")]);
+
+  // ✅ 2) Scroll-spy: update URL hash when active section changes (NO jump)
+  const lastHashRef = useRef<string>("");
+  useEffect(() => {
+    if (!syncHashOnScroll) return;
+    if (typeof window === "undefined") return;
+    if (!idList.length) return;
+
+    const topOffset = parsePx(scrollMarginTop);
+    const thresholds = [0.2, 0.35, 0.5, 0.65];
+
+    const getCurrentHashId = () => normalizeDomId(window.location.hash || "");
+
+    const setHashSilently = (id: string) => {
+      const cur = getCurrentHashId();
+      if (cur === id) return;
+
+      const url = new URL(window.location.href);
+      url.hash = `#${id}`;
+
+      // replaceState avoids scroll jump and avoids spamming history
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+      lastHashRef.current = id;
+    };
+
+    // initialize "last"
+    lastHashRef.current = getCurrentHashId();
+
+    const elements = idList
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+
+    if (!elements.length) return;
+
+    let raf = 0;
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const candidates = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0));
+
+        if (!candidates.length) return;
+
+        const best = candidates[0].target as HTMLElement;
+        if (!best?.id) return;
+
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => setHashSilently(best.id));
+      },
+      {
+        root: null,
+        // top negative margin accounts for fixed header; bottom keeps it from switching too early
+        rootMargin: `-${topOffset + 8}px 0px -55% 0px`,
+        threshold: thresholds,
+      }
+    );
+
+    elements.forEach((el) => obs.observe(el));
+
+    return () => {
+      cancelAnimationFrame(raf);
+      obs.disconnect();
+    };
+  }, [idList.join("|"), scrollMarginTop, syncHashOnScroll]);
 
   return (
     <>
       {visible.map((it, idx) => {
         const payload = extractPayload(it.node);
         const section = (payload?.section ?? payload ?? {}) as Partial<SectionProps>;
+
+        const domId = normalizeDomId(it.id) || `section-${idx}`;
 
         const titleText = resolveText(it.title ?? (section as any).content?.title);
         const descText = resolveText(it.description ?? (section as any).content?.description);
@@ -138,7 +270,6 @@ const SectionList: React.FC<SectionListProps> = ({
             : TextAlign.CENTER;
 
         const textColor = section.content?.textColor || undefined;
-
         const bgMode = normalizeBgMode(section.background?.mode) || BgMode.AUTO;
 
         const bgColor =
@@ -239,6 +370,10 @@ const SectionList: React.FC<SectionListProps> = ({
           paddingBottom,
           paddingLeft,
           gap: itemsGap ?? undefined,
+
+          // lets anchor landing respect fixed header
+          scrollMarginTop:
+            typeof scrollMarginTop === "number" ? `${scrollMarginTop}px` : scrollMarginTop,
         };
 
         if (effectiveSource !== BgMode.VIDEO && backgroundImageCss) {
@@ -344,7 +479,7 @@ const SectionList: React.FC<SectionListProps> = ({
           ) : null;
 
         return (
-          <section key={it.id} id={it.id} style={style}>
+          <section key={domId} id={domId} data-section-id={domId} style={style}>
             {videoLayer}
 
             <div style={innerContentStyle}>

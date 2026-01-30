@@ -1,10 +1,14 @@
+// src/components/router/LayoutRouter.tsx  (or wherever yours lives)
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { Typography } from "antd";
+
 import DashboardLayout from "../layouts/DashboardLayout";
 import MainLayout from "../layouts/MainLayout";
 import "@/styles/globals.css";
+
 import { useUser } from "@/hooks/useUser";
 import LoadingSpin from "@/components/loaders/LoadingSpin";
 import { ROUTES } from "@/config/navigations/routes";
@@ -12,10 +16,11 @@ import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
 import { LayoutProvider } from "@/providers/LayoutProvider";
 import { useSettings } from "@/hooks/useSettings";
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
-import { Typography } from "antd";
 
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
+
+import { useHash } from "@/hooks/useHash";
 
 const { Title, Text } = Typography;
 
@@ -26,8 +31,12 @@ interface LayoutRouterProps {
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const pathToRegex = (path: string) => {
+  // supports:
+  // - "/newsletters/:id"
+  // - "/#services"
+  // - "/dashboard/users"
   const parts = path.split("/").map((p) => {
-    if (p.startsWith(":")) return "[^/]+"; // ids/slugs w/ hyphens etc.
+    if (p.startsWith(":")) return "[^/]+";
     return escapeRegex(p);
   });
   return new RegExp(`^${parts.join("/")}$`);
@@ -39,47 +48,13 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   const { language } = useLanguage();
 
   const pathname = usePathname();
+  const hash = useHash(); // "#services" etc.
   const router = useRouter();
+
   const isDashboardRoute = pathname?.startsWith("/dashboard");
-
   const [loading, setLoading] = useState(false);
-  const [hash, setHash] = useState("");
 
-  // ✅ FIX: Next changes URL via history.pushState/replaceState (hashchange may not fire)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const update = () => setHash(window.location.hash || "");
-    update();
-
-    const origPush = window.history.pushState;
-    const origReplace = window.history.replaceState;
-
-    const wrap =
-      (fn: typeof window.history.pushState) =>
-      function (this: History, ...args: Parameters<typeof fn>) {
-        const ret = fn.apply(this, args as any);
-        update();
-        return ret;
-      };
-
-    window.history.pushState = wrap(origPush);
-    window.history.replaceState = wrap(origReplace);
-
-    // back/forward
-    window.addEventListener("popstate", update);
-    // real hash changes (anchor clicks)
-    window.addEventListener("hashchange", update);
-
-    return () => {
-      window.history.pushState = origPush;
-      window.history.replaceState = origReplace;
-      window.removeEventListener("popstate", update);
-      window.removeEventListener("hashchange", update);
-    };
-  }, []);
-
-  // ✅ IMPORTANT: hash-only navigation must NOT show spinner (breaks scroll)
+  // NOTE: hash-only navigation should not trigger your spinner; it breaks anchor UX.
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => setLoading(false), 200);
@@ -89,9 +64,10 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   const routeConfig = useMemo(() => {
     const fullPath = `${pathname}${hash}`; // "/#services"
     return (
-      Object.values(ROUTES).find((route) =>
-        pathToRegex(route.path).test(fullPath)
-      ) || null
+      Object.values(ROUTES).find((route) => pathToRegex(route.path).test(fullPath)) ||
+      // fallback to pathname-only match for non-hash routes
+      Object.values(ROUTES).find((route) => pathToRegex(route.path).test(pathname)) ||
+      null
     );
   }, [pathname, hash]);
 
@@ -101,6 +77,7 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
     return hasPermission(user, routeConfig.access || [], true);
   }, [user, routeConfig]);
 
+  // title = SiteName | translated route navKey
   useEffect(() => {
     const siteName =
       settings[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteName?.trim() ||
@@ -117,7 +94,9 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   useEffect(() => {
     if (initialLoading) return;
 
-    const redirectTo = (target: string) => router.replace(target);
+    const redirectTo = (target: string) => {
+      router.replace(target);
+    };
 
     if (!user && routeConfig?.loginRequired) {
       redirectTo(routeConfig.IfNotLoggedInRedirectUrl || "/login");
@@ -150,8 +129,7 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
       >
         <Title level={2}>❌</Title>
         <Text strong>
-          {routeConfig?.noAccessMessage ||
-            "You do not have permission to view this page."}
+          {routeConfig?.noAccessMessage || "You do not have permission to view this page."}
         </Text>
       </div>
     ) : (
