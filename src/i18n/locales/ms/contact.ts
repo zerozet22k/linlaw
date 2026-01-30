@@ -1,21 +1,24 @@
 export const contact = {
   header: "Hubungi Kami",
-  clickToActionHeader: "Perlukan bantuan guaman?",
-  subheader: "Hubungi kami hari ini untuk konsultasi dan biarkan kami membantu anda menguruskan urusan guaman anda dengan yakin.",
-  buttonLabel: "Hubungi kami",
+  clickToActionHeader: "Perlukan Bantuan Undang-undang?",
+  subheader:
+    "Hubungi kami hari ini untuk sesi konsultasi, dan biarkan kami membantu anda mengurus hal undang-undang dengan yakin.",
+  buttonLabel: "Hubungi Kami",
   modalTitle: "Hantar E-mel",
 
   address: "Alamat",
-  phoneNumber: "Nombor telefon",
-  email: "Emel",
+  phoneNumber: "Nombor Telefon",
+  email: "E-mel",
 
   name: "Nama",
-  username: "Nama pengguna",
+  username: "Nama Pengguna",
   roles: "Peranan",
 
-  yourName: "Nama anda",
-  yourPhoneNumber: "Nombor telefon anda",
-  yourEmail: "Emel anda",
+  phone: "Telefon",
+
+  yourName: "Nama Anda",
+  yourPhoneNumber: "Nombor Telefon Anda",
+  yourEmail: "E-mel Anda",
 
   subject: "Subjek",
   message: "Mesej",
@@ -26,14 +29,18 @@ export const contact = {
   notifFailure: "Gagal menghantar e-mel",
   notifGenericFailure: "Gagal menghantar e-mel, sila cuba lagi kemudian.",
 
-  mapNotice: "Peta akan muncul di sini sebaik sahaja tersedia.",
+  mapNotice: "Peta akan dipaparkan di sini apabila tersedia.",
 
   yourNameRequired: "Nama anda diperlukan.",
   yourPhoneNumberRequired: "Nombor telefon anda diperlukan.",
-  yourEmailRequired: "Emel anda diperlukan.",
+  yourEmailRequired: "E-mel anda diperlukan.",
   subjectRequired: "Subjek diperlukan.",
   messageRequired: "Mesej diperlukan.",
 
-  contacts: "Kenalan",
-  noContacts: "Tiada kenalan yang tersedia",
+  contacts: "Maklumat Perhubungan",
+  noContacts: "Tiada maklumat perhubungan tersedia",
+
+  location: "Lokasi",
+  openMap: "Buka Peta",
+  locationMapTitle: "Peta Lokasi",
 } as const;

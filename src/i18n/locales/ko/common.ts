@@ -1,3 +1,4 @@
+// ko/common.ts
 export const common = {
   readMore: "더 읽기",
   readLess: "간략히 보기",
@@ -54,4 +55,12 @@ export const common = {
   operatingHours: "영업 시간",
   socialLinks: "소셜 링크",
   mapLocation: "지도 위치",
+
+  open: "열기",
+  address: "주소",
+  results: "결과",
+  view: "보기",
+
+  heroSliderAriaLabel: "히어로 슬라이더",
+  slideAltFallback: "슬라이드 이미지",
 } as const;

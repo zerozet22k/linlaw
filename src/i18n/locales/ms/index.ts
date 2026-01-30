@@ -2,6 +2,22 @@ import { contact } from "./contact";
 import { common } from "./common";
 import { title } from "./title";
 
-import type { BaseLocale } from "../en/index";
+import { relatedBusinesses } from "./relatedBusinesses";
+import { newsletter } from "./newsletter";
+import { career } from "./career";
+import { team } from "./team";
+import { faq } from "./faq";
+import { aboutUs } from "./aboutUs";
+import { BaseLocale } from "@/i18n/languages";
 
-export const ms = { contact, common, title } as const satisfies BaseLocale;
+export const ms = {
+    contact,
+    common,
+    title,
+    relatedBusinesses,
+    newsletter,
+    career,
+    team,
+    faq,
+    aboutUs,
+} as const satisfies BaseLocale;

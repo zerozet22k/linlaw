@@ -1,3 +1,4 @@
+// ko/contact.ts
 export const contact = {
   header: "문의하기",
   clickToActionHeader: "법률 지원이 필요하신가요?",
@@ -12,6 +13,9 @@ export const contact = {
   name: "이름",
   username: "사용자 이름",
   roles: "역할",
+
+  // ✅ added (EN contact has it)
+  phone: "전화",
 
   yourName: "귀하의 이름",
   yourPhoneNumber: "귀하의 전화번호",
@@ -36,4 +40,8 @@ export const contact = {
 
   contacts: "연락처",
   noContacts: "사용 가능한 연락처가 없습니다",
+
+  location: "위치",
+  openMap: "지도 열기",
+  locationMapTitle: "위치 지도",
 } as const;

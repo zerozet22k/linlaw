@@ -54,4 +54,12 @@ export const common = {
   operatingHours: "Operating Hours",
   socialLinks: "Social Links",
   mapLocation: "Map Location",
+
+  // ✅ added from your list
+  open: "Open",
+  address: "Address",
+  results: "Results",
+  view: "View",
+  heroSliderAriaLabel: "Hero Slider",
+  slideAltFallback: "Slide image",
 } as const;

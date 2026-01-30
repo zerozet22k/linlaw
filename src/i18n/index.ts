@@ -1,10 +1,10 @@
 import type { LanguageJson } from "./types";
 import {
-  messages,
+  langs,
   DEFAULT_LANG,
   SUPPORTED_LANGS,
-  isLang,
-  type Lang,
+  isSupportedLanguage,
+  type SupportedLanguage,
   type BaseLocale,
   languageFlags,
   languageNames,
@@ -13,22 +13,24 @@ import {
 } from "./languages";
 
 export {
-  messages,
+  langs as messages,
   DEFAULT_LANG,
   SUPPORTED_LANGS,
-  isLang,
+  isSupportedLanguage,
   languageFlags,
   languageNames,
   languageNativeNames,
   languages,
 };
 
-export type { Lang, BaseLocale };
+export type { SupportedLanguage, BaseLocale };
 
 function get(obj: unknown, path: string): unknown {
-  return path
-    .split(".")
-    .reduce<any>((acc, k) => (acc == null ? acc : acc[k]), obj as any);
+  return path.split(".").reduce<unknown>((acc, k) => {
+    if (acc == null) return undefined;
+    if (typeof acc !== "object") return undefined;
+    return (acc as Record<string, unknown>)[k];
+  }, obj);
 }
 
 function isLanguageJson(x: unknown): x is LanguageJson {
@@ -38,20 +40,18 @@ function isLanguageJson(x: unknown): x is LanguageJson {
     if (typeof (x as any)[k] === "string") return true;
   }
 
-  if (typeof (x as any).en === "string") return true;
-
-  return false;
+  return typeof (x as any).en === "string";
 }
 
 export function t(
   lang: string,
   keyOrValue: string | LanguageJson | undefined,
-  fallback: string = ""
+  fallback = ""
 ): string {
-  const safeLang: Lang = isLang(lang) ? lang : DEFAULT_LANG;
+  const safeLang: SupportedLanguage = isSupportedLanguage(lang) ? lang : DEFAULT_LANG;
 
   if (isLanguageJson(keyOrValue)) {
-    return keyOrValue?.[safeLang] || keyOrValue?.en || fallback;
+    return keyOrValue[safeLang] || keyOrValue.en || fallback;
   }
 
   if (typeof keyOrValue === "string") {
@@ -60,10 +60,10 @@ export function t(
 
     if (!s.includes(".")) return s;
 
-    const hit = get(messages[safeLang], s);
+    const hit = get(langs[safeLang], s);
     if (typeof hit === "string") return hit;
 
-    const enHit = get(messages.en, s);
+    const enHit = get(langs.en, s);
     if (typeof enHit === "string") return enHit;
 
     return fallback || s;
@@ -73,9 +73,9 @@ export function t(
 }
 
 export function tL(
-  lang: Lang,
+  lang: SupportedLanguage,
   keyOrValue: string | LanguageJson | undefined,
-  fallback: string = ""
+  fallback = ""
 ): string {
   return t(lang, keyOrValue, fallback);
 }

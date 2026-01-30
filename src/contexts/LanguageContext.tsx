@@ -1,8 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from "react";
-
-export type SupportedLanguage = string;
+import type { SupportedLanguage } from "@/i18n/languages";
 
 export const LanguageContext = createContext<{
   language: SupportedLanguage;

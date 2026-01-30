@@ -1,32 +1,34 @@
 export const contact = {
   header: "お問い合わせ",
-  clickToActionHeader: "法的支援が必要ですか？",
-  subheader: "今日ご連絡いただき、相談してください。私たちがあなたの法律問題を自信を持って解決するお手伝いをいたします。",
+  clickToActionHeader: "法的サポートが必要ですか？",
+  subheader: "まずはご相談ください。自信を持って法的問題を解決できるようサポートします。",
   buttonLabel: "お問い合わせ",
-  modalTitle: "メールを送信",
+  modalTitle: "メール送信",
 
   address: "住所",
   phoneNumber: "電話番号",
   email: "メール",
 
-  name: "名前",
+  name: "氏名",
   username: "ユーザー名",
   roles: "役割",
 
-  yourName: "あなたの名前",
-  yourPhoneNumber: "あなたの電話番号",
-  yourEmail: "あなたのメールアドレス",
+  phone: "電話",
+
+  yourName: "お名前",
+  yourPhoneNumber: "電話番号",
+  yourEmail: "メールアドレス",
 
   subject: "件名",
   message: "メッセージ",
 
   sendEmail: "メールを送信",
 
-  notifSuccess: "メールの送信に成功しました！",
-  notifFailure: "メールの送信に失敗しました",
-  notifGenericFailure: "メールの送信に失敗しました。後でもう一度お試しください。",
+  notifSuccess: "メールを送信しました！",
+  notifFailure: "メール送信に失敗しました",
+  notifGenericFailure: "メール送信に失敗しました。しばらくしてから再度お試しください。",
 
-  mapNotice: "地図は利用可能になり次第ここに表示されます。",
+  mapNotice: "利用可能になり次第、ここに地図が表示されます。",
 
   yourNameRequired: "お名前は必須です。",
   yourPhoneNumberRequired: "電話番号は必須です。",
@@ -36,4 +38,8 @@ export const contact = {
 
   contacts: "連絡先",
   noContacts: "利用可能な連絡先がありません",
+
+  location: "場所",
+  openMap: "地図を開く",
+  locationMapTitle: "所在地マップ",
 } as const;

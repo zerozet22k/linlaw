@@ -1,4 +1,4 @@
-import { DEFAULT_LANG, isLang, Lang } from "./languages";
+import { DEFAULT_LANG, isSupportedLanguage, type SupportedLanguage } from "./languages";
 import type { LanguageJson } from "./types";
 
 export const getTranslatedText = (
@@ -8,8 +8,8 @@ export const getTranslatedText = (
 ): string => {
   if (!translations) return "";
 
-  const lang: Lang = isLang(language) ? language : DEFAULT_LANG;
-  const fb: Lang = isLang(fallbackLang) ? (fallbackLang as Lang) : DEFAULT_LANG;
+  const lang: SupportedLanguage = isSupportedLanguage(language) ? language : DEFAULT_LANG;
+  const fb: SupportedLanguage = isSupportedLanguage(fallbackLang) ? fallbackLang : DEFAULT_LANG;
 
   return translations[lang] || translations[fb] || translations.en || "";
 };

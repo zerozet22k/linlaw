@@ -1,9 +1,10 @@
 export const contact = {
-  header: "ကျွန်ုပ်တို့ကို ဆက်သွယ်ပါ",
-  clickToActionHeader: "ဥပဒေအကူအညီလိုအပ်ပါသလား?",
-  subheader: "ဆွေးနွေးရန်အတွက် ယနေ့ကျွန်ုပ်တို့ကို ဆက်သွယ်လိုက်ပါ၊ သင်၏ဥပဒေရေးရာကိစ္စများကို ယုံကြည်စိတ်ချစွာ လမ်းညွှန်ပေးနိုင်ရန် ကျွန်ုပ်တို့ကူညီပါမည်။",
+  header: "ဆက်သွယ်ရန်",
+  clickToActionHeader: "ဥပဒေရေးရာအကူအညီ လိုအပ်ပါသလား?",
+  subheader:
+    "ယနေ့ပဲ ဆက်သွယ်ပါ။ သင်၏ ဥပဒေရေးရာပြဿနာများကို ယုံကြည်မှုနဲ့ ဖြေရှင်းနိုင်ရန် ကူညီပေးပါမည်။",
   buttonLabel: "ဆက်သွယ်ရန်",
-  modalTitle: "အီးမေးလ်ပို့မည်",
+  modalTitle: "အီးမေးလ် ပို့မည်",
 
   address: "လိပ်စာ",
   phoneNumber: "ဖုန်းနံပါတ်",
@@ -13,27 +14,33 @@ export const contact = {
   username: "အသုံးပြုသူအမည်",
   roles: "အခန်းကဏ္ဍများ",
 
+  phone: "ဖုန်း",
+
   yourName: "သင့်အမည်",
   yourPhoneNumber: "သင့်ဖုန်းနံပါတ်",
   yourEmail: "သင့်အီးမေးလ်",
 
-  subject: "ခေါင်းစဉ်",
-  message: "စာတို",
+  subject: "အကြောင်းအရာ",
+  message: "စာသား",
 
-  sendEmail: "အီးမေးလ်ပို့မည်",
+  sendEmail: "အီးမေးလ် ပို့မည်",
 
-  notifSuccess: "အီးမေးလ်ကိုအောင်မြင်စွာပို့ပြီးပါပြီ!",
-  notifFailure: "အီးမေးလ်ပို့ရန် မအောင်မြင်ပါ",
-  notifGenericFailure: "အီးမေးလ်ပို့ရန် မအောင်မြင်ပါ၊ နောက်မှ ထပ်မံကြိုးစားပါ။",
+  notifSuccess: "အီးမေးလ် အောင်မြင်စွာ ပို့ပြီးပါပြီ!",
+  notifFailure: "အီးမေးလ် ပို့ခြင်း မအောင်မြင်ပါ",
+  notifGenericFailure: "အီးမေးလ် ပို့ခြင်း မအောင်မြင်ပါ။ နောက်မှ ထပ်မံ ကြိုးစားပါ။",
 
-  mapNotice: "မြေပုံကို အသုံးပြုနိုင်လာသည်နှင့် မျက်နှာပြင်တွင် ပြပါမည်။",
+  mapNotice: "မြေပုံ ရရှိလာပါက ဒီမှာ ပြသပါမည်။",
 
-  yourNameRequired: "သင့်အမည်လိုအပ်ပါသည်။",
-  yourPhoneNumberRequired: "သင့်ဖုန်းနံပါတ်လိုအပ်ပါသည်။",
-  yourEmailRequired: "သင့်အီးမေးလ်လိုအပ်ပါသည်။",
-  subjectRequired: "ခေါင်းစဉ်လိုအပ်ပါသည်။",
-  messageRequired: "စာတိုလိုအပ်ပါသည်။",
+  yourNameRequired: "သင့်အမည် လိုအပ်ပါသည်။",
+  yourPhoneNumberRequired: "သင့်ဖုန်းနံပါတ် လိုအပ်ပါသည်။",
+  yourEmailRequired: "သင့်အီးမေးလ် လိုအပ်ပါသည်။",
+  subjectRequired: "အကြောင်းအရာ လိုအပ်ပါသည်။",
+  messageRequired: "စာသား လိုအပ်ပါသည်။",
 
   contacts: "ဆက်သွယ်ရန်များ",
-  noContacts: "မည်သည့်ဆက်သွယ်ရန်မရှိပါ",
+  noContacts: "ဆက်သွယ်ရန် မရှိပါ",
+
+  location: "တည်နေရာ",
+  openMap: "မြေပုံ ဖွင့်မည်",
+  locationMapTitle: "တည်နေရာ မြေပုံ",
 } as const;

@@ -1,8 +1,9 @@
 export const contact = {
   header: "Contactez-nous",
-  clickToActionHeader: "Besoin d'aide juridique ?",
-  subheader: "Contactez-nous dès aujourd'hui pour une consultation et laissez-nous vous aider à gérer vos questions juridiques en toute confiance.",
-  buttonLabel: "Contactez-nous",
+  clickToActionHeader: "Besoin d’une assistance juridique ?",
+  subheader:
+    "Contactez-nous dès aujourd’hui pour une consultation et laissez-nous vous aider à gérer vos affaires juridiques en toute confiance.",
+  buttonLabel: "Nous contacter",
   modalTitle: "Envoyer un e-mail",
 
   address: "Adresse",
@@ -10,23 +11,25 @@ export const contact = {
   email: "E-mail",
 
   name: "Nom",
-  username: "Nom d'utilisateur",
+  username: "Nom d’utilisateur",
   roles: "Rôles",
+
+  phone: "Téléphone",
 
   yourName: "Votre nom",
   yourPhoneNumber: "Votre numéro de téléphone",
   yourEmail: "Votre e-mail",
 
-  subject: "Sujet", 
+  subject: "Sujet",
   message: "Message",
 
-  sendEmail: "Envoyer l'e-mail",
+  sendEmail: "Envoyer l’e-mail",
 
   notifSuccess: "E-mail envoyé avec succès !",
-  notifFailure: "L'envoi de l'e-mail a échoué",
-  notifGenericFailure: "L'envoi de l'e-mail a échoué, veuillez réessayer plus tard.",
+  notifFailure: "Échec de l’envoi de l’e-mail",
+  notifGenericFailure: "Échec de l’envoi de l’e-mail. Veuillez réessayer plus tard.",
 
-  mapNotice: "La carte apparaîtra ici dès qu'elle sera disponible.",
+  mapNotice: "La carte apparaîtra ici lorsqu’elle sera disponible.",
 
   yourNameRequired: "Votre nom est requis.",
   yourPhoneNumberRequired: "Votre numéro de téléphone est requis.",
@@ -36,4 +39,8 @@ export const contact = {
 
   contacts: "Contacts",
   noContacts: "Aucun contact disponible",
+
+  location: "Emplacement",
+  openMap: "Ouvrir la carte",
+  locationMapTitle: "Carte de localisation",
 } as const;

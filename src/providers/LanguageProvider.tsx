@@ -1,6 +1,7 @@
 "use client";
-import { LanguageContext, SupportedLanguage } from "@/contexts/LanguageContext";
+import { LanguageContext, } from "@/contexts/LanguageContext";
 import { useSettings } from "@/hooks/useSettings";
+import { SupportedLanguage } from "@/i18n/languages";
 import { ReactNode, useState, useEffect } from "react";
 
 const LANGUAGE_STORAGE_KEY = "selected_language";

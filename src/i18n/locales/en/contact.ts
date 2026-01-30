@@ -13,6 +13,9 @@ export const contact = {
   username: "Username",
   roles: "Roles",
 
+  // ✅ added (you listed it)
+  phone: "Phone",
+
   yourName: "Your Name",
   yourPhoneNumber: "Your Phone Number",
   yourEmail: "Your Email",
@@ -36,4 +39,7 @@ export const contact = {
 
   contacts: "Contacts",
   noContacts: "No contacts available",
+  location: "Location",
+  openMap: "Open Map",
+  locationMapTitle: "Location Map",
 } as const;

@@ -1,6 +1,6 @@
 export const common = {
   readMore: "Leer más",
-  readLess: "Leer menos",
+  readLess: "Mostrar menos",
   viewAll: "Ver todo",
   optional: "Opcional",
   clickToView: "Haga clic para ver",
@@ -11,7 +11,7 @@ export const common = {
   error: "Error",
   loading: "Cargando...",
   success: "Éxito",
-  failed: "Fallido",
+  failed: "Falló",
   noData: "Sin datos",
   yes: "Sí",
   no: "No",
@@ -47,11 +47,19 @@ export const common = {
   notFound: "No encontrado",
   welcome: "Bienvenido",
   goodbye: "Adiós",
-  pleaseWait: "Por favor espera...",
+  pleaseWait: "Por favor espere...",
   profile: "Perfil de usuario",
   viewProfile: "Ver perfil",
   website: "Sitio web",
   operatingHours: "Horario de atención",
   socialLinks: "Enlaces sociales",
   mapLocation: "Ubicación en el mapa",
+
+  open: "Abrir",
+  address: "Dirección",
+  results: "Resultados",
+  view: "Ver",
+
+  heroSliderAriaLabel: "Carrusel principal",
+  slideAltFallback: "Imagen de diapositiva",
 } as const;

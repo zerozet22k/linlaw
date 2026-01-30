@@ -9,13 +9,18 @@ import { th } from "./locales/th/index";
 import { ms } from "./locales/ms/index";
 import { my } from "./locales/my/index";
 
-export const messages = { en, fr, de, es, zh, ja, ko, th, ms, my } as const;
-export type Lang = keyof typeof messages;
+export const langs = { en, fr, de, es, zh, ja, ko, th, ms, my } as const;
 
-export const DEFAULT_LANG: Lang = "en";
-export const SUPPORTED_LANGS = Object.keys(messages) as Lang[];
-export const isLang = (x: string): x is Lang => x in messages;
-const _localeShapeCheck = messages satisfies Record<Lang, BaseLocale>;
+/** Canonical language union */
+export type SupportedLanguage = keyof typeof langs;
+
+export const DEFAULT_LANG: SupportedLanguage = "en";
+export const SUPPORTED_LANGS = Object.keys(langs) as SupportedLanguage[];
+
+export const isSupportedLanguage = (x: string): x is SupportedLanguage => x in langs;
+
+// compile-time shape check
+const _localeShapeCheck = langs satisfies Record<SupportedLanguage, BaseLocale>;
 void _localeShapeCheck;
 
 export const languageFlags = {
@@ -27,9 +32,9 @@ export const languageFlags = {
   ja: "jp",
   ko: "kr",
   th: "th",
-  ms: "my", 
-  my: "mm", 
-} as const satisfies Record<Lang, string>;
+  ms: "my",
+  my: "mm",
+} as const satisfies Record<SupportedLanguage, string>;
 
 export const languageNames = {
   en: "English",
@@ -42,7 +47,7 @@ export const languageNames = {
   th: "Thai",
   ms: "Malay",
   my: "Burmese",
-} as const satisfies Record<Lang, string>;
+} as const satisfies Record<SupportedLanguage, string>;
 
 export const languageNativeNames = {
   en: "English",
@@ -55,23 +60,21 @@ export const languageNativeNames = {
   th: "ไทย",
   ms: "Bahasa Melayu",
   my: "မြန်မာ",
-} as const satisfies Record<Lang, string>;
+} as const satisfies Record<SupportedLanguage, string>;
 
 export type LanguageOption = {
-  code: Lang;
+  code: SupportedLanguage;
   name: string;
   nativeName: string;
   flag: string;
 };
 
-export const languages: LanguageOption[] = (Object.keys(languageNames) as Lang[]).map(
-  (code) => ({
-    code,
-    name: languageNames[code],
-    nativeName: languageNativeNames[code],
-    flag: languageFlags[code],
-  })
-);
+export const languages: LanguageOption[] = SUPPORTED_LANGS.map((code) => ({
+  code,
+  name: languageNames[code],
+  nativeName: languageNativeNames[code],
+  flag: languageFlags[code],
+}));
 
 // Re-export for convenience
 export type { BaseLocale };

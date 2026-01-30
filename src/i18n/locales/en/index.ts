@@ -2,10 +2,25 @@ import { contact } from "./contact";
 import { common } from "./common";
 import { title } from "./title";
 
-export const en = { contact, common, title } as const;
+import { relatedBusinesses } from "./relatedBusinesses";
+import { newsletter } from "./newsletter";
+import { career } from "./career";
+import { team } from "./team";
+import { faq } from "./faq";
+import { aboutUs } from "./aboutUs";
 
-// Turn "Contact Us" literal types into just `string`,
-// while preserving exact key structure.
+export const en = {
+  contact,
+  common,
+  title,
+  relatedBusinesses,
+  newsletter,
+  career,
+  team,
+  faq,
+  aboutUs,
+} as const;
+
 type DeepWiden<T> =
   T extends string ? string :
   T extends number ? number :

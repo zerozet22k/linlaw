@@ -1,4 +1,4 @@
 export const title = {
   newsletterTitle: "Nuestros boletines",
-  newsletterSubtitle: "Tu fuente de actualizaciones legales",
+  newsletterSubtitle: "Su fuente de actualizaciones legales",
 } as const;

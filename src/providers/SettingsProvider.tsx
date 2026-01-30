@@ -11,6 +11,7 @@ import { LANGUAGE_SETTINGS_KEYS } from "@/config/CMS/settings/keys/LANGUAGE_SETT
 import { PUSHER_SETTINGS_KEYS } from "@/config/CMS/settings/keys/PUSHER_SETTINGS_KEYS";
 import apiClient from "@/utils/api/apiClient";
 import { SettingsContext } from "@/contexts/SettingsContext";
+import { isSupportedLanguage, type SupportedLanguage } from "@/i18n/languages";
 
 const replacePublicSettings = (
   baseSettings: Partial<SettingsInterface>,
@@ -47,26 +48,31 @@ export const SettingsProvider: React.FC<{
     return !siteSettings?.siteName?.trim() || !siteSettings?.siteUrl?.trim();
   }, [currentSettings]);
 
-  const supportedLanguages = useMemo(() => {
-    const languageSettings = currentSettings[
+  const supportedLanguages = useMemo<SupportedLanguage[]>(() => {
+    const languageSettingsRaw = currentSettings[
       LANGUAGE_SETTINGS_KEYS.SUPPORTED_LANGUAGES as keyof SettingsInterface
-    ] as string[] | undefined;
+    ] as unknown;
 
-    return Array.from(new Set(["en", ...(languageSettings || [])]));
+    const fromSettings = Array.isArray(languageSettingsRaw)
+      ? languageSettingsRaw.filter((x): x is string => typeof x === "string")
+      : [];
+
+    const filtered = fromSettings.filter(isSupportedLanguage);
+
+    const merged = Array.from(new Set<SupportedLanguage>(["en", ...filtered]));
+
+    return merged.length ? merged : (["en"] as SupportedLanguage[]);
   }, [currentSettings]);
 
   const pusherConfig = useMemo(() => {
     return currentSettings[PUSHER_SETTINGS_KEYS.PUSHER];
   }, [currentSettings]);
 
-  const updateSettings = useCallback(
-    (newSettings: Partial<SettingsInterface>) => {
-      setCurrentSettings((prevSettings) => {
-        return replacePublicSettings(prevSettings, newSettings);
-      });
-    },
-    []
-  );
+  const updateSettings = useCallback((newSettings: Partial<SettingsInterface>) => {
+    setCurrentSettings((prevSettings) => {
+      return replacePublicSettings(prevSettings, newSettings);
+    });
+  }, []);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -87,7 +93,7 @@ export const SettingsProvider: React.FC<{
         settings: currentSettings,
         themeMode,
         requiresSetup,
-        supportedLanguages,
+        supportedLanguages, 
         updateSettings,
         fetchSettings,
         pusherConfig,

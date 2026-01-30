@@ -1,4 +1,4 @@
 export const title = {
-  newsletterTitle: "ကျွန်ုပ်တို့၏သတင်းစာများ",
-  newsletterSubtitle: "ဥပဒေအပ်ဒိတ်များအတွက် သင်၏ရင်းမြစ်",
+  newsletterTitle: "သတင်းလွှာများ",
+  newsletterSubtitle: "ဥပဒေရေးရာ အပ်ဒိတ်များ၏ အရင်းအမြစ်",
 } as const;

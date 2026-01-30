@@ -1,6 +1,7 @@
 "use client";
 
-import { LanguageContext, SupportedLanguage } from "@/contexts/LanguageContext";
+import { LanguageContext, } from "@/contexts/LanguageContext";
+import { SupportedLanguage } from "@/i18n/languages";
 import { useContext } from "react";
 
 export const useLanguage = () => {
