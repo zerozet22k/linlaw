@@ -2,21 +2,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Typography,
-  Alert,
-  Empty,
-  Card,
-  Skeleton,
-  theme,
-  Grid,
-  Button,
-} from "antd";
+import { Typography, Alert, Empty, Card, Skeleton, theme, Grid, Button } from "antd";
 import Link from "next/link";
-import { getTranslatedText } from "@/utils/getTranslatedText";
-import { INewsletterAPI } from "@/models/Newsletter";
+
 import apiClient from "@/utils/api/apiClient";
-import { commonTranslations } from "@/translations";
+import { INewsletterAPI } from "@/models/Newsletter";
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/i18n";
+
 import {
   HOME_PAGE_SETTINGS_KEYS as K,
   HOME_PAGE_SETTINGS_TYPES,
@@ -35,21 +28,12 @@ type Props = {
 function resolveLocalized(val: any, language: string): string {
   if (!val) return "";
   if (typeof val === "string") return val.trim();
-  if (typeof val === "object") {
-    return String(val?.[language] ?? val?.en ?? "").trim();
-  }
+  if (typeof val === "object") return String(val?.[language] ?? val?.en ?? "").trim();
   return "";
 }
 
 function extractPreview(item: any, language: string): string {
-  const candidates = [
-    item?.excerpt,
-    item?.summary,
-    item?.description,
-    item?.content,
-    item?.body,
-  ];
-
+  const candidates = [item?.excerpt, item?.summary, item?.description, item?.content, item?.body];
   for (const c of candidates) {
     const v = resolveLocalized(c, language);
     if (v) return v;
@@ -58,9 +42,9 @@ function extractPreview(item: any, language: string): string {
 }
 
 function clampText(s: string, max = 140) {
-  const t = (s || "").replace(/\s+/g, " ").trim();
-  if (!t) return "";
-  return t.length > max ? `${t.slice(0, max).trim()}…` : t;
+  const tt = (s || "").replace(/\s+/g, " ").trim();
+  if (!tt) return "";
+  return tt.length > max ? `${tt.slice(0, max).trim()}…` : tt;
 }
 
 function formatDotDate(d?: string | number | Date) {
@@ -85,7 +69,6 @@ function getCategoryLabel(item: any, language: string) {
   );
 }
 
-// used to pick featured cards by category if API provides it
 function getCategoryKey(item: any) {
   return String(item?.category ?? item?.type ?? item?.tag ?? "")
     .toLowerCase()
@@ -103,6 +86,12 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tReadMore = useMemo(() => t(language, "common.readMore"), [language]);
+  const tViewAll = useMemo(() => t(language, "newsletter.viewAll"), [language]);
+  const tFailedToLoad = useMemo(() => t(language, "newsletter.failedToLoad"), [language]);
+  const tNoData = useMemo(() => t(language, "common.noData"), [language]);
+
   useEffect(() => {
     let mounted = true;
 
@@ -112,13 +101,11 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
 
       try {
         const res = await apiClient.get(`/newsletters?search=&page=1&limit=6`);
-        const list = Array.isArray(res?.data?.newsletters)
-          ? (res.data.newsletters as INewsletterAPI[])
-          : [];
+        const list = Array.isArray(res?.data?.newsletters) ? (res.data.newsletters as INewsletterAPI[]) : [];
         if (mounted) setNewsletters(list);
       } catch (e) {
         console.error("Newsletter fetch error:", e);
-        if (mounted) setError("Failed to load newsletters.");
+        if (mounted) setError(tFailedToLoad);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -127,12 +114,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     return () => {
       mounted = false;
     };
-  }, []);
-
-  const tReadMore =
-    getTranslatedText(commonTranslations.readMore, language) || "Read More";
-  const tViewAll =
-    getTranslatedText(commonTranslations.viewAll, language) || "View all newsletters";
+  }, [tFailedToLoad]);
 
   const sorted = useMemo(() => {
     const arr = Array.isArray(newsletters) ? [...newsletters] : [];
@@ -161,7 +143,6 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     return { bigLeft: left, bigRight: right, small: rest };
   }, [sorted]);
 
-  // IMPORTANT: no inner title/header (outer section handles it)
   const containerStyle: React.CSSProperties = {
     width: "100%",
     maxWidth: 980,
@@ -184,7 +165,6 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     marginTop: token.marginLG,
   };
 
-  // Glassy look (works well over background image)
   const glassBorder = "1px solid rgba(255,255,255,0.28)";
   const glassShadow = "0 18px 40px rgba(0,0,0,0.25)";
 
@@ -258,7 +238,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     if (!item) return null;
 
     const id = item?._id;
-    const title = resolveLocalized(item?.title, language) || "Untitled";
+    const title = resolveLocalized(item?.title, language) || t(language, "newsletter.untitled");
     const preview = clampText(extractPreview(item, language), 170);
     const date = formatDotDate(item?.createdAt);
     const cat = getCategoryLabel(item, language);
@@ -267,7 +247,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
       <Link
         href={`/newsletters/${id}`}
         style={{ textDecoration: "none", display: "block" }}
-        aria-label={`Open newsletter: ${title}`}
+        aria-label={`${t(language, "common.open")} newsletter: ${title}`}
       >
         <Card
           variant="borderless"
@@ -336,7 +316,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     if (!item) return null;
 
     const id = item?._id;
-    const title = resolveLocalized(item?.title, language) || "Untitled";
+    const title = resolveLocalized(item?.title, language) || t(language, "newsletter.untitled");
     const preview = clampText(extractPreview(item, language), 95);
     const date = formatDotDate(item?.createdAt);
     const cat = getCategoryLabel(item, language);
@@ -345,7 +325,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
       <Link
         href={`/newsletters/${id}`}
         style={{ textDecoration: "none", display: "block" }}
-        aria-label={`Open newsletter: ${title}`}
+        aria-label={`${t(language, "common.open")} newsletter: ${title}`}
       >
         <Card
           variant="borderless"
@@ -390,7 +370,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
             <Text style={dateStyleLight}>{date}</Text>
           </div>
         </Card>
-      </Link >
+      </Link>
     );
   };
 
@@ -398,19 +378,10 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
 
   if (loading) {
     return (
-      <div
-        data-component="NewsletterSection"
-        aria-busy="true"
-        style={containerStyle}
-      >
+      <div data-component="NewsletterSection" aria-busy="true" style={containerStyle}>
         <div style={gridTopStyle}>
           {Array.from({ length: 2 }).map((_, i) => (
-            <Card
-              key={i}
-              variant="borderless"
-              style={darkCardStyle}
-              styles={{ body: { padding: 26 } }}
-            >
+            <Card key={i} variant="borderless" style={darkCardStyle} styles={{ body: { padding: 26 } }}>
               <Skeleton active title paragraph={{ rows: 3 }} />
             </Card>
           ))}
@@ -418,30 +389,20 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
 
         <div style={gridBottomStyle}>
           {Array.from({ length: isLgUp ? 3 : isMdUp ? 2 : 3 }).map((_, i) => (
-            <Card
-              key={i}
-              variant="borderless"
-              style={lightCardStyle}
-              styles={{ body: { padding: 24 } }}
-            >
+            <Card key={i} variant="borderless" style={lightCardStyle} styles={{ body: { padding: 24 } }}>
               <Skeleton active title paragraph={{ rows: 2 }} />
             </Card>
-          ))
-          }
-        </div >
-      </div >
+          ))}
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <div
-        data-component="NewsletterSection"
-        aria-busy="false"
-        style={containerStyle}
-      >
+      <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
         <Alert
-          message="Error"
+          message={tError}
           description={error}
           type="error"
           showIcon
@@ -453,22 +414,14 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
 
   if (!bigLeft) {
     return (
-      <div
-        data-component="NewsletterSection"
-        aria-busy="false"
-        style={containerStyle}
-      >
-        <Empty description="No newsletters found." />
+      <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
+        <Empty description={tNoData} />
       </div>
     );
   }
 
   return (
-    <div
-      data-component="NewsletterSection"
-      aria-busy="false"
-      style={containerStyle}
-    >
+    <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
       <div style={gridTopStyle}>
         {renderBigCard(bigLeft)}
         {renderBigCard(bigRight)}
@@ -476,14 +429,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
 
       <div style={gridBottomStyle}>{small.map((it) => renderSmallCard(it))}</div>
 
-      {/* View all button */}
-      <div
-        style={{
-          marginTop: token.marginLG,
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
+      <div style={{ marginTop: token.marginLG, display: "flex", justifyContent: "center" }}>
         <Link href="/newsletters" style={{ textDecoration: "none" }}>
           <Button
             size="large"

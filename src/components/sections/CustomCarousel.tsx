@@ -69,8 +69,6 @@ const CustomCarousel: React.FC<CustomCarouselProps> = ({
   const show = Math.min(slidesToShow, Math.max(1, totalChildren));
 
   const effectiveW = Math.max(0, containerW - paddingInline * 2);
-
-  // keep this math (it matches "show cards with (show-1) gaps")
   const slidePx = useMemo(() => {
     if (!effectiveW) return 0;
     const gapsTotal = Math.max(0, show - 1) * gapPx;

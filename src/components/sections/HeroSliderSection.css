@@ -4,7 +4,6 @@
   user-select: none;
 }
 
-/* Swiper canvas sizing: keep your "full hero" feel */
 .heroSwiper {
   width: 100%;
   height: calc(100vh - 130px);

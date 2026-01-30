@@ -1,20 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Button, Card, Descriptions, Alert } from "antd";
+import React, { useState, useEffect, useMemo } from "react";
+import { Button, Card, Descriptions, Alert, theme } from "antd";
 import ProfileUpdateForm from "@/components/forms/ProfileUpdateForm";
 import { useRouter } from "next/navigation";
 import SubLoader from "@/components/loaders/SubLoader";
 import { useUser } from "@/hooks/useUser";
 import { useLanguage } from "@/hooks/useLanguage";
-import { getTranslatedText } from "@/utils/getTranslatedText";
-import { commonTranslations } from "@/translations";
-import { contactTranslations } from "@/translations/";
+import { t } from "@/i18n";
 
 const UserProfile: React.FC = () => {
   const { user, refreshUser, initialLoading } = useUser();
   const router = useRouter();
   const { language } = useLanguage();
+  const { token } = theme.useToken();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
@@ -24,26 +23,16 @@ const UserProfile: React.FC = () => {
     }
   }, [user, initialLoading, router]);
 
-  const tLoading =
-    getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const tUserNotFound =
-    getTranslatedText(commonTranslations.notFound, language) ||
-    "User Not Found";
-  const tNoData =
-    getTranslatedText(commonTranslations.noData, language) ||
-    "No user data available.";
-  const tEdit =
-    getTranslatedText(commonTranslations.edit, language) || "Edit Profile";
-  const tUserProfile =
-    getTranslatedText(commonTranslations.profile, language) || "User Profile";
-  const tName = getTranslatedText(contactTranslations.name, language) || "Name";
-  const tUsername =
-    getTranslatedText(contactTranslations.username, language) || "Username";
-  const tEmail =
-    getTranslatedText(contactTranslations.email, language) || "Email";
-  const tRoles =
-    getTranslatedText(contactTranslations.roles, language) || "Roles";
-  const tNA = getTranslatedText(commonTranslations.empty, language) || "N/A";
+  const tLoading = useMemo(() => t(language, "common.loading"), [language]);
+  const tUserNotFound = useMemo(() => t(language, "common.notFound"), [language]);
+  const tNoData = useMemo(() => t(language, "common.noData"), [language]);
+  const tEdit = useMemo(() => t(language, "common.edit"), [language]);
+  const tUserProfile = useMemo(() => t(language, "common.profile"), [language]);
+  const tName = useMemo(() => t(language, "contact.name"), [language]);
+  const tUsername = useMemo(() => t(language, "contact.username"), [language]);
+  const tEmail = useMemo(() => t(language, "contact.email"), [language]);
+  const tRoles = useMemo(() => t(language, "contact.roles"), [language]);
+  const tNA = useMemo(() => t(language, "common.empty"), [language]);
 
   if (initialLoading) {
     return <SubLoader tip={tLoading} />;
@@ -52,18 +41,13 @@ const UserProfile: React.FC = () => {
   if (!user) {
     return (
       <div style={{ maxWidth: 600, margin: "50px auto" }}>
-        <Alert
-          message={tUserNotFound}
-          description={tNoData}
-          type="warning"
-          showIcon
-        />
+        <Alert message={tUserNotFound} description={tNoData} type="warning" showIcon />
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: 20 }}>
       <Card
         title={tUserProfile}
         extra={
@@ -72,20 +56,18 @@ const UserProfile: React.FC = () => {
           </Button>
         }
         style={{
-          borderRadius: "10px",
+          borderRadius: 10,
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          background: token.colorBgContainer,
+          border: `1px solid ${token.colorBorderSecondary}`,
         }}
       >
         <Descriptions column={1} bordered>
           <Descriptions.Item label={tName}>{user.name}</Descriptions.Item>
-          <Descriptions.Item label={tUsername}>
-            {user.username}
-          </Descriptions.Item>
+          <Descriptions.Item label={tUsername}>{user.username}</Descriptions.Item>
           <Descriptions.Item label={tEmail}>{user.email}</Descriptions.Item>
           <Descriptions.Item label={tRoles}>
-            {user.roles?.length
-              ? user.roles.map((role) => role.name).join(", ")
-              : tNA}
+            {user.roles?.length ? user.roles.map((role) => role.name).join(", ") : tNA}
           </Descriptions.Item>
         </Descriptions>
       </Card>

@@ -10,7 +10,7 @@ import {
 import { SHARED_PAGE_CONTENT_FIELDS } from "./shared/sharedPageConfig";
 import { SharedPageContentType } from "./shared/sharedPageTypes";
 import { SECTION, SectionProps } from "../../fields/SECTION_SETTINGS";
-import { LanguageJson } from "@/utils/getTranslatedText";
+import type { LanguageJson } from "@/i18n/types";
 
 const pageName = "careers";
 

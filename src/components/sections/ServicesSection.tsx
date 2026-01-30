@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { Card, theme } from "antd";
 import { motion, useReducedMotion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+import { t } from "@/i18n";
 import {
   HOME_PAGE_SETTINGS_KEYS as K,
   HOME_PAGE_SETTINGS_TYPES,
@@ -17,6 +17,9 @@ type ServicesSectionProps = {
   language: string;
 };
 
+const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
+const tt = (lang: string, v: any, fallback = "") => clean(t(lang, v, fallback));
+
 const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => {
   const { token } = theme.useToken();
   const reduceMotion = useReducedMotion();
@@ -28,10 +31,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => 
 
   if (items.length === 0) return null;
 
-  const baseShadow =
-    (token as any).boxShadowSecondary || "0 8px 24px rgba(0,0,0,0.06)";
-  const hoverShadow =
-    (token as any).boxShadowTertiary || "0 14px 40px rgba(0,0,0,0.10)";
+  const baseShadow = (token as any).boxShadowSecondary || "0 8px 24px rgba(0,0,0,0.06)";
+  const hoverShadow = (token as any).boxShadowTertiary || "0 14px 40px rgba(0,0,0,0.10)";
 
   const outerStyle: React.CSSProperties = {
     width: "100%",
@@ -61,8 +62,8 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => 
     <div style={outerStyle}>
       <div style={gridStyle}>
         {items.map((service: any, index: number) => {
-          const title = (getTranslatedText(service.title, language) || "").trim();
-          const desc = (getTranslatedText(service.description, language) || "").trim();
+          const title = tt(language, service.title, "");
+          const desc = tt(language, service.description, "");
           if (!title && !desc) return null;
 
           const key = service._id || service.id || `${title}-${index}`;
@@ -74,11 +75,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => 
               initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.25 }}
-              transition={{
-                duration: 0.45,
-                ease: "easeOut",
-                delay: index * 0.06,
-              }}
+              transition={{ duration: 0.45, ease: "easeOut", delay: index * 0.06 }}
               whileHover={reduceMotion ? {} : { y: -4 }}
               style={{
                 width: "100%",
@@ -129,6 +126,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => 
 
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                   <div
+                    aria-hidden
                     style={{
                       width: 44,
                       height: 44,
@@ -164,7 +162,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => 
                   </div>
                 </div>
 
-                {desc && (
+                {!!desc && (
                   <p
                     style={{
                       margin: 0,
@@ -173,7 +171,9 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ data, language }) => 
                       lineHeight: 1.7,
                       whiteSpace: "pre-line",
                       flexGrow: 1,
-
+                      overflowWrap: "anywhere",
+                      wordBreak: "break-word",
+                      hyphens: "auto",
                     }}
                   >
                     {desc}

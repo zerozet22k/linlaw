@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Types } from "mongoose";
-import { LanguageJson } from "@/utils/getTranslatedText";
 import { newsletterModelName } from ".";
+import { LanguageJson } from "@/i18n/types";
 
 export interface INewsletterAttachmentBase {
   fileName: string;

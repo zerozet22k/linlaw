@@ -6,7 +6,7 @@ import { lighten, darken } from "polished";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
 import { languageInputWrapperStyle, languageInputStyle } from "../../InputStyle";
-import { languageFlags, languageNames } from "@/models/languages";
+import { languageFlags, languageNames } from "@/i18n/languages";
 import Image from "next/image";
 
 interface LanguageJsonTextareaProps {

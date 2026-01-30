@@ -5,7 +5,7 @@ import { Avatar, Select, Tag, theme } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { defaultWrapperStyle, defaultSelectStyle } from "../../InputStyle";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags, languageNames } from "@/models/languages";
+import { languageFlags, languageNames } from "@/i18n/languages";
 const { Option } = Select;
 
 interface Props {

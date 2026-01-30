@@ -16,23 +16,12 @@ import {
   Typography,
 } from "antd";
 import { useUser } from "@/hooks/useUser";
+import { formatDate } from "@/utils/fileUtils";
 
 const { Title, Text } = Typography;
 
 const cap = (s?: string) => (s ? s[0].toUpperCase() + s.slice(1) : "");
 
-const formatDate = (value: any) => {
-  if (!value) return "—";
-  const d = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(d.getTime())) return String(value);
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
-};
 
 export default function DashboardPage() {
   const { user } = useUser();

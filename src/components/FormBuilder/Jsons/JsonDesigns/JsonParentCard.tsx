@@ -3,7 +3,7 @@ import React from "react";
 import { Card, theme } from "antd";
 import { darken } from "polished";
 import FieldTitle from "../../Fields/extra/FieldTitle";
-import { hasRenderableChildren } from "@/utils/hasRenderableChildren";
+import { hasRenderableChildren } from "@/utils/components/hasRenderableChildren";
 
 type JsonParentCardProps = {
   label?: string | null;

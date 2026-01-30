@@ -1,5 +1,4 @@
-import { LanguageJson } from "@/utils/getTranslatedText";
-
+import { LanguageJson } from "@/i18n/types";
 export type CardStyle = "default" | "shadow" | "borderless";
 export type AnimationStyle = "none" | "fade-in" | "slide-up" | "scale-in";
 export type TextAlign = "left" | "center" | "right";

@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { Card, Typography, Avatar, theme, Grid } from "antd";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+import { t } from "@/i18n";
 import {
   HOME_PAGE_SETTINGS_KEYS,
   HOME_PAGE_SETTINGS_TYPES,
@@ -35,6 +35,9 @@ const pickInitials = (name: string) =>
 
 const EMPTY_ITEMS: TestimonialItem[] = [];
 
+const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
+const tt = (lang: string, v: any, fallback = "") => clean(t(lang, v, fallback));
+
 const Testimonials: React.FC<TestimonialsProps> = ({
   data,
   language,
@@ -44,30 +47,28 @@ const Testimonials: React.FC<TestimonialsProps> = ({
   const { token } = useToken();
   const screens = Grid.useBreakpoint();
 
-  // Make the array reference stable
   const raw = useMemo<TestimonialItem[]>(
     () => (Array.isArray(data?.items) ? data.items : EMPTY_ITEMS),
     [data?.items]
   );
 
   const items = useMemo(() => {
-    return raw.map((t, idx) => {
-      const name = (getTranslatedText(t.name, language) || "").trim();
-      const comment = (getTranslatedText(t.comment, language) || "").trim();
+    return raw.map((it, idx) => {
+      const name = tt(language, (it as any).name, "");
+      const comment = tt(language, (it as any).comment, "");
 
-      const title =
-        typeof (t as any).title === "string" ? (t as any).title.trim() : "";
-      const company =
-        typeof (t as any).company === "string" ? (t as any).company.trim() : "";
+      // these are not LanguageJson in your model (leave as plain strings)
+      const title = typeof (it as any).title === "string" ? (it as any).title.trim() : "";
+      const company = typeof (it as any).company === "string" ? (it as any).company.trim() : "";
 
       const sub = [title, company].filter(Boolean).join(" · ");
-      const avatar = (t as any).avatar as string | undefined;
+      const avatar = (it as any).avatar as string | undefined;
 
-      const id = (t as any)._id ?? (t as any).id;
+      const id = (it as any)._id ?? (it as any).id;
 
       return {
         key: String(id ?? idx),
-        name: name || "Anonymous",
+        name: name || tt(language, "testimonials.anonymous", "Anonymous"),
         comment: comment || "—",
         sub,
         avatar,
@@ -75,14 +76,12 @@ const Testimonials: React.FC<TestimonialsProps> = ({
     });
   }, [raw, language]);
 
-  // ✅ Hook must be before any early return
   const responsiveSlides = useMemo(() => {
     if (!screens.sm) return 1;
     if (!screens.md) return 2;
     return slidesToShow;
   }, [screens.sm, screens.md, slidesToShow]);
 
-  // Now you can early-return safely
   if (items.length === 0) return null;
 
   const show = Math.min(responsiveSlides, Math.max(1, items.length));
@@ -97,6 +96,8 @@ const Testimonials: React.FC<TestimonialsProps> = ({
   const clampChars = !screens.sm ? 260 : 340;
 
   const softShadow = "none";
+
+  const tVerified = tt(language, "testimonials.verifiedClientFeedback", "Verified client feedback");
 
   return (
     <section
@@ -121,15 +122,15 @@ const Testimonials: React.FC<TestimonialsProps> = ({
         paddingBottom={!screens.sm ? 8 : 10}
         paddingInline={0}
       >
-        {items.map((t) => {
+        {items.map((it) => {
           const commentDisplay =
-            t.comment.length > clampChars
-              ? t.comment.slice(0, clampChars).trimEnd() + "…"
-              : t.comment;
+            it.comment.length > clampChars
+              ? it.comment.slice(0, clampChars).trimEnd() + "…"
+              : it.comment;
 
           return (
             <div
-              key={t.key}
+              key={it.key}
               className="tsSlide"
               style={{
                 padding: slidePad,
@@ -192,14 +193,14 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                   <div className="tsAvatarWrap" aria-hidden>
                     <Avatar
                       size={48}
-                      src={t.avatar}
+                      src={it.avatar}
                       style={{
                         background: token.colorFillSecondary,
                         color: token.colorText,
                         fontWeight: 800,
                       }}
                     >
-                      {pickInitials(t.name)}
+                      {pickInitials(it.name)}
                     </Avatar>
                   </div>
 
@@ -215,12 +216,12 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                       }}
-                      title={t.name}
+                      title={it.name}
                     >
-                      {t.name}
+                      {it.name}
                     </Text>
 
-                    {!!t.sub && (
+                    {!!it.sub && (
                       <Text
                         style={{
                           display: "block",
@@ -231,9 +232,9 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                         }}
-                        title={t.sub}
+                        title={it.sub}
                       >
-                        {t.sub}
+                        {it.sub}
                       </Text>
                     )}
                   </div>
@@ -272,7 +273,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                       wordBreak: "break-word",
                       hyphens: "auto",
                     }}
-                    title={t.comment}
+                    title={it.comment}
                   >
                     {commentDisplay}
                   </Text>
@@ -297,7 +298,7 @@ const Testimonials: React.FC<TestimonialsProps> = ({
                     flex: "0 0 auto",
                   }}
                 >
-                  Verified client feedback
+                  {tVerified}
                 </Text>
               </Card>
             </div>

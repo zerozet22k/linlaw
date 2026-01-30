@@ -28,7 +28,7 @@ import {
     BoxSides,
     BOX_SIDES_FIELD,
 } from "../settings";
-import type { LanguageJson } from "@/utils/getTranslatedText";
+import type { LanguageJson } from "@/i18n/types";
 
 export type SectionProps = {
     enabled?: boolean;

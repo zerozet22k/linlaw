@@ -1,11 +1,13 @@
 /* components/sections/AboutUsSection.tsx */
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { theme, Grid, Typography, Button } from "antd";
 import { motion, useReducedMotion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/i18n";
+
 import {
   HOME_PAGE_SETTINGS_KEYS as K,
   HOME_PAGE_SETTINGS_TYPES,
@@ -17,20 +19,20 @@ type AboutData = HOME_PAGE_SETTINGS_TYPES[typeof K.ABOUT_US_SECTION];
 
 type Props = {
   data: AboutData;
-  language: string;
+  language: string; // kept for compatibility, but we’ll use hook if present
 };
 
-function clean(s: string) {
-  return (s || "").replace(/\s+/g, " ").trim();
-}
-function t(val: any, lang: string) {
-  return clean(getTranslatedText(val, lang) || "");
-}
+const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
+const tt = (lang: string, v: any, fallback = "") => clean(t(lang, v, fallback));
 
-export default function AboutUsSection({ data, language }: Props) {
+export default function AboutUsSection({ data, language: propLanguage }: Props) {
   const { token } = theme.useToken();
   const screens = Grid.useBreakpoint();
   const reduceMotion = useReducedMotion();
+
+  // prefer hook language; fall back to prop
+  const { language: hookLang } = useLanguage();
+  const language = hookLang || propLanguage || "en";
 
   const lead = data?.lead;
   const panel = data?.panel;
@@ -38,9 +40,19 @@ export default function AboutUsSection({ data, language }: Props) {
   const ctas = Array.isArray(data?.ctas) ? data.ctas : [];
   const pillars = Array.isArray(data?.pillars) ? data.pillars : [];
 
+  const leadTitle = useMemo(() => tt(language, lead?.title), [language, lead?.title]);
+  const leadSubtitle = useMemo(() => tt(language, lead?.subtitle), [language, lead?.subtitle]);
+  const leadDesc = useMemo(() => clean(t(language, lead?.description, "")), [language, lead?.description]);
+  const leadAccent = lead?.iconColor || token.colorPrimary;
+
+  const panelTitle = useMemo(() => tt(language, panel?.title), [language, panel?.title]);
+  const panelDesc = useMemo(() => clean(t(language, panel?.description, "")), [language, panel?.description]);
+  const panelAccent = panel?.panelAccentColor || token.colorPrimary;
+  const panelBgImage = panel?.panelBgImage;
+
   const hasAny =
-    !!(t(lead?.title, language) || t(lead?.subtitle, language) || t(lead?.description, language)) ||
-    !!(t(panel?.title, language) || t(panel?.description, language) || panel?.panelBgImage) ||
+    !!(leadTitle || leadSubtitle || leadDesc) ||
+    !!(panelTitle || panelDesc || panelBgImage) ||
     stats.length > 0 ||
     ctas.length > 0 ||
     pillars.length > 0;
@@ -50,16 +62,6 @@ export default function AboutUsSection({ data, language }: Props) {
   const contentMax = 1400;
   const padInline = !screens.sm ? 12 : token.paddingLG;
   const border = `1px solid ${token.colorBorderSecondary}`;
-
-  const leadTitle = t(lead?.title, language);
-  const leadSubtitle = t(lead?.subtitle, language);
-  const leadDesc = (getTranslatedText(lead?.description, language) || "").trim();
-  const leadAccent = lead?.iconColor || token.colorPrimary;
-
-  const panelTitle = t(panel?.title, language);
-  const panelDesc = (getTranslatedText(panel?.description, language) || "").trim();
-  const panelAccent = panel?.panelAccentColor || token.colorPrimary;
-  const panelBgImage = panel?.panelBgImage;
 
   const gridCols = !screens.md ? 1 : !screens.lg ? 2 : pillars.length >= 6 ? 3 : 2;
   const cardPad = !screens.sm ? 14 : 18;
@@ -72,7 +74,6 @@ export default function AboutUsSection({ data, language }: Props) {
         margin: "0 auto",
         paddingInline: padInline,
         boxSizing: "border-box",
-        
       }}
     >
       <div
@@ -83,7 +84,6 @@ export default function AboutUsSection({ data, language }: Props) {
           alignItems: "stretch",
         }}
       >
-        {/* Lead */}
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
@@ -143,7 +143,7 @@ export default function AboutUsSection({ data, language }: Props) {
                     color: token.colorText,
                   }}
                 >
-                  {leadTitle || "About Us"}
+                  {leadTitle || t(language, "aboutUs.title", "About Us")}
                 </div>
 
                 {!!leadSubtitle && (
@@ -175,7 +175,6 @@ export default function AboutUsSection({ data, language }: Props) {
               </div>
             ) : null}
 
-            {/* Stats */}
             {stats.length ? (
               <div
                 style={{
@@ -186,8 +185,8 @@ export default function AboutUsSection({ data, language }: Props) {
                 }}
               >
                 {stats.slice(0, 3).map((s, i) => {
-                  const value = (s.statValue || "").trim();
-                  const label = t(s.statLabel, language);
+                  const value = String(s.statValue || "").trim();
+                  const label = tt(language, s.statLabel);
                   if (!value && !label) return null;
 
                   return (
@@ -217,12 +216,11 @@ export default function AboutUsSection({ data, language }: Props) {
               </div>
             ) : null}
 
-            {/* CTAs */}
             {ctas.length ? (
               <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }}>
                 {ctas.slice(0, 3).map((c, i) => {
-                  const href = (c.ctaHref || "").trim();
-                  const text = t(c.ctaText, language);
+                  const href = String(c.ctaHref || "").trim();
+                  const text = tt(language, c.ctaText);
                   if (!href || !text) return null;
 
                   const variant = c.ctaVariant === "primary" ? "primary" : "default";
@@ -243,7 +241,6 @@ export default function AboutUsSection({ data, language }: Props) {
           </div>
         </motion.div>
 
-        {/* Right Panel */}
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
@@ -266,8 +263,8 @@ export default function AboutUsSection({ data, language }: Props) {
               inset: 0,
               background: panelBgImage
                 ? `linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 100%), url("${String(
-                  panelBgImage
-                ).replace(/"/g, '\\"')}")`
+                    panelBgImage
+                  ).replace(/"/g, '\\"')}")`
                 : `linear-gradient(135deg, ${token.colorFillTertiary} 0%, ${token.colorFillSecondary} 55%, rgba(0,0,0,0.08) 100%)`,
               backgroundSize: "cover",
               backgroundPosition: "center",
@@ -305,7 +302,6 @@ export default function AboutUsSection({ data, language }: Props) {
         </motion.div>
       </div>
 
-      {/* Pillars */}
       {pillars.length ? (
         <div style={{ marginTop: !screens.sm ? 14 : 22 }}>
           <div
@@ -316,8 +312,8 @@ export default function AboutUsSection({ data, language }: Props) {
             }}
           >
             {pillars.map((p: any, idx: number) => {
-              const title = t(p.title, language);
-              const desc = (getTranslatedText(p.description, language) || "").trim();
+              const title = tt(language, p.title);
+              const desc = clean(t(language, p.description, ""));
               if (!title && !desc) return null;
 
               const accent = p.iconColor || token.colorPrimary;

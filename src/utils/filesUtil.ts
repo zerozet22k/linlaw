@@ -78,3 +78,14 @@ export const shortenFileName = (name: string, maxLength = 15) => {
   const baseName = extIndex > 0 ? name.slice(0, extIndex) : name;
   return `${baseName.slice(0, Math.max(1, maxLength - ext.length - 3))}...${ext}`;
 };
+
+export function getFileExtension(fileName?: string): string {
+  if (!fileName) return "";
+  const parts = fileName.split(".");
+  return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
+}
+
+export function humanizeExt(ext: string): string {
+  if (!ext) return "";
+  return ext.toUpperCase();
+}

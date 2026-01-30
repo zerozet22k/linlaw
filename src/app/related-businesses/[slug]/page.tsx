@@ -2,18 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Card,
-  Typography,
-  Button,
-  Space,
-  Tag,
-  Row,
-  Col,
-  Divider,
-  List,
-  Result,
-} from "antd";
+import { Card, Typography, Button, Space, Tag, Row, Col, Divider, List, Result, theme } from "antd";
 import {
   ArrowLeftOutlined,
   GlobalOutlined,
@@ -28,47 +17,55 @@ import apiClient from "@/utils/api/apiClient";
 import SubLoader from "@/components/loaders/SubLoader";
 import { RelatedBusinessAPI } from "@/models/RelatedBusinessModel";
 import { useLanguage } from "@/hooks/useLanguage";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+import { t } from "@/i18n";
+import { normalizeUrl, isEmbeddableMapUrl, platformLabel } from "@/utils/urlUtils";
 
 const { Title, Text, Paragraph } = Typography;
-
-const platformLabel = (p: string) => {
-  const x = String(p || "").toLowerCase().trim();
-  if (x === "facebook") return "Facebook";
-  if (x === "instagram") return "Instagram";
-  if (x === "twitter") return "Twitter / X";
-  if (x === "linkedin") return "LinkedIn";
-  return p?.trim() || "Link";
-};
-
-const getEn = (obj: any) => String(obj?.en ?? "").trim();
-
-const normalizeUrl = (url?: string) => {
-  const u = String(url || "").trim();
-  if (!u) return "";
-  if (/^https?:\/\//i.test(u)) return u;
-  return `https://${u}`;
-};
-
-const isEmbeddableMapUrl = (url?: string) => {
-  const u = String(url || "").trim();
-  if (!u) return false;
-  return /google\.com\/maps\/embed/i.test(u);
-};
 
 const RelatedBusinessSlugPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const { language } = useLanguage();
+  const { token } = theme.useToken();
 
   const slug = String((params as any)?.slug || "").trim();
   const [item, setItem] = useState<RelatedBusinessAPI | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const tLoadingProfile = useMemo(() => t(language, "relatedBusinesses.loadingProfile"), [language]);
+  const tInvalidSlug = useMemo(() => t(language, "relatedBusinesses.invalidSlug"), [language]);
+  const tNotFound = useMemo(() => t(language, "common.notFound"), [language]);
+  const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tFailedToLoadProfile = useMemo(() => t(language, "relatedBusinesses.failedToLoadProfile"), [language]);
+
+  const tBackToDirectory = useMemo(() => t(language, "relatedBusinesses.backToDirectory"), [language]);
+
+  const tPartnerProfile = useMemo(() => t(language, "relatedBusinesses.partnerProfile"), [language]);
+
+  const tWebsiteLabel = useMemo(() => t(language, "common.website"), [language]);
+  const tEmailLabel = useMemo(() => t(language, "contact.email"), [language]);
+  const tAddressLabel = useMemo(() => t(language, "common.address"), [language]);
+  const tPhoneLabel = useMemo(() => t(language, "contact.phone"), [language]);
+
+  const tVisitWebsite = useMemo(() => t(language, "relatedBusinesses.visitWebsite"), [language]);
+  const tOpenMap = useMemo(() => t(language, "relatedBusinesses.openMap"), [language]);
+
+  const tOverview = useMemo(() => t(language, "relatedBusinesses.overview"), [language]);
+  const tNoDescription = useMemo(() => t(language, "relatedBusinesses.noDescription"), [language]);
+
+  const tSocialLinks = useMemo(() => t(language, "relatedBusinesses.socialLinks"), [language]);
+  const tOperatingHours = useMemo(() => t(language, "relatedBusinesses.operatingHours"), [language]);
+  const tMapLocation = useMemo(() => t(language, "relatedBusinesses.mapLocation"), [language]);
+
+  const tContactDetails = useMemo(() => t(language, "relatedBusinesses.contactDetails"), [language]);
+  const tNoContactDetails = useMemo(() => t(language, "relatedBusinesses.noContactDetails"), [language]);
+
+  const tInactivePartner = useMemo(() => t(language, "relatedBusinesses.inactivePartner"), [language]);
+
   useEffect(() => {
     if (!slug) {
-      setError("Invalid slug.");
+      setError(tInvalidSlug);
       setLoading(false);
       return;
     }
@@ -78,27 +75,23 @@ const RelatedBusinessSlugPage: React.FC = () => {
       setError(null);
 
       try {
-        const res = await apiClient.get(
-          `/related-businesses/slug/${encodeURIComponent(slug)}`
-        );
+        const res = await apiClient.get(`/related-businesses/slug/${encodeURIComponent(slug)}`);
 
         if (res.status === 200 && res.data) {
           setItem(res.data);
           return;
         }
 
-        setError("Not found.");
+        setError(tNotFound);
         setItem(null);
       } catch (e) {
-        // If your slug route returns 404 via catch, treat as not found
-        // Otherwise show generic error
         const status = (e as any)?.response?.status;
         if (status === 404) {
-          setError("Not found.");
+          setError(tNotFound);
           setItem(null);
         } else {
           console.error("Failed to fetch business:", e);
-          setError("Failed to load profile.");
+          setError(tFailedToLoadProfile);
           setItem(null);
         }
       } finally {
@@ -107,26 +100,26 @@ const RelatedBusinessSlugPage: React.FC = () => {
     };
 
     fetchBySlug();
-  }, [slug]);
+  }, [slug, tInvalidSlug, tNotFound, tFailedToLoadProfile]);
 
   const title = useMemo(() => {
     if (!item) return "";
-    return getTranslatedText(item.title, language) || getEn(item.title) || item.slug;
+    return t(language, item.title, item.slug);
   }, [item, language]);
 
   const subtitle = useMemo(() => {
     if (!item?.subtitle) return "";
-    return getTranslatedText(item.subtitle, language) || "";
+    return t(language, item.subtitle, "");
   }, [item, language]);
 
   const desc = useMemo(() => {
     if (!item?.description) return "";
-    return getTranslatedText(item.description, language) || "";
+    return t(language, item.description, "");
   }, [item, language]);
 
   const tags = useMemo(() => {
     const raw = Array.isArray(item?.tags) ? item!.tags : [];
-    return raw.map((t) => String(t?.value || "").trim()).filter(Boolean);
+    return raw.map((x) => String(x?.value || "").trim()).filter(Boolean);
   }, [item]);
 
   const socialLinks = useMemo(() => {
@@ -144,19 +137,29 @@ const RelatedBusinessSlugPage: React.FC = () => {
     return raw.filter((h) => String(h?.day || "").trim());
   }, [item]);
 
-  if (loading) return <SubLoader tip="Loading profile..." />;
+  if (loading) return <SubLoader tip={tLoadingProfile} />;
 
   if (error) {
+    const isNotFound = error === tNotFound;
+
     return (
       <div style={{ minHeight: "70vh", display: "grid", placeItems: "center", padding: 20 }}>
-        <Card style={{ borderRadius: 16, maxWidth: 560, width: "100%" }}>
+        <Card
+          style={{
+            borderRadius: 16,
+            maxWidth: 560,
+            width: "100%",
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
           <Result
-            status={error === "Not found." ? "404" : "error"}
-            title={error === "Not found." ? "Not Found" : "Error"}
+            status={isNotFound ? "404" : "error"}
+            title={isNotFound ? tNotFound : tError}
             subTitle={error}
             extra={
               <Button type="primary" onClick={() => router.push("/related-businesses")}>
-                Back to directory
+                {tBackToDirectory}
               </Button>
             }
           />
@@ -168,14 +171,22 @@ const RelatedBusinessSlugPage: React.FC = () => {
   if (!item) {
     return (
       <div style={{ minHeight: "70vh", display: "grid", placeItems: "center", padding: 20 }}>
-        <Card style={{ borderRadius: 16, maxWidth: 560, width: "100%" }}>
+        <Card
+          style={{
+            borderRadius: 16,
+            maxWidth: 560,
+            width: "100%",
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorderSecondary}`,
+          }}
+        >
           <Result
             status="404"
-            title="Not Found"
-            subTitle="This profile does not exist."
+            title={tNotFound}
+            subTitle={t(language, "relatedBusinesses.profileDoesNotExist")}
             extra={
               <Button type="primary" onClick={() => router.push("/related-businesses")}>
-                Back to directory
+                {tBackToDirectory}
               </Button>
             }
           />
@@ -193,7 +204,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
   if (websiteUrl) {
     contactRows.push({
       icon: <GlobalOutlined />,
-      label: "Website",
+      label: tWebsiteLabel,
       value: (
         <a href={websiteUrl} target="_blank" rel="noreferrer">
           {websiteUrl.replace(/^https?:\/\//i, "")}
@@ -206,7 +217,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
     const email = String(item.email).trim();
     contactRows.push({
       icon: <MailOutlined />,
-      label: "Email",
+      label: tEmailLabel,
       value: <a href={`mailto:${email}`}>{email}</a>,
     });
   }
@@ -214,7 +225,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
   if (address) {
     contactRows.push({
       icon: <EnvironmentOutlined />,
-      label: "Address",
+      label: tAddressLabel,
       value: <div style={{ whiteSpace: "pre-line" }}>{address}</div>,
     });
   }
@@ -222,7 +233,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
   if (Array.isArray(item.contacts) && item.contacts.length > 0) {
     contactRows.push({
       icon: <PhoneOutlined />,
-      label: "Phone",
+      label: tPhoneLabel,
       value: (
         <Space direction="vertical" size={4}>
           {item.contacts.map((c, i) => {
@@ -242,7 +253,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
   }
 
   return (
-    <div style={{ width: "100%", background: "#fff" }}>
+    <div style={{ width: "100%", background: token.colorBgBase }}>
       {/* HERO */}
       <div
         style={{
@@ -257,18 +268,14 @@ const RelatedBusinessSlugPage: React.FC = () => {
             onClick={() => router.push("/related-businesses")}
             style={{ borderRadius: 999, marginBottom: 14 }}
           >
-            Back to directory
+            {tBackToDirectory}
           </Button>
 
           <Row gutter={[20, 20]} align="middle">
             <Col xs={24} md={16}>
-              <Text style={{ letterSpacing: 2, fontSize: 12, color: "rgba(15,23,42,0.65)" }}>
-                PARTNER PROFILE
-              </Text>
+              <Text style={{ letterSpacing: 2, fontSize: 12, color: "rgba(15,23,42,0.65)" }}>{tPartnerProfile}</Text>
 
-              <Title style={{ margin: "6px 0 6px", fontSize: 40, lineHeight: 1.1 }}>
-                {title}
-              </Title>
+              <Title style={{ margin: "6px 0 6px", fontSize: 40, lineHeight: 1.1 }}>{title}</Title>
 
               {!!subtitle && (
                 <Text type="secondary" style={{ fontSize: 16, lineHeight: 1.5 }}>
@@ -278,9 +285,9 @@ const RelatedBusinessSlugPage: React.FC = () => {
 
               {tags.length > 0 && (
                 <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {tags.map((t, i) => (
+                  {tags.map((x, i) => (
                     <Tag
-                      key={`${t}-${i}`}
+                      key={`${x}-${i}`}
                       style={{
                         borderRadius: 999,
                         padding: "4px 12px",
@@ -288,7 +295,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
                         border: "1px solid rgba(15,23,42,0.10)",
                       }}
                     >
-                      {t}
+                      {x}
                     </Tag>
                   ))}
                 </div>
@@ -303,24 +310,15 @@ const RelatedBusinessSlugPage: React.FC = () => {
                       href={websiteUrl}
                       target="_blank"
                       rel="noreferrer"
-                      style={{
-                        borderRadius: 999,
-                        background: "#0f172a",
-                        borderColor: "#0f172a",
-                      }}
+                      style={{ borderRadius: 999, background: "#0f172a", borderColor: "#0f172a" }}
                     >
-                      Visit website
+                      {tVisitWebsite}
                     </Button>
                   )}
+
                   {mapUrl && (
-                    <Button
-                      icon={<EnvironmentOutlined />}
-                      href={mapUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ borderRadius: 999 }}
-                    >
-                      Open map
+                    <Button icon={<EnvironmentOutlined />} href={mapUrl} target="_blank" rel="noreferrer" style={{ borderRadius: 999 }}>
+                      {tOpenMap}
                     </Button>
                   )}
                 </Space>
@@ -328,13 +326,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
             </Col>
 
             <Col xs={24} md={8}>
-              <Card
-                style={{
-                  borderRadius: 18,
-                  border: "1px solid rgba(15,23,42,0.08)",
-                }}
-                styles={{ body: { padding: 14 } }}
-              >
+              <Card style={{ borderRadius: 18, border: "1px solid rgba(15,23,42,0.08)" }} styles={{ body: { padding: 14 } }}>
                 <div
                   style={{
                     width: "100%",
@@ -355,27 +347,22 @@ const RelatedBusinessSlugPage: React.FC = () => {
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "22px 20px 70px" }}>
         <Row gutter={[18, 18]}>
           <Col xs={24} md={16}>
-            <Card
-              style={{ borderRadius: 18, border: "1px solid rgba(15,23,42,0.08)" }}
-              styles={{ body: { padding: 22 } }}
-            >
+            <Card style={{ borderRadius: 18, border: "1px solid rgba(15,23,42,0.08)" }} styles={{ body: { padding: 22 } }}>
               <Title level={4} style={{ marginTop: 0 }}>
-                Overview
+                {tOverview}
               </Title>
 
               {!!desc ? (
-                <Paragraph style={{ fontSize: 16, color: "rgba(15,23,42,0.82)" }}>
-                  {desc}
-                </Paragraph>
+                <Paragraph style={{ fontSize: 16, color: "rgba(15,23,42,0.82)" }}>{desc}</Paragraph>
               ) : (
-                <Text type="secondary">No description provided.</Text>
+                <Text type="secondary">{tNoDescription}</Text>
               )}
 
               {socialLinks.length > 0 && (
                 <>
                   <Divider style={{ margin: "18px 0" }} />
                   <Title level={5} style={{ marginTop: 0 }}>
-                    Social links
+                    {tSocialLinks}
                   </Title>
 
                   <List
@@ -398,7 +385,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
                 <>
                   <Divider style={{ margin: "18px 0" }} />
                   <Title level={5} style={{ marginTop: 0 }}>
-                    Operating hours
+                    {tOperatingHours}
                   </Title>
 
                   <List
@@ -417,23 +404,16 @@ const RelatedBusinessSlugPage: React.FC = () => {
                 </>
               )}
 
-              {/* Embed only if it's an embed URL; otherwise don't iframe it */}
               {mapUrl && isEmbeddableMapUrl(mapUrl) && (
                 <>
                   <Divider style={{ margin: "18px 0" }} />
                   <Title level={5} style={{ marginTop: 0 }}>
-                    Map location
+                    {tMapLocation}
                   </Title>
 
                   <iframe
                     src={mapUrl}
-                    style={{
-                      width: "100%",
-                      height: 340,
-                      border: 0,
-                      borderRadius: 14,
-                      background: "#fff",
-                    }}
+                    style={{ width: "100%", height: 340, border: 0, borderRadius: 14, background: "#fff" }}
                     loading="lazy"
                     allowFullScreen
                   />
@@ -443,16 +423,13 @@ const RelatedBusinessSlugPage: React.FC = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <Card
-              style={{ borderRadius: 18, border: "1px solid rgba(15,23,42,0.08)" }}
-              styles={{ body: { padding: 18 } }}
-            >
+            <Card style={{ borderRadius: 18, border: "1px solid rgba(15,23,42,0.08)" }} styles={{ body: { padding: 18 } }}>
               <Title level={5} style={{ marginTop: 0, marginBottom: 10 }}>
-                Contact details
+                {tContactDetails}
               </Title>
 
               {contactRows.length === 0 ? (
-                <Text type="secondary">No contact details provided.</Text>
+                <Text type="secondary">{tNoContactDetails}</Text>
               ) : (
                 <List
                   itemLayout="horizontal"
@@ -469,18 +446,10 @@ const RelatedBusinessSlugPage: React.FC = () => {
                 />
               )}
 
-              {/* If map is not embeddable, at least show a clear action here too */}
               {mapUrl && !isEmbeddableMapUrl(mapUrl) && (
                 <div style={{ marginTop: 12 }}>
-                  <Button
-                    icon={<EnvironmentOutlined />}
-                    href={mapUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ borderRadius: 999 }}
-                    block
-                  >
-                    Open map
+                  <Button icon={<EnvironmentOutlined />} href={mapUrl} target="_blank" rel="noreferrer" style={{ borderRadius: 999 }} block>
+                    {tOpenMap}
                   </Button>
                 </div>
               )}
@@ -496,7 +465,7 @@ const RelatedBusinessSlugPage: React.FC = () => {
                 }}
               >
                 <Text strong style={{ color: "rgba(185,28,28,1)" }}>
-                  This partner is currently marked as inactive.
+                  {tInactivePartner}
                 </Text>
               </Card>
             )}

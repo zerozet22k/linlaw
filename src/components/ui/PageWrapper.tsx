@@ -4,19 +4,15 @@ import React, { ReactNode, CSSProperties } from "react";
 import { Layout, Typography } from "antd";
 import ClickToAction from "../sections/ClickToAction";
 import { useLanguage } from "@/hooks/useLanguage";
-import { getTranslatedText, LanguageJson } from "@/utils/getTranslatedText";
-import { cssUrl } from "@/utils/cssUrl";
+import { t } from "@/i18n";
+import { cssUrl } from "@/utils/components/cssUrl";
+import { SharedPageContentType } from "@/config/CMS/pages/keys/shared/sharedPageTypes";
 
 const { Title, Paragraph } = Typography;
 const { Content } = Layout;
 
 interface PageWrapperProps {
-  pageContent: {
-    title: LanguageJson;
-    subtitle: LanguageJson;
-    description: LanguageJson;
-    backgroundImage?: string;
-  };
+  pageContent?: SharedPageContentType;
   children: ReactNode;
   style?: CSSProperties;
 }
@@ -74,13 +70,13 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
                 textShadow: "2px 2px 10px rgba(0,0,0,0.6)",
               }}
             >
-              {getTranslatedText(pageContent?.title, language)}
+              {t(language, pageContent?.title, "")}
             </Title>
             <Title level={3} style={{ color: "#fff", marginTop: 10 }}>
-              {getTranslatedText(pageContent?.subtitle, language)}
+              {t(language, pageContent?.subtitle, "")}
             </Title>
             <Paragraph style={{ color: "#ddd", fontSize: 16, marginTop: 10 }}>
-              {getTranslatedText(pageContent?.description, language)}
+              {t(language, pageContent?.description, "")}
             </Paragraph>
           </div>
         </div>

@@ -1,55 +1,28 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import {
-  Alert,
-  Button,
-  Card,
-  Empty,
-  Input,
-  Skeleton,
-  Typography,
-  theme,
-} from "antd";
+import { Alert, Button, Card, Empty, Input, Skeleton, Typography, theme } from "antd";
 import Link from "next/link";
-import {
-  ArrowRightOutlined,
-  CalendarOutlined,
-  PaperClipOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { ArrowRightOutlined, CalendarOutlined, PaperClipOutlined, SearchOutlined } from "@ant-design/icons";
 
 import apiClient from "@/utils/api/apiClient";
 import PageWrapper from "@/components/ui/PageWrapper";
 import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/i18n";
 
 import {
   NEWSLETTER_PAGE_SETTINGS_KEYS,
   NEWSLETTER_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 import { INewsletterAPI } from "@/models/Newsletter";
-import { commonTranslations } from "@/translations";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+import type { LanguageJson } from "@/i18n/types";
+import { formatDate } from "@/utils/fileUtils";
 
 const { Title, Text } = Typography;
 
 type NewsletterContentProps = {
   data: NEWSLETTER_PAGE_SETTINGS_TYPES;
 };
-
-function formatDate(d?: string | number | Date) {
-  if (!d) return "";
-  try {
-    const date = d instanceof Date ? d : new Date(d);
-    return date.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    });
-  } catch {
-    return "";
-  }
-}
 
 const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const { language } = useLanguage();
@@ -67,25 +40,29 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
-  // type-to-search (debounced) + Enter applies immediately
   const [queryDraft, setQueryDraft] = useState("");
   const [searchText, setSearchText] = useState("");
 
   const reqIdRef = useRef(0);
 
   useEffect(() => {
-    const t = setTimeout(() => setSearchText(queryDraft.trim()), 300);
-    return () => clearTimeout(t);
+    const tt = setTimeout(() => setSearchText(queryDraft.trim()), 300);
+    return () => clearTimeout(tt);
   }, [queryDraft]);
 
-  const tSearch = getTranslatedText(commonTranslations.search, language) || "Search";
-  const tLoadMore = getTranslatedText(commonTranslations.loadMore, language) || "Load more";
-  const tLoading = getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const tError = getTranslatedText(commonTranslations.error, language) || "Error";
-  const tNoData =
-    getTranslatedText(commonTranslations.noData, language) || "No newsletters found.";
-  const tClickToView =
-    getTranslatedText(commonTranslations.clickToView, language) || "Click to view";
+  const tSearch = useMemo(() => t(language, "common.search"), [language]);
+  const tLoadMore = useMemo(() => t(language, "common.loadMore"), [language]);
+  const tLoading = useMemo(() => t(language, "common.loading"), [language]);
+  const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tNoData = useMemo(() => t(language, "common.noData"), [language]);
+  const tResults = useMemo(() => t(language, "common.results"), [language]);
+  const tView = useMemo(() => t(language, "common.view"), [language]);
+
+  const tClickToView = useMemo(() => t(language, "newsletter.clickToView"), [language]);
+  const tUntitled = useMemo(() => t(language, "newsletter.untitled"), [language]);
+  const tSearchPlaceholder = useMemo(() => t(language, "newsletter.searchPlaceholder"), [language]);
+  const tOpenNewsletterAria = useMemo(() => t(language, "newsletter.openNewsletterAria"), [language]);
+  const tFailedToLoad = useMemo(() => t(language, "newsletter.failedToLoad"), [language]);
 
   const fetchNewsletters = useCallback(
     async (opts?: { reset?: boolean }) => {
@@ -116,14 +93,14 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
       } catch (err) {
         if (reqId !== reqIdRef.current) return;
         console.error("Error fetching newsletters:", err);
-        setError("Failed to load newsletters.");
+        setError(tFailedToLoad);
       } finally {
         if (reqId !== reqIdRef.current) return;
         setLoading(false);
         setLoadingMore(false);
       }
     },
-    [searchText, page, limit]
+    [searchText, page, limit, tFailedToLoad]
   );
 
   useEffect(() => {
@@ -157,7 +134,6 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
           padding: `${token.paddingXL}px ${token.paddingLG}px ${token.paddingXL}px`,
         }}
       >
-        {/* Toolbar */}
         <div
           style={{
             display: "flex",
@@ -173,7 +149,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
             onPressEnter={() => setSearchText(queryDraft.trim())}
             allowClear
             prefix={<SearchOutlined />}
-            placeholder={`${tSearch} newsletters...`}
+            placeholder={tSearchPlaceholder || tSearch}
             size="large"
             style={{
               flex: "1 1 520px",
@@ -182,11 +158,10 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
           />
 
           <Text style={{ color: token.colorTextTertiary, fontSize: 13 }}>
-            {countLabel ? `${countLabel} results` : ""}
+            {countLabel ? `${countLabel} ${tResults}` : ""}
           </Text>
         </div>
 
-        {/* Content */}
         {error ? (
           <Alert
             message={tError}
@@ -217,22 +192,19 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
           <>
             <div style={listStyle}>
               {newsletters.map((n) => {
-                const title =
-                  typeof n.title === "string"
-                    ? n.title
-                    : n.title?.[language] || n.title?.en || "Untitled";
+                const title = t(language, n.title as unknown as string | LanguageJson | undefined, tUntitled);
 
                 const created = formatDate((n as any).createdAt);
-                const files = Array.isArray((n as any).fileAttachments)
-                  ? (n as any).fileAttachments.length
-                  : 0;
+                const files = Array.isArray((n as any).fileAttachments) ? (n as any).fileAttachments.length : 0;
+
+                const aria = tOpenNewsletterAria ? `${tOpenNewsletterAria}: ${title}` : title;
 
                 return (
                   <Link
                     key={n._id}
                     href={`/newsletters/${n._id}`}
                     style={{ textDecoration: "none", display: "block" }}
-                    aria-label={`Open newsletter: ${title}`}
+                    aria-label={aria}
                   >
                     <Card
                       variant="outlined"
@@ -256,14 +228,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
                     >
                       <div style={{ display: "flex", alignItems: "flex-start", gap: token.sizeLG }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <Title
-                            level={5}
-                            style={{
-                              margin: 0,
-                              color: token.colorText,
-                              lineHeight: 1.25,
-                            }}
-                          >
+                          <Title level={5} style={{ margin: 0, color: token.colorText, lineHeight: 1.25 }}>
                             {title}
                           </Title>
 
@@ -297,7 +262,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
                         </div>
 
                         <span style={{ color: token.colorPrimary, fontSize: 14, whiteSpace: "nowrap" }}>
-                          View <ArrowRightOutlined />
+                          {tView} <ArrowRightOutlined />
                         </span>
                       </div>
                     </Card>

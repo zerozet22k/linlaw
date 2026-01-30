@@ -26,7 +26,7 @@ import {
   LinkTargetModeValue,
 } from "../../settings";
 
-import { LanguageJson } from "@/utils/getTranslatedText";
+import type { LanguageJson } from "@/i18n/types";
 import { SECTION, SectionProps } from "../../fields/SECTION_SETTINGS";
 
 const pageName = "home";

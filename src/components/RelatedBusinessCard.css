@@ -1,0 +1,114 @@
+.rbCard.ant-card {
+  box-shadow: var(--rb-shadow) !important;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+  will-change: transform;
+}
+
+.rbCard.ant-card-hoverable:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--rb-shadow-hover) !important;
+}
+
+.rbCard.ant-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.10), var(--rb-shadow) !important;
+}
+
+.rbCover {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(2, 6, 23, 0.10), rgba(2, 6, 23, 0.03));
+}
+
+.rbCoverImg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: var(--rb-bg-size, cover);
+  transform: none;
+}
+
+.rbCoverFallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.rbInitials {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: rgba(2, 6, 23, 0.75);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(2, 6, 23, 0.10);
+  backdrop-filter: blur(6px);
+}
+
+.rbCoverShadeTop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px 220px at 20% 0%,
+    rgba(2, 6, 23, 0.14),
+    rgba(2, 6, 23, 0) 62%
+  );
+  pointer-events: none;
+}
+
+.rbCoverShadeBottom {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 56%,
+    rgba(255, 255, 255, 0.92) 100%
+  );
+  pointer-events: none;
+}
+
+.rbTag.ant-tag {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  background: rgba(2, 6, 23, 0.03);
+  border: 1px solid rgba(2, 6, 23, 0.08);
+  color: rgba(2, 6, 23, 0.78);
+  margin-inline-end: 0;
+}
+
+.rbDesc {
+  color: rgba(15, 23, 42, 0.76);
+  line-height: 1.55;
+}
+
+.rbFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rbBtn.ant-btn {
+  border-radius: 999px;
+  border-color: rgba(15, 23, 42, 0.18);
+}
+
+.rbCta {
+  color: rgba(15, 23, 42, 0.72);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.rbCard.ant-card-hoverable:hover .rbCta {
+  color: rgba(15, 23, 42, 0.92);
+}

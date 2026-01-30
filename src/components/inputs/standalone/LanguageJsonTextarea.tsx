@@ -5,7 +5,7 @@ import { Input, theme } from "antd";
 import { lighten, darken } from "polished";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags, languageNames } from "@/models/languages";
+import { languageFlags, languageNames } from "@/i18n/languages";
 
 
 interface Props {

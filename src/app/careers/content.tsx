@@ -1,17 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Typography,
-  Tag,
-  Divider,
-  theme,
-  Empty,
-  Button,
-} from "antd";
+import { Card, Row, Col, Typography, Tag, Divider, theme, Empty, Button } from "antd";
 import {
   ApartmentOutlined,
   EnvironmentOutlined,
@@ -23,31 +13,16 @@ import {
 import { motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import PageWrapper from "@/components/ui/PageWrapper";
-import {
-  CAREER_PAGE_SETTINGS_KEYS as K,
-  CAREER_PAGE_SETTINGS_TYPES,
-} from "@/config/CMS/pages/keys/CAREER_PAGE_SETTINGS";
+import { CAREER_PAGE_SETTINGS_KEYS as K, CAREER_PAGE_SETTINGS_TYPES } from "@/config/CMS/pages/keys/CAREER_PAGE_SETTINGS";
 import { useLanguage } from "@/hooks/useLanguage";
-import { getTranslatedText } from "@/utils/getTranslatedText";
-import { commonTranslations } from "@/translations";
+import { t } from "@/i18n";
+import { formatYmd } from "@/utils/fileUtils";
 
 const { Title, Paragraph } = Typography;
 
 type Props = { data: CAREER_PAGE_SETTINGS_TYPES };
 
-const text = (v: any, lang: string) => getTranslatedText(v, lang) || "";
-
-const formatYmd = (s?: string) => {
-  if (!s) return "";
-  const [y, m, d] = s.split("-").map(Number);
-  if (!y || !m || !d) return s;
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(dt);
-};
+const text = (v: any, lang: string) => t(lang, v, "");
 
 const useBodyLock = (locked: boolean) => {
   useEffect(() => {
@@ -85,7 +60,7 @@ const EMP_TYPE_LABEL: Record<string, string> = {
   hybrid: "Hybrid",
   onsite: "On-site",
 };
-const labelOfType = (t?: string) => (t ? EMP_TYPE_LABEL[t] : undefined);
+const labelOfType = (tp?: string) => (tp ? EMP_TYPE_LABEL[tp] : undefined);
 
 const nf0 = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
 
@@ -104,9 +79,7 @@ const currencySuffix = (raw?: string): string => {
   return /^[A-Z]{3}$/.test(up) ? ` ${up}` : "";
 };
 
-const salaryText = (
-  j: CAREER_PAGE_SETTINGS_TYPES[typeof K.JOBS_SECTION]["items"][number]
-) => {
+const salaryText = (j: CAREER_PAGE_SETTINGS_TYPES[typeof K.JOBS_SECTION]["items"][number], lang: string) => {
   const s = j.salary;
   if (!s) return "";
 
@@ -116,68 +89,50 @@ const salaryText = (
   const min = toNum((s as any).min);
   const max = toNum((s as any).max);
 
+  const tFrom = t(lang, "career.from");
+  const tUpTo = t(lang, "career.upTo");
+
   if (min != null && max != null) {
     if (min === max) return `${nf0.format(min)}${code}${unit}`;
     return `${nf0.format(min)}–${nf0.format(max)}${code}${unit}`;
   }
-  if (min != null) return `from ${nf0.format(min)}${code}${unit}`;
-  if (max != null) return `up to ${nf0.format(max)}${code}${unit}`;
+  if (min != null) return `${tFrom} ${nf0.format(min)}${code}${unit}`;
+  if (max != null) return `${tUpTo} ${nf0.format(max)}${code}${unit}`;
   return "";
 };
 
-const metaChips = (
-  j: CAREER_PAGE_SETTINGS_TYPES[typeof K.JOBS_SECTION]["items"][number]
-) => {
+const metaChips = (j: CAREER_PAGE_SETTINGS_TYPES[typeof K.JOBS_SECTION]["items"][number], lang: string) => {
   const chips: Array<{ key: string; label: React.ReactNode }> = [];
 
-  if (j.department)
-    chips.push({
-      key: "dept",
-      label: <Tag icon={<ApartmentOutlined />}>{j.department}</Tag>,
-    });
-  if (j.location)
-    chips.push({
-      key: "loc",
-      label: <Tag icon={<EnvironmentOutlined />}>{j.location}</Tag>,
-    });
+  if (j.department) chips.push({ key: "dept", label: <Tag icon={<ApartmentOutlined />}>{j.department}</Tag> });
+  if (j.location) chips.push({ key: "loc", label: <Tag icon={<EnvironmentOutlined />}>{j.location}</Tag> });
 
   const et = labelOfType(j.employmentType as any);
-  if (et)
-    chips.push({
-      key: "type",
-      label: <Tag icon={<IdcardOutlined />}>{et}</Tag>,
-    });
+  if (et) chips.push({ key: "type", label: <Tag icon={<IdcardOutlined />}>{et}</Tag> });
 
-  const sal = salaryText(j);
-  if (sal)
-    chips.push({
-      key: "sal",
-      label: <Tag icon={<DollarOutlined />}>{sal}</Tag>,
-    });
+  const sal = salaryText(j, lang);
+  if (sal) chips.push({ key: "sal", label: <Tag icon={<DollarOutlined />}>{sal}</Tag> });
+
+  const tPosted = t(lang, "career.posted");
+  const tCloses = t(lang, "career.closes");
 
   if (j.postedAt)
     chips.push({
       key: "posted",
-      label: (
-        <Tag icon={<CalendarOutlined />}>Posted {formatYmd(j.postedAt)}</Tag>
-      ),
+      label: <Tag icon={<CalendarOutlined />}>{tPosted} {formatYmd(j.postedAt)}</Tag>,
     });
+
   if (j.closingDate)
     chips.push({
       key: "closes",
-      label: (
-        <Tag icon={<CalendarOutlined />}>Closes {formatYmd(j.closingDate)}</Tag>
-      ),
+      label: <Tag icon={<CalendarOutlined />}>{tCloses} {formatYmd(j.closingDate)}</Tag>,
     });
 
   const hideSet = new Set(
-    [j.department, j.location, et]
-      .filter(Boolean)
-      .map((s) => String(s).trim().toLowerCase())
+    [j.department, j.location, et].filter(Boolean).map((s) => String(s).trim().toLowerCase())
   );
-  const extra = dedup((j.tags ?? []).map((t) => t.value)).filter(
-    (v) => !hideSet.has(v.trim().toLowerCase())
-  );
+
+  const extra = dedup((j.tags ?? []).map((tg) => tg.value)).filter((v) => !hideSet.has(v.trim().toLowerCase()));
   for (const v of extra) chips.push({ key: `tag-${v}`, label: <Tag>{v}</Tag> });
 
   return chips;
@@ -186,17 +141,19 @@ const metaChips = (
 const CareersContent: React.FC<Props> = ({ data }) => {
   const pageContent = data[K.PAGE_CONTENT];
   const jobsSection = data[K.JOBS_SECTION];
-
   const items = Array.isArray(jobsSection?.items) ? jobsSection.items : [];
 
   const { token } = theme.useToken();
-
-  const cardRadius = 16;
-  const gridGutter = 24;
-
   const { language } = useLanguage();
-  const tNoData =
-    getTranslatedText(commonTranslations.noData, language) || "No Data";
+
+  const tNoData = useMemo(() => t(language, "common.noData"), [language]);
+  const tClose = useMemo(() => t(language, "common.close"), [language]);
+
+  const tPositionFallback = useMemo(() => t(language, "career.position"), [language]);
+  const tUntitledPosition = useMemo(() => t(language, "career.untitledPosition"), [language]);
+  const tResponsibilities = useMemo(() => t(language, "career.responsibilities"), [language]);
+  const tRequirements = useMemo(() => t(language, "career.requirements"), [language]);
+  const tBenefits = useMemo(() => t(language, "career.benefits"), [language]);
 
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -221,7 +178,7 @@ const CareersContent: React.FC<Props> = ({ data }) => {
 
   const overlay = useMemo(() => {
     if (!open || !mounted || !active) return null;
-    const chips = metaChips(active);
+    const chips = metaChips(active, language);
 
     return createPortal(
       <div
@@ -243,7 +200,7 @@ const CareersContent: React.FC<Props> = ({ data }) => {
           icon={<CloseOutlined />}
           onClick={handleClose}
           style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}
-          aria-label="Close"
+          aria-label={tClose}
         />
 
         <div
@@ -263,47 +220,32 @@ const CareersContent: React.FC<Props> = ({ data }) => {
             }}
           >
             <Title level={2} style={{ marginTop: 8 }}>
-              {text(active.title, language) || "Position"}
+              {text(active.title, language) || tPositionFallback}
             </Title>
 
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-                marginBottom: 8,
-              }}
-            >
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
               {chips.map((c) => (
                 <span key={c.key}>{c.label}</span>
               ))}
             </div>
 
-            {active.summary && (
-              <Paragraph style={{ fontSize: 16 }}>
-                {text(active.summary, language)}
-              </Paragraph>
-            )}
+            {active.summary && <Paragraph style={{ fontSize: 16 }}>{text(active.summary, language)}</Paragraph>}
 
             {active.description && (
               <>
                 <Divider />
-                <Paragraph style={{ whiteSpace: "pre-line" }}>
-                  {text(active.description, language)}
-                </Paragraph>
+                <Paragraph style={{ whiteSpace: "pre-line" }}>{text(active.description, language)}</Paragraph>
               </>
             )}
 
             {!!active.responsibilities?.length && (
               <>
                 <Divider />
-                <Title level={4}>Responsibilities</Title>
+                <Title level={4}>{tResponsibilities}</Title>
                 <ul style={{ paddingLeft: 18, marginTop: 6 }}>
                   {active.responsibilities.map((r, i) => (
                     <li key={i}>
-                      <Paragraph style={{ marginBottom: 6 }}>
-                        {text(r.text, language)}
-                      </Paragraph>
+                      <Paragraph style={{ marginBottom: 6 }}>{text(r.text, language)}</Paragraph>
                     </li>
                   ))}
                 </ul>
@@ -313,13 +255,11 @@ const CareersContent: React.FC<Props> = ({ data }) => {
             {!!active.requirements?.length && (
               <>
                 <Divider />
-                <Title level={4}>Requirements</Title>
+                <Title level={4}>{tRequirements}</Title>
                 <ul style={{ paddingLeft: 18, marginTop: 6 }}>
                   {active.requirements.map((r, i) => (
                     <li key={i}>
-                      <Paragraph style={{ marginBottom: 6 }}>
-                        {text(r.text, language)}
-                      </Paragraph>
+                      <Paragraph style={{ marginBottom: 6 }}>{text(r.text, language)}</Paragraph>
                     </li>
                   ))}
                 </ul>
@@ -329,13 +269,11 @@ const CareersContent: React.FC<Props> = ({ data }) => {
             {!!active.benefits?.length && (
               <>
                 <Divider />
-                <Title level={4}>Benefits</Title>
+                <Title level={4}>{tBenefits}</Title>
                 <ul style={{ paddingLeft: 18, marginTop: 6 }}>
                   {active.benefits.map((b, i) => (
                     <li key={i}>
-                      <Paragraph style={{ marginBottom: 6 }}>
-                        {text(b.text, language)}
-                      </Paragraph>
+                      <Paragraph style={{ marginBottom: 6 }}>{text(b.text, language)}</Paragraph>
                     </li>
                   ))}
                 </ul>
@@ -346,7 +284,18 @@ const CareersContent: React.FC<Props> = ({ data }) => {
       </div>,
       document.body
     );
-  }, [open, mounted, active, language, token.colorBgBase]);
+  }, [
+    open,
+    mounted,
+    active,
+    language,
+    token.colorBgBase,
+    tClose,
+    tPositionFallback,
+    tResponsibilities,
+    tRequirements,
+    tBenefits,
+  ]);
 
   return (
     <PageWrapper pageContent={pageContent}>
@@ -356,17 +305,13 @@ const CareersContent: React.FC<Props> = ({ data }) => {
             <Empty description={tNoData} />
           </Card>
         ) : (
-          <Row gutter={[gridGutter, gridGutter]}>
+          <Row gutter={[24, 24]}>
             {items.map((j, idx) => {
-              const chips = metaChips(j);
+              const chips = metaChips(j, language);
 
               return (
                 <Col xs={24} sm={12} md={8} key={idx}>
-                  <motion.div
-                    initial={variants.initial}
-                    animate={variants.animate}
-                    transition={{ duration: 0.3 + idx * 0.05 }}
-                  >
+                  <motion.div initial={variants.initial} animate={variants.animate} transition={{ duration: 0.3 + idx * 0.05 }}>
                     <Card
                       hoverable
                       role="button"
@@ -376,7 +321,7 @@ const CareersContent: React.FC<Props> = ({ data }) => {
                         if (e.key === "Enter" || e.key === " ") handleOpen(j);
                       }}
                       style={{
-                        borderRadius: cardRadius,
+                        borderRadius: 16,
                         height: "100%",
                         display: "flex",
                         flexDirection: "column",
@@ -392,7 +337,7 @@ const CareersContent: React.FC<Props> = ({ data }) => {
                       }}
                     >
                       <Title level={4} style={{ marginBottom: 0 }}>
-                        {text(j.title, language) || "Untitled Position"}
+                        {text(j.title, language) || tUntitledPosition}
                       </Title>
 
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -401,11 +346,7 @@ const CareersContent: React.FC<Props> = ({ data }) => {
                         ))}
                       </div>
 
-                      {j.summary && (
-                        <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
-                          {text(j.summary, language)}
-                        </Paragraph>
-                      )}
+                      {j.summary && <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>{text(j.summary, language)}</Paragraph>}
                     </Card>
                   </motion.div>
                 </Col>

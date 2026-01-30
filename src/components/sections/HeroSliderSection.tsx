@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
@@ -12,9 +12,10 @@ import "swiper/css/autoplay";
 import "./HeroSliderSection.css";
 
 import { EffectFade, Navigation, Pagination, Autoplay, A11y, Keyboard } from "swiper/modules";
-import { LanguageJson, getTranslatedText } from "@/utils/getTranslatedText";
 import { useLanguage } from "@/hooks/useLanguage";
 import { TextAlign } from "@/config/CMS/settings";
+import { t } from "@/i18n";
+import type { LanguageJson } from "@/i18n/types";
 
 export interface Slide {
   images: {
@@ -38,6 +39,9 @@ interface HeroSliderProps {
   };
 }
 
+const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
+const tt = (lang: string, v: any, fallback = "") => clean(t(lang, v, fallback));
+
 const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay, sizes }) => {
   const { language } = useLanguage();
 
@@ -45,15 +49,16 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay, sizes }) 
   const tabletSize = sizes?.tablet ?? "100vw";
   const mobileSize = sizes?.mobile ?? "100vw";
 
-  const pick = (...candidates: Array<string | undefined>) =>
-    candidates.find(Boolean) ?? "";
+  const pick = (...candidates: Array<string | undefined>) => candidates.find(Boolean) ?? "";
 
   const sizesAttr = `(min-width: 1024px) ${desktopSize}, (min-width: 768px) ${tabletSize}, ${mobileSize}`;
+
+  const ariaLabel = useMemo(() => tt(language, "common.heroSlider", "Hero slider"), [language]);
 
   if (!slides?.length) return null;
 
   return (
-    <section className="heroSlider no-select" aria-label="Hero slider">
+    <section className="heroSlider no-select" aria-label={ariaLabel}>
       <Swiper
         className="heroSwiper"
         slidesPerView={1}
@@ -79,11 +84,13 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay, sizes }) 
           const tabletSrc = pick(slide.images.tablet, slide.images.desktop, slide.images.mobile);
           const mobileSrc = pick(slide.images.mobile, slide.images.tablet, slide.images.desktop);
 
+          const headerText = tt(language, slide.header, "");
+          const descText = slide.description ? tt(language, slide.description, "") : "";
+
           const altText =
-            slide.alt ??
-            (typeof slide.header === "string"
-              ? slide.header
-              : getTranslatedText(slide.header, language));
+            clean(String(slide.alt ?? "")) ||
+            headerText ||
+            tt(language, "common.slideAltFallback", `Slide ${index + 1}`);
 
           return (
             <SwiperSlide key={index}>
@@ -95,7 +102,7 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay, sizes }) 
                     <source media="(max-width: 767px)" srcSet={mobileSrc} sizes={mobileSize} />
                     <img
                       src={mobileSrc}
-                      alt={String(altText ?? `Slide ${index + 1}`)}
+                      alt={altText}
                       className="heroImage"
                       loading={isFirst ? "eager" : "lazy"}
                       decoding="async"
@@ -110,11 +117,8 @@ const HeroSliderSection: React.FC<HeroSliderProps> = ({ slides, delay, sizes }) 
 
                 <div className={`heroContent ${slide.textAlign}`}>
                   <div className="heroContentInner">
-                    <h2 className="heroTitle">{getTranslatedText(slide.header, language)}</h2>
-
-                    {slide.description && (
-                      <p className="heroDesc">{getTranslatedText(slide.description, language)}</p>
-                    )}
+                    <h2 className="heroTitle">{headerText}</h2>
+                    {!!descText && <p className="heroDesc">{descText}</p>}
                   </div>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
+import type { LanguageJson } from "@/i18n/types";
 
 export const relatedBusinessModelName = "RelatedBusiness";
 
@@ -6,10 +7,9 @@ export type SocialPlatform = "facebook" | "instagram" | "twitter" | "linkedin";
 
 export interface RelatedBusinessBase {
     slug: string;
-    title: any;
-    subtitle?: any;
-    description?: any;
-
+    title: LanguageJson;
+    subtitle?: LanguageJson;
+    description?: LanguageJson;
     image?: string;
     website?: string;
     address?: string;
@@ -39,8 +39,6 @@ export interface RelatedBusinessAPI extends RelatedBusinessBase {
 const relatedBusinessSchema = new Schema<RelatedBusiness>(
     {
         slug: { type: String, required: true, unique: true, trim: true },
-
-
         title: { type: Schema.Types.Mixed, required: true },
         subtitle: { type: Schema.Types.Mixed },
         description: { type: Schema.Types.Mixed },

@@ -6,8 +6,7 @@ import { Typography, Spin, Alert, theme } from "antd";
 import apiClient from "@/utils/api/apiClient";
 import PageWrapper from "@/components/ui/PageWrapper";
 import { useLanguage } from "@/hooks/useLanguage";
-import { getTranslatedText } from "@/utils/getTranslatedText";
-import { commonTranslations } from "@/translations";
+import { t } from "@/i18n";
 
 import RelatedBusinessCard from "@/components/RelatedBusinessCard";
 import { RelatedBusinessAPI } from "@/models/RelatedBusinessModel";
@@ -28,14 +27,11 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
   const pageContent = data?.[K.PAGE_CONTENT];
   const sections = data?.[K.SECTIONS];
 
-  const tLoading =
-    getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const tError =
-    getTranslatedText(commonTranslations.error, language) || "Error";
-  const tNoData =
-    getTranslatedText(commonTranslations.noData, language) || "No Data";
+  const tLoading = useMemo(() => t(language, "common.loading"), [language]);
+  const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tNoData = useMemo(() => t(language, "common.noData"), [language]);
+  const tFailedToLoad = useMemo(() => t(language, "relatedBusinesses.failedToLoad"), [language]);
 
-  // allow 0 = unlimited? your settings guide doesn't say that, so keep safe default
   const limit = Math.max(1, Number(sections?.maxBusinessesCount ?? 50));
   const includeInactive = Number(sections?.includeInactive ?? 0) === 1;
 
@@ -52,23 +48,21 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
 
       try {
         const res = await apiClient.get(
-          `/related-businesses?search=&page=1&limit=${limit}&includeInactive=${
-            includeInactive ? 1 : 0
-          }`
+          `/related-businesses?search=&page=1&limit=${limit}&includeInactive=${includeInactive ? 1 : 0}`
         );
 
         const list = Array.isArray(res.data?.businesses)
           ? res.data.businesses
           : Array.isArray(res.data)
-          ? res.data
-          : [];
+            ? res.data
+            : [];
 
         if (mounted) setItems(list);
       } catch (e) {
         console.error("Failed to fetch related businesses:", e);
         if (mounted) {
           setItems([]);
-          setError("Failed to load related businesses.");
+          setError(tFailedToLoad);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -79,15 +73,15 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
     return () => {
       mounted = false;
     };
-  }, [limit, includeInactive]);
+  }, [limit, includeInactive, tFailedToLoad]);
 
   const sorted = useMemo(() => {
     const arr = Array.isArray(items) ? [...items] : [];
 
     const titleForSort = (it: any) => {
-      const localized = getTranslatedText(it?.title, language);
+      const localized = t(language, it?.title);
       if (localized) return localized.trim().toLowerCase();
-      const en = getTranslatedText(it?.title, "en");
+      const en = t("en", it?.title);
       return (en || "").trim().toLowerCase();
     };
 
@@ -116,22 +110,10 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
           color: token.colorTextBase,
         }}
       >
-        {loading && (
-          <Spin
-            size="large"
-            tip={tLoading}
-            style={{ display: "block", margin: "40px auto" }}
-          />
-        )}
+        {loading && <Spin size="large" tip={tLoading} style={{ display: "block", margin: "40px auto" }} />}
 
         {error && (
-          <Alert
-            message={tError}
-            description={error}
-            type="error"
-            showIcon
-            style={{ marginBottom: 40 }}
-          />
+          <Alert message={tError} description={error} type="error" showIcon style={{ marginBottom: 40 }} />
         )}
 
         {!loading && !error && sorted.length === 0 && (

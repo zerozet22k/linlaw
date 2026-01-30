@@ -2,17 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Alert,
-  Button,
-  Card,
-  List,
-  Skeleton,
-  Space,
-  Tag,
-  Typography,
-  theme,
-} from "antd";
+import { Alert, Button, Card, List, Skeleton, Space, Tag, Typography, theme } from "antd";
 import {
   ArrowLeftOutlined,
   CalendarOutlined,
@@ -20,51 +10,25 @@ import {
   FileTextOutlined,
   PaperClipOutlined,
 } from "@ant-design/icons";
-
 import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
 import { useLanguage } from "@/hooks/useLanguage";
-import { getTranslatedText } from "@/utils/getTranslatedText";
-import { commonTranslations } from "@/translations";
+import { t } from "@/i18n";
+import type { LanguageJson } from "@/i18n/types";
+import { getFileExtension, humanizeExt } from "@/utils/filesUtil";
+import { formatDate } from "@/utils/fileUtils";
 
 const { Title, Text, Paragraph } = Typography;
 
 type Attachment = NonNullable<INewsletterAPI["fileAttachments"]>[number];
 
-function formatDate(d?: string | number | Date) {
-  if (!d) return "";
-  try {
-    const date = d instanceof Date ? d : new Date(d);
-    return date.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-    });
-  } catch {
-    return "";
-  }
-}
-
-function getFileExtension(fileName?: string) {
-  if (!fileName) return "";
-  const parts = fileName.split(".");
-  return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
-}
-
-function humanizeExt(ext: string) {
-  if (!ext) return "";
-  return ext.toUpperCase();
-}
-
 type AttachmentPreviewProps = {
+  lang: string;
   attachment: Attachment;
   onLoad?: () => void;
 };
 
-const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
-  attachment,
-  onLoad,
-}) => {
+const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({ lang, attachment, onLoad }) => {
   const ext = getFileExtension(attachment.fileName);
 
   const frameStyle: React.CSSProperties = {
@@ -76,45 +40,22 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   };
 
   if (ext === "pdf") {
-    return (
-      <iframe
-        src={attachment.publicUrl}
-        style={frameStyle}
-        title={attachment.fileName}
-        onLoad={onLoad}
-      />
-    );
+    return <iframe src={attachment.publicUrl} style={frameStyle} title={attachment.fileName} onLoad={onLoad} />;
   }
 
   if (ext === "docx" || ext === "doc") {
-    // Google viewer works for public URLs
-    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(
-      attachment.publicUrl
-    )}&embedded=true`;
-
-    return (
-      <iframe
-        src={viewerUrl}
-        style={frameStyle}
-        title={attachment.fileName}
-        onLoad={onLoad}
-      />
-    );
+    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(attachment.publicUrl)}&embedded=true`;
+    return <iframe src={viewerUrl} style={frameStyle} title={attachment.fileName} onLoad={onLoad} />;
   }
+
+  const tNoPreview = t(lang, "newsletter.noPreview");
+  const tDownload = t(lang, "common.download");
 
   return (
     <div>
-      <Paragraph style={{ marginBottom: 8 }}>
-        Preview isn’t available for this file type.
-      </Paragraph>
-      <Button
-        type="primary"
-        icon={<DownloadOutlined />}
-        href={attachment.publicUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Download
+      <Paragraph style={{ marginBottom: 8 }}>{tNoPreview}</Paragraph>
+      <Button type="primary" icon={<DownloadOutlined />} href={attachment.publicUrl} target="_blank" rel="noopener noreferrer">
+        {tDownload}
       </Button>
     </div>
   );
@@ -129,34 +70,32 @@ const NewsletterDetail: React.FC = () => {
   const { token } = theme.useToken();
 
   const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(null);
-  const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(
-    null
-  );
+  const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const [previewLoading, setPreviewLoading] = useState(false);
   const reqIdRef = useRef(0);
 
-  const tLoading =
-    getTranslatedText(commonTranslations.loading, language) || "Loading...";
-  const tError = getTranslatedText(commonTranslations.error, language) || "Error";
-  const tNoData =
-    getTranslatedText(commonTranslations.noData, language) || "No Data";
-  const tBack = getTranslatedText(commonTranslations.back, language) || "Back";
-  const tDownload =
-    getTranslatedText(commonTranslations.download, language) || "Download";
-  const tEmpty =
-    getTranslatedText(commonTranslations.empty, language) ||
-    "No attachments available.";
+  const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tNoData = useMemo(() => t(language, "common.noData"), [language]);
+  const tBack = useMemo(() => t(language, "common.back"), [language]);
+  const tDownload = useMemo(() => t(language, "common.download"), [language]);
+
+  const tEmpty = useMemo(() => t(language, "newsletter.emptyAttachments"), [language]);
+  const tAttachments = useMemo(() => t(language, "newsletter.attachments"), [language]);
+  const tSelected = useMemo(() => t(language, "newsletter.selected"), [language]);
+  const tPreview = useMemo(() => t(language, "newsletter.preview"), [language]);
+  const tFailedToLoad = useMemo(() => t(language, "newsletter.failedToLoad"), [language]);
+  const tUntitled = useMemo(() => t(language, "newsletter.untitled"), [language]);
 
   const fetchNewsletter = useCallback(async () => {
     if (!id) return;
 
     const reqId = ++reqIdRef.current;
     setLoading(true);
-    setError(null);
+    setErrorCode(null);
 
     try {
       const response = await apiClient.get(`/newsletters/${id}`);
@@ -169,12 +108,12 @@ const NewsletterDetail: React.FC = () => {
         const first = Array.isArray(data.fileAttachments) ? data.fileAttachments[0] : null;
         setSelectedAttachment(first ?? null);
       } else {
-        throw new Error("Unexpected response format");
+        setErrorCode("failedToLoad");
       }
     } catch (err) {
       if (reqId !== reqIdRef.current) return;
       console.error("Error fetching newsletter:", err);
-      setError("Failed to load newsletter.");
+      setErrorCode("failedToLoad");
     } finally {
       if (reqId !== reqIdRef.current) return;
       setLoading(false);
@@ -185,11 +124,9 @@ const NewsletterDetail: React.FC = () => {
     fetchNewsletter();
   }, [fetchNewsletter]);
 
-  // When switching attachments, show skeleton until iframe loads.
   useEffect(() => {
     if (!selectedAttachment) return;
     const ext = getFileExtension(selectedAttachment.fileName);
-    // only show loading for iframe-able previews
     if (ext === "pdf" || ext === "doc" || ext === "docx") setPreviewLoading(true);
     else setPreviewLoading(false);
   }, [selectedAttachment]);
@@ -201,13 +138,9 @@ const NewsletterDetail: React.FC = () => {
 
   const newsletterTitle = useMemo(() => {
     if (!newsletter) return "";
-    if (typeof newsletter.title === "string") return newsletter.title;
-    return (
-      getTranslatedText(newsletter.title as any, language) ||
-      (newsletter.title as any)?.en ||
-      "Untitled"
-    );
-  }, [newsletter, language]);
+    const raw = newsletter.title as unknown as string | LanguageJson | undefined;
+    return t(language, raw, tUntitled).trim();
+  }, [newsletter, language, tUntitled]);
 
   const metaDate = formatDate((newsletter as any)?.createdAt);
   const metaAttachments = attachments.length;
@@ -229,11 +162,12 @@ const NewsletterDetail: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (errorCode) {
+    const desc = errorCode === "failedToLoad" ? tFailedToLoad : String(errorCode);
     return (
       <Alert
         message={tError}
-        description={error}
+        description={desc}
         type="error"
         showIcon
         style={{ margin: "40px auto", maxWidth: 900 }}
@@ -250,7 +184,6 @@ const NewsletterDetail: React.FC = () => {
   return (
     <div style={{ width: "100%", margin: "0 auto", padding: "40px 20px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        {/* Page header */}
         <div
           style={{
             display: "flex",
@@ -294,20 +227,13 @@ const NewsletterDetail: React.FC = () => {
             </Button>
 
             {selectedAttachment && (
-              <Button
-                type="primary"
-                icon={<DownloadOutlined />}
-                href={selectedAttachment.publicUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Button type="primary" icon={<DownloadOutlined />} href={selectedAttachment.publicUrl} target="_blank" rel="noopener noreferrer">
                 {tDownload}
               </Button>
             )}
           </Space>
         </div>
 
-        {/* Content */}
         {attachments.length === 0 ? (
           <Card
             variant="outlined"
@@ -340,7 +266,7 @@ const NewsletterDetail: React.FC = () => {
                 styles={{ body: { padding: token.paddingMD } }}
               >
                 <Text strong style={{ display: "block", marginBottom: 10 }}>
-                  Attachments
+                  {tAttachments}
                 </Text>
 
                 <List
@@ -359,8 +285,7 @@ const NewsletterDetail: React.FC = () => {
                           padding: "10px 12px",
                           marginBottom: 8,
                           background: active ? token.colorFillSecondary : "transparent",
-                          border: `1px solid ${active ? token.colorPrimaryBorder : "transparent"
-                            }`,
+                          border: `1px solid ${active ? token.colorPrimaryBorder : "transparent"}`,
                           transition: "background 150ms ease, border-color 150ms ease",
                         }}
                       >
@@ -404,7 +329,7 @@ const NewsletterDetail: React.FC = () => {
                               {ext && <Tag style={{ marginInlineEnd: 0 }}>{humanizeExt(ext)}</Tag>}
                               {active && (
                                 <Text style={{ fontSize: 12, color: token.colorPrimary }}>
-                                  Selected
+                                  {tSelected}
                                 </Text>
                               )}
                             </div>
@@ -437,7 +362,7 @@ const NewsletterDetail: React.FC = () => {
               >
                 <div style={{ minWidth: 0 }}>
                   <Text strong style={{ fontSize: 16 }} ellipsis>
-                    {selectedAttachment?.fileName ?? "Preview"}
+                    {selectedAttachment?.fileName ?? tPreview}
                   </Text>
                 </div>
 
@@ -461,10 +386,7 @@ const NewsletterDetail: React.FC = () => {
 
                 {selectedAttachment && (
                   <div style={{ opacity: previewLoading ? 0 : 1, transition: "opacity 160ms ease" }}>
-                    <AttachmentPreview
-                      attachment={selectedAttachment}
-                      onLoad={() => setPreviewLoading(false)}
-                    />
+                    <AttachmentPreview lang={language} attachment={selectedAttachment} onLoad={() => setPreviewLoading(false)} />
                   </div>
                 )}
               </div>

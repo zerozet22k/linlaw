@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Spin, Alert, Typography, theme } from "antd";
 import { useParams } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
 import { rgba } from "polished";
 import Image from "next/image";
+
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/i18n";
 
 import "./TeamMemberPage.css";
 
@@ -21,6 +24,14 @@ const TeamMemberPage: React.FC = () => {
   const { id: userId } = useParams<{ id: string }>() ?? {};
   const { token } = useToken();
 
+  const { language } = useLanguage();
+
+  const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tFailedToLoad = useMemo(() => t(language, "team.failedToLoadUser"), [language]);
+  const tNotFound = useMemo(() => t(language, "team.userNotFound"), [language]);
+  const tNoBio = useMemo(() => t(language, "team.noBiography"), [language]);
+  const tCoverAltSuffix = useMemo(() => t(language, "team.coverAltSuffix"), [language]);
+
   useEffect(() => {
     if (!userId) return;
 
@@ -30,21 +41,20 @@ const TeamMemberPage: React.FC = () => {
         setUser(data);
       } catch (e) {
         console.error(e);
-        setError("Failed to load user.");
+        setError(tFailedToLoad);
       } finally {
         setLoading(false);
       }
     })();
-  }, [userId]);
+  }, [userId, tFailedToLoad]);
 
-  if (loading)
-    return <Spin size="large" style={{ display: "block", margin: 40 }} />;
+  if (loading) return <Spin size="large" style={{ display: "block", margin: 40 }} />;
 
   if (error || !user)
     return (
       <Alert
-        message="Error"
-        description={error ?? "User not found"}
+        message={tError}
+        description={error ?? tNotFound}
         type="error"
         showIcon
         style={{ margin: 40 }}
@@ -54,7 +64,11 @@ const TeamMemberPage: React.FC = () => {
   const glass = rgba(token.colorBgContainer, 0.2);
 
   const coverSrc = user.cover_image ?? "/images/default-cover.jpg";
-  const alt = `${user.name ?? user.username} cover`;
+
+  const who = String(user.name ?? user.username ?? "").trim();
+  const alt = who ? `${who} ${tCoverAltSuffix}` : tCoverAltSuffix;
+
+  const displayName = user.name ?? user.username;
 
   return (
     <div className="tm-page" style={{ color: token.colorTextBase }}>
@@ -82,7 +96,7 @@ const TeamMemberPage: React.FC = () => {
 
         <div className="tm-details">
           <Title level={2} style={{ marginBottom: 8, color: token.colorTextHeading }}>
-            {user.name ?? user.username}
+            {displayName}
           </Title>
 
           {user.position && (
@@ -92,7 +106,7 @@ const TeamMemberPage: React.FC = () => {
           )}
 
           <Paragraph style={{ fontSize: 16, lineHeight: 1.6 }}>
-            {user.bio || "No biography available."}
+            {user.bio || tNoBio}
           </Paragraph>
         </div>
       </div>

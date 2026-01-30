@@ -2,7 +2,7 @@ import React from "react";
 import { Select, theme } from "antd";
 import { useLanguage } from "@/hooks/useLanguage";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags, languageNames } from "@/models/languages";
+import { languageFlags, languageNames } from "@/i18n/languages";
 import Image from "next/image";
 
 const { Option } = Select;

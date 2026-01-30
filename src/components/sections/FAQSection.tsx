@@ -5,80 +5,56 @@ import React, { useMemo, useState } from "react";
 import { Collapse, Button, theme, Typography } from "antd";
 import type { CollapseProps } from "antd";
 import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
-import { getTranslatedText } from "@/utils/getTranslatedText";
+
+import { t } from "@/i18n";
 import {
   HOME_PAGE_SETTINGS_KEYS as K,
   HOME_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/HOME_PAGE_SETTINGS";
-import { commonTranslations } from "@/translations";
 
 const { Text } = Typography;
 
 type FAQData = HOME_PAGE_SETTINGS_TYPES[typeof K.FAQS_SECTION];
-
-type NormalizedFaq = {
-  key: string;
-  q: string;
-  a: string;
-  perks: string[];
-};
+type FAQItem = NonNullable<FAQData["items"]>[number];
 
 const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
-const clamp = (s: string, n: number) =>
-  s.length > n ? `${s.slice(0, n).trim()}…` : s;
+const clamp = (s: string, n: number) => (s.length > n ? `${s.slice(0, n).trim()}…` : s);
 
-const FAQSection: React.FC<{ data: FAQData; language: string }> = ({
-  data,
-  language,
-}) => {
+const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, language }) => {
   const { token } = theme.useToken();
 
   const [activeKey, setActiveKey] = useState<string>();
-  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(
-    () => new Set()
-  );
+  const [expandedBodies, setExpandedBodies] = useState<Set<string>>(() => new Set());
 
-  const rawItems = useMemo(
-    () => (Array.isArray((data as any)?.items) ? (data as any).items : []),
-    [data]
-  );
+  const faqs = useMemo(() => {
+    const raw: FAQItem[] = Array.isArray(data?.items) ? data.items : [];
 
-  const faqs = useMemo<NormalizedFaq[]>(() => {
-    return rawItems
-      .map((faq: any, index: number): NormalizedFaq => {
-        const q = clean(getTranslatedText(faq.question, language) || "");
-        const a = clean(getTranslatedText(faq.answer, language) || "");
+    return raw
+      .map((faq, index) => {
+        const q = clean(t(language, faq.question, ""));
+        const a = clean(t(language, faq.answer, ""));
+
         const perks = Array.isArray(faq.list)
-          ? faq.list
-              .map((li: any) =>
-                clean(getTranslatedText(li?.answer, language) || "")
-              )
-              .filter(Boolean)
+          ? faq.list.map((li) => clean(t(language, li.answer, ""))).filter(Boolean)
           : [];
-        const key = String(faq._id || faq.id || index);
+
+        const key = String((faq as any)?._id ?? (faq as any)?.id ?? index);
+
         return { key, q, a, perks };
       })
-      .filter((f: any) => !!f.q || !!f.a || f.perks.length > 0);
-  }, [rawItems, language]);
+      .filter((f): f is { key: string; q: string; a: string; perks: string[] } => {
+        return Boolean(f.q || f.a || f.perks.length > 0);
+      });
+  }, [data, language]);
 
-  const tReadMore = clean(
-    getTranslatedText(commonTranslations.readMore, language) || "Read More"
-  );
-  const tReadLess = clean(
-    getTranslatedText(commonTranslations.readLess, language) || "Read Less"
-  );
+  const tReadMore = useMemo(() => clean(t(language, "faq.readMore")), [language]);
+  const tReadLess = useMemo(() => clean(t(language, "faq.readLess")), [language]);
 
   const toggleBody = (key: string) => {
     setExpandedBodies((prev) => {
       const next = new Set(prev);
-
-      // ESLint-friendly: no ternary side-effects
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };
