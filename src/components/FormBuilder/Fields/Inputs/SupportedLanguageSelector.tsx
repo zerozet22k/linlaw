@@ -5,7 +5,13 @@ import { Avatar, Select, Tag, theme } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { defaultWrapperStyle, defaultSelectStyle } from "../../InputStyle";
 import { getFlagUrl } from "@/config/navigations/IconMapper";
-import { languageFlags, languageNames } from "@/i18n/languages";
+import {
+  languageFlags,
+  languageNames,
+  isSupportedLanguage,
+  type SupportedLanguage,
+} from "@/i18n/languages";
+
 const { Option } = Select;
 
 interface Props {
@@ -14,7 +20,6 @@ interface Props {
   style?: CSSProperties;
   inputStyle?: CSSProperties;
 }
-
 
 const SupportedLanguageSelector: React.FC<Props> = ({
   value = [],
@@ -33,7 +38,9 @@ const SupportedLanguageSelector: React.FC<Props> = ({
   const tagRender = (props: any) => {
     const { value: langValue, closable, onClose } = props;
     const lang = typeof langValue === "string" ? langValue : "";
-    const flag = getFlagUrl(languageFlags[lang] ?? "un", 20);
+
+    const flagCode = isSupportedLanguage(lang) ? languageFlags[lang] : "un";
+    const flag = getFlagUrl(flagCode, 20);
 
     return (
       <Tag
@@ -51,16 +58,13 @@ const SupportedLanguageSelector: React.FC<Props> = ({
         closeIcon={<CloseOutlined style={{ fontSize: 12, opacity: 0.6 }} />}
         onClose={onClose}
       >
-        <Avatar
-          src={flag}
-          size={16}
-          shape="square"
-          style={{ marginRight: 6 }}
-        />
+        <Avatar src={flag} size={16} shape="square" style={{ marginRight: 6 }} />
         {lang.toUpperCase()}
       </Tag>
     );
   };
+
+  const languageKeys = Object.keys(languageFlags) as SupportedLanguage[];
 
   return (
     <div
@@ -86,7 +90,7 @@ const SupportedLanguageSelector: React.FC<Props> = ({
           minHeight: 44,
         }}
       >
-        {Object.keys(languageFlags).map((lang) => (
+        {languageKeys.map((lang) => (
           <Option key={lang} value={lang} disabled={lang === "en"}>
             <Avatar
               src={getFlagUrl(languageFlags[lang] ?? "un", 20)}
@@ -94,7 +98,7 @@ const SupportedLanguageSelector: React.FC<Props> = ({
               shape="square"
               style={{ marginRight: 8 }}
             />
-            {lang.toUpperCase()}
+            {(languageNames[lang] ?? lang.toUpperCase())}
           </Option>
         ))}
       </Select>
