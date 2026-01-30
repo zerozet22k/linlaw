@@ -16,7 +16,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
 import type { LanguageJson } from "@/i18n/types";
 import { getFileExtension, humanizeExt } from "@/utils/filesUtil";
-import { formatDate } from "@/utils/fileUtils";
+import { formatDate } from "@/utils/timeUtil";
 
 const { Title, Text, Paragraph } = Typography;
 

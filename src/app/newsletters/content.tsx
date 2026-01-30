@@ -16,7 +16,7 @@ import {
 } from "@/config/CMS/pages/keys/NEWSLETTER_PAGE_SETTINGS";
 import { INewsletterAPI } from "@/models/Newsletter";
 import type { LanguageJson } from "@/i18n/types";
-import { formatDate } from "@/utils/fileUtils";
+import { formatDate } from "@/utils/timeUtil";
 
 const { Title, Text } = Typography;
 

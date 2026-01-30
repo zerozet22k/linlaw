@@ -16,7 +16,7 @@ import {
   Typography,
 } from "antd";
 import { useUser } from "@/hooks/useUser";
-import { formatDate } from "@/utils/fileUtils";
+import { formatDate } from "@/utils/timeUtil";
 
 const { Title, Text } = Typography;
 

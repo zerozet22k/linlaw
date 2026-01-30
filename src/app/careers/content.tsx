@@ -16,7 +16,8 @@ import PageWrapper from "@/components/ui/PageWrapper";
 import { CAREER_PAGE_SETTINGS_KEYS as K, CAREER_PAGE_SETTINGS_TYPES } from "@/config/CMS/pages/keys/CAREER_PAGE_SETTINGS";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
-import { formatYmd } from "@/utils/fileUtils";
+import { formatYmd } from "@/utils/timeUtil";
+
 
 const { Title, Paragraph } = Typography;
 
