@@ -1,4 +1,3 @@
-/*  ─────────────────  base layout ─────────────────  */
 .tm-page {
   position: relative;
   min-height: 100vh;
@@ -28,23 +27,43 @@
   backdrop-filter: blur(10px);
 }
 
-/*  image  */
+/* image panel */
 .tm-cover {
   flex: 1 1 40%;
   position: relative;
   overflow: hidden;
+  min-height: 520px;
+
+  /* looks fine when portrait uses contain */
+  background: radial-gradient(
+      900px 380px at 40% 30%,
+      rgba(15, 23, 42, 0.08) 0%,
+      rgba(15, 23, 42, 0.02) 60%,
+      rgba(15, 23, 42, 0.00) 100%
+    ),
+    rgba(15, 23, 42, 0.02);
 }
-.tm-cover img {
-  width: 100%;
-  height: 100%;
+
+/* ✅ zoom stays for ALL images */
+.tm-img {
   object-fit: cover;
   transition: transform 0.5s ease;
 }
-.tm-cover img:hover {
+
+.tm-cover:hover .tm-img {
   transform: scale(1.05);
 }
 
-/*  details  */
+/* ✅ portrait: show full image by default (no crop) */
+.tm-cover--portrait {
+  min-height: 680px;
+}
+
+.tm-cover--portrait .tm-img {
+  object-fit: contain;
+}
+
+/* details */
 .tm-details {
   flex: 1 1 60%;
   padding: 40px;
@@ -53,14 +72,18 @@
   justify-content: center;
 }
 
-/*  ─────────────────  break-point: < 992px (lg→md) ─────────────────  */
 @media (max-width: 991.98px) {
   .tm-details {
     padding: 32px;
   }
+  .tm-cover {
+    min-height: 480px;
+  }
+  .tm-cover--portrait {
+    min-height: 620px;
+  }
 }
 
-/*  ─────────────────  break-point: < 768px (tablet / md→sm) ─────────────────  */
 @media (max-width: 767.98px) {
   .tm-page {
     padding: 16px;
@@ -69,20 +92,24 @@
     flex-direction: column;
   }
   .tm-cover {
-    flex: 0 0 auto;
-    height: 120vw;
-  } /* tall portrait */
+    min-height: 62vh;
+  }
+  .tm-cover--portrait {
+    min-height: 74vh;
+  }
   .tm-details {
     padding: 24px;
     text-align: center;
   }
 }
 
-/*  ─────────────────  break-point: < 576px (phone / xs) ─────────────────  */
 @media (max-width: 575.98px) {
   .tm-cover {
-    height: 150vw;
-  } /* extra tall on small phones */
+    min-height: 58vh;
+  }
+  .tm-cover--portrait {
+    min-height: 78vh;
+  }
   .tm-details {
     padding: 20px;
   }

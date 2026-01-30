@@ -14,21 +14,72 @@ import { useSettings } from "@/hooks/useSettings";
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import { Typography } from "antd";
 
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/i18n";
+
 const { Title, Text } = Typography;
 
 interface LayoutRouterProps {
   children: React.ReactNode;
 }
 
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const pathToRegex = (path: string) => {
+  const parts = path.split("/").map((p) => {
+    if (p.startsWith(":")) return "[^/]+"; // ids/slugs w/ hyphens etc.
+    return escapeRegex(p);
+  });
+  return new RegExp(`^${parts.join("/")}$`);
+};
+
 const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   const { user, initialLoading } = useUser();
   const { settings } = useSettings();
+  const { language } = useLanguage();
+
   const pathname = usePathname();
   const router = useRouter();
   const isDashboardRoute = pathname?.startsWith("/dashboard");
 
   const [loading, setLoading] = useState(false);
+  const [hash, setHash] = useState("");
 
+  // ✅ FIX: Next changes URL via history.pushState/replaceState (hashchange may not fire)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const update = () => setHash(window.location.hash || "");
+    update();
+
+    const origPush = window.history.pushState;
+    const origReplace = window.history.replaceState;
+
+    const wrap =
+      (fn: typeof window.history.pushState) =>
+      function (this: History, ...args: Parameters<typeof fn>) {
+        const ret = fn.apply(this, args as any);
+        update();
+        return ret;
+      };
+
+    window.history.pushState = wrap(origPush);
+    window.history.replaceState = wrap(origReplace);
+
+    // back/forward
+    window.addEventListener("popstate", update);
+    // real hash changes (anchor clicks)
+    window.addEventListener("hashchange", update);
+
+    return () => {
+      window.history.pushState = origPush;
+      window.history.replaceState = origReplace;
+      window.removeEventListener("popstate", update);
+      window.removeEventListener("hashchange", update);
+    };
+  }, []);
+
+  // ✅ IMPORTANT: hash-only navigation must NOT show spinner (breaks scroll)
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => setLoading(false), 200);
@@ -36,21 +87,19 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   }, [pathname]);
 
   const routeConfig = useMemo(() => {
+    const fullPath = `${pathname}${hash}`; // "/#services"
     return (
-      Object.values(ROUTES).find((route) => {
-        const regexPath = new RegExp(
-          `^${route.path.replace(/:\w+/g, "\\w+")}$`
-        );
-        return regexPath.test(pathname);
-      }) || null
+      Object.values(ROUTES).find((route) =>
+        pathToRegex(route.path).test(fullPath)
+      ) || null
     );
-  }, [pathname]);
+  }, [pathname, hash]);
 
   const hasAccess = useMemo(() => {
     if (!routeConfig) return true;
     if (!routeConfig.access && !routeConfig.loginRequired) return true;
     return hasPermission(user, routeConfig.access || [], true);
-  }, [user, routeConfig, pathname]);
+  }, [user, routeConfig]);
 
   useEffect(() => {
     const siteName =
@@ -58,19 +107,17 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
       process.env.NEXT_PUBLIC_SITE_NAME ||
       "Default Site";
 
-    const newTitle = routeConfig?.label
-      ? `${siteName} | ${routeConfig.label}`
-      : siteName;
+    const pageTitle = routeConfig?.navKey
+      ? t(language, routeConfig.navKey, routeConfig.key)
+      : "";
 
-    document.title = newTitle;
-  }, [routeConfig, settings]);
+    document.title = pageTitle ? `${siteName} | ${pageTitle}` : siteName;
+  }, [routeConfig, settings, language]);
 
   useEffect(() => {
     if (initialLoading) return;
 
-    const redirectTo = (target: string) => {
-      if (pathname !== target) router.replace(target);
-    };
+    const redirectTo = (target: string) => router.replace(target);
 
     if (!user && routeConfig?.loginRequired) {
       redirectTo(routeConfig.IfNotLoggedInRedirectUrl || "/login");
@@ -83,13 +130,10 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
       } else {
         redirectTo("/");
       }
-      return;
     }
   }, [initialLoading, user, routeConfig, pathname, router]);
 
-  if (initialLoading || loading) {
-    return <LoadingSpin message="Building Theme..." />;
-  }
+  if (initialLoading || loading) return <LoadingSpin message="Building Theme..." />;
 
   const content =
     user && routeConfig?.access && !hasAccess ? (

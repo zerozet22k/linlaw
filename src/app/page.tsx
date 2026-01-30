@@ -78,13 +78,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = getSiteName(settings);
   const siteUrl = getSiteUrl(settings).replace(/\/$/, "");
   const { description, keywords, ogImageRaw } = getSeo(settings);
-  const ogImage = toAbsoluteUrl(ogImageRaw, siteUrl);
 
+  const ogImage = ogImageRaw ? toAbsoluteUrl(ogImageRaw, siteUrl) : undefined;
   const canonical = `${siteUrl}/`;
 
   return {
-    // Keep homepage title = default site title (from layout template/default)
-    title: siteName,
+    title: { absolute: siteName },
     description,
     keywords,
     alternates: { canonical },
@@ -92,19 +91,20 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: siteName,
       description,
-      images: [{ url: ogImage }],
+      images: ogImage ? [{ url: ogImage }] : undefined,
       type: "website",
       url: canonical,
     },
 
     twitter: {
-      card: "summary_large_image",
+      card: ogImage ? "summary_large_image" : "summary",
       title: siteName,
       description,
-      images: [ogImage],
+      images: ogImage ? [ogImage] : undefined,
     },
   };
 }
+
 
 const HomePage = async () => {
   const data = await loadData();

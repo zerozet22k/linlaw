@@ -12,7 +12,7 @@ import {
 
 import { getPageSettings } from "@/utils/server/pageSettings";
 import { valuesOf } from "@/utils/typed";
-import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
+import { buildPageMetadata, getLang } from "@/utils/server/metadata/buildPageMetadata";
 
 const defaults: NEWSLETTER_PAGE_SETTINGS_TYPES = {
   [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: undefined,
@@ -28,15 +28,21 @@ async function loadData() {
   });
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: { lang?: string };
+}): Promise<Metadata> {
   const data = await loadData();
+  const lang = getLang(searchParams);
 
   return buildPageMetadata({
     path: "/newsletters",
-    fallbackTitle: "Newsletters",
+    lang,
     pageContent: data[NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT],
   });
 }
+
 
 const NewsletterPage = async () => {
   const data = await loadData();

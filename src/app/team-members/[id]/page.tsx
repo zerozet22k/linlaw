@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import TeamMemberContent from "./content";
 
-import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
+import { buildPageMetadata, getLang } from "@/utils/server/metadata/buildPageMetadata";
 
 function shortText(input: string, max = 160) {
   const s = String(input || "").trim().replace(/\s+/g, " ");
@@ -20,9 +20,15 @@ function getRequestOrigin() {
   return host ? `${proto}://${host}` : "";
 }
 
-export async function generateMetadata(
-  { params }: { params: { id: string } }
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams?: { lang?: string };
+}): Promise<Metadata> {
+  const lang = getLang(searchParams);
+
   const origin = getRequestOrigin();
   const idForFetch = encodeURIComponent(params.id);
 
@@ -32,7 +38,9 @@ export async function generateMetadata(
 
   try {
     if (origin) {
-      const res = await fetch(`${origin}/api/team/${idForFetch}`, { cache: "no-store" });
+      const res = await fetch(`${origin}/api/team/${idForFetch}`, {
+        cache: "no-store",
+      });
       if (res.ok) {
         const u: any = await res.json();
 
@@ -41,24 +49,25 @@ export async function generateMetadata(
 
         bio = String(u?.bio ?? "").trim();
 
-        // optional: promote a better OG image if you have it
         const img = String(u?.cover_image ?? u?.avatar ?? "").trim();
         if (img) ogImageRaw = img;
       }
     }
-  } catch { }
+  } catch {}
 
   const desc = shortText(bio);
 
   return buildPageMetadata({
     path: `/team-members/${params.id}`,
-    fallbackTitle: "Team Member",
-    title: personName,
+    lang,
+    title: personName, 
     description: desc || undefined,
     ogImageRaw,
     type: "profile",
+    preferFallbackTitle: false,
   });
 }
+
 
 export default function Page() {
   return <TeamMemberContent />;

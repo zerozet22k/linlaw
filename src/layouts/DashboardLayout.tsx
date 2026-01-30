@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Layout, Drawer, Typography, theme } from "antd";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,15 +14,27 @@ import AppMenu from "@/config/navigations/navigationMenu";
 const { Sider, Content, Header, Footer } = Layout;
 const { Text } = Typography;
 
-const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+
+const NAV = {
+  desktop: {
+    width: 300,
+    collapsedWidth: 80,
+    logoHeight: 300,
+    logoHeightCollapsed: 80,
+  },
+  mobile: {
+    drawerWidth: 400,
+    logoHeight: 400,
+  },
+};
+
+const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { settings } = useSettings();
   const [collapsed, setCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  const handleDrawerToggle = () => setDrawerVisible(!drawerVisible);
+  const handleDrawerToggle = () => setDrawerVisible((v) => !v);
 
   const {
     [GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]: siteSettings = {
@@ -40,6 +52,15 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   const siteLogo = siteSettings.siteLogo?.trim() || "/images/logo.svg";
   const siteName = siteSettings.siteName?.trim() || "Site Logo";
 
+  const desktopWidth = NAV.desktop.width;
+  const desktopCollapsedWidth = NAV.desktop.collapsedWidth;
+  const mobileDrawerWidth = NAV.mobile.drawerWidth;
+
+  const contentMarginLeft = useMemo(() => {
+    if (isMobile) return 0;
+    return collapsed ? desktopCollapsedWidth : desktopWidth;
+  }, [isMobile, collapsed, desktopCollapsedWidth, desktopWidth]);
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       {isMobile ? (
@@ -49,21 +70,17 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           styles={{ body: { padding: 0, background: colorBgContainer } }}
           onClose={handleDrawerToggle}
           open={drawerVisible}
-          size={200}
+          width={mobileDrawerWidth}
         >
-          <div
-            className="logo"
-            style={{
-              display: "flex",
-            }}
-          >
+          <div className="logo" style={{ display: "flex" }}>
             <Link href="/" style={{ width: "100%" }}>
-              <div style={{ position: "relative", width: "100%", height: 200 }}>
+              <div style={{ position: "relative", width: "100%", height: NAV.mobile.logoHeight }}>
                 <Image
                   src={siteLogo}
                   alt={siteName}
                   fill
                   priority
+                  sizes={`${mobileDrawerWidth}px`}
                   style={{ objectFit: "contain" }}
                 />
               </div>
@@ -82,8 +99,8 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           collapsible
           collapsed={collapsed}
           onCollapse={setCollapsed}
-          width={200}
-          collapsedWidth={80}
+          width={desktopWidth}
+          collapsedWidth={desktopCollapsedWidth}
           style={{
             overflow: "auto",
             height: "100vh",
@@ -103,13 +120,19 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
             }}
           >
             <Link href="/" style={{ width: "100%" }}>
-              <div style={{ position: "relative", width: "100%", height: collapsed ? 80 : 200 }}>
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: collapsed ? NAV.desktop.logoHeightCollapsed : NAV.desktop.logoHeight,
+                }}
+              >
                 <Image
                   src={siteLogo}
                   alt={siteName}
                   fill
                   priority
-                  sizes="200px"
+                  sizes={`${collapsed ? desktopCollapsedWidth : desktopWidth}px`}
                   style={{ objectFit: "contain" }}
                 />
               </div>
@@ -127,7 +150,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
 
       <Layout
         style={{
-          marginLeft: isMobile ? 0 : collapsed ? 80 : 200,
+          marginLeft: contentMarginLeft,
           transition: "margin-left 0.2s ease",
         }}
       >

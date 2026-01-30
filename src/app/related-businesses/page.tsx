@@ -12,7 +12,7 @@ import {
 
 import { getPageSettings } from "@/utils/server/pageSettings";
 import { valuesOf } from "@/utils/typed";
-import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
+import { buildPageMetadata, getLang } from "@/utils/server/metadata/buildPageMetadata";
 
 const defaults: RELATED_BUSINESSES_PAGE_SETTINGS_TYPES = {
   [RELATED_BUSINESSES_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: undefined,
@@ -29,15 +29,21 @@ async function loadData() {
   });
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: { lang?: string };
+}): Promise<Metadata> {
   const data = await loadData();
+  const lang = getLang(searchParams);
 
   return buildPageMetadata({
     path: "/related-businesses",
-    fallbackTitle: "Related Businesses",
+    lang,
     pageContent: data[RELATED_BUSINESSES_PAGE_SETTINGS_KEYS.PAGE_CONTENT],
   });
 }
+
 
 const RelatedBusinessesPage = async () => {
   const data = await loadData();

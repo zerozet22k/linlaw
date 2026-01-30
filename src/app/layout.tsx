@@ -9,18 +9,16 @@ import { Analytics } from "@vercel/analytics/next";
 import { SettingsProvider } from "@/providers/SettingsProvider";
 import LayoutContent from "./layout-content";
 
-import { getPublicSettings, getSiteName, getSiteUrl } from "@/utils/server/publicSiteSettings";
-import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
+import {
+  getPublicSettings,
+  getSiteName,
+  getSiteUrl,
+} from "@/utils/server/publicSiteSettings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
   const siteName = getSiteName(settings);
   const siteUrl = getSiteUrl(settings).replace(/\/$/, "");
-
-  const base = await buildPageMetadata({
-    path: "/",
-    fallbackTitle: siteName,
-  });
 
   return {
     metadataBase: new URL(siteUrl),
@@ -28,8 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
       default: siteName,
       template: `%s | ${siteName}`,
     },
-
-    ...base,
   };
 }
 

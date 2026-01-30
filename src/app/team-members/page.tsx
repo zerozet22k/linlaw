@@ -1,5 +1,5 @@
-/* TEAM_PAGE_SETTINGS */
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import React from "react";
 import type { Metadata } from "next";
@@ -13,6 +13,9 @@ import {
 import { getPageSettings } from "@/utils/server/pageSettings";
 import { valuesOf } from "@/utils/typed";
 import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
+
+import { cookies } from "next/headers";
+import { DEFAULT_LANG, type SupportedLanguage } from "@/i18n/languages";
 
 const defaults: TEAM_PAGE_SETTINGS_TYPES = {
   [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: undefined,
@@ -29,11 +32,23 @@ async function loadData() {
   });
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+const getLang = (searchParams?: { lang?: string }): SupportedLanguage => {
+  const fromQuery = searchParams?.lang;
+  const fromCookie = cookies().get("language")?.value;
+  return (fromQuery || fromCookie || DEFAULT_LANG) as SupportedLanguage;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: { lang?: string };
+}): Promise<Metadata> {
   const data = await loadData();
+  const lang = getLang(searchParams);
+
   return buildPageMetadata({
     path: "/team-members",
-    fallbackTitle: "Team Members",
+    lang,
     pageContent: data[TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT],
   });
 }

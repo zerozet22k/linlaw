@@ -324,8 +324,10 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
   [ROUTE_KEYS.LOGIN]: {
     key: ROUTE_KEYS.LOGIN,
     path: "/login",
+    navKey: "nav.routes.login",
     IfLoggedInRedirectUrl: "/dashboard",
   },
+
   [ROUTE_KEYS.REGISTER]: {
     key: ROUTE_KEYS.REGISTER,
     path: "/signup",

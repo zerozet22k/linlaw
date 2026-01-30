@@ -21,6 +21,8 @@ const TeamMemberClient: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [isPortrait, setIsPortrait] = useState(false);
+
   const { id: userId } = useParams<{ id: string }>() ?? {};
   const { token } = useToken();
 
@@ -64,10 +66,8 @@ const TeamMemberClient: React.FC = () => {
   const glass = rgba(token.colorBgContainer, 0.2);
 
   const coverSrc = user.cover_image ?? "/images/default-cover.jpg";
-
   const who = String(user.name ?? user.username ?? "").trim();
   const alt = who ? `${who} ${tCoverAltSuffix}` : tCoverAltSuffix;
-
   const displayName = user.name ?? user.username;
 
   return (
@@ -81,14 +81,19 @@ const TeamMemberClient: React.FC = () => {
       </svg>
 
       <div className="tm-card" style={{ background: glass }}>
-        <div className="tm-cover" style={{ position: "relative" }}>
+        <div className={`tm-cover ${isPortrait ? "tm-cover--portrait" : ""}`}>
           <Image
+            className="tm-img"
             src={coverSrc}
             alt={alt}
             fill
             priority
             sizes="(max-width: 768px) 100vw, 900px"
-            style={{ objectFit: "cover" }}
+            onLoadingComplete={(img) => {
+              const ratio = img.naturalHeight / Math.max(1, img.naturalWidth);
+              setIsPortrait(ratio > 1.15);
+            }}
+            style={{ objectPosition: "center" }}
           />
         </div>
 
