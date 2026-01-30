@@ -76,5 +76,4 @@ export const languages: LanguageOption[] = SUPPORTED_LANGS.map((code) => ({
   flag: languageFlags[code],
 }));
 
-// Re-export for convenience
 export type { BaseLocale };
