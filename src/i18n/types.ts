@@ -6,7 +6,7 @@ import type { SupportedLanguage } from "./languages";
  * - still allows extra language codes coming from DB
  */
 export type LanguageJson =
+  { en: string } &
   Partial<Record<SupportedLanguage, string>> & {
-    en?: string;
     [languageCode: string]: string | undefined;
   };

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect } from "react";
 import { ConfigProvider, theme } from "antd";
 import { useSettings } from "@/hooks/useSettings";

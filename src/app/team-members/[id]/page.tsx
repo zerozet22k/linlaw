@@ -1,117 +1,65 @@
-"use client";
+export const dynamic = "force-dynamic";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Alert, Typography, theme } from "antd";
-import { useParams } from "next/navigation";
-import apiClient from "@/utils/api/apiClient";
-import { UserAPI } from "@/models/UserModel";
-import { rgba } from "polished";
-import Image from "next/image";
+import React from "react";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import TeamMemberContent from "./content";
 
-import { useLanguage } from "@/hooks/useLanguage";
-import { t } from "@/i18n";
+import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
 
-import "./TeamMemberPage.css";
+function shortText(input: string, max = 160) {
+  const s = String(input || "").trim().replace(/\s+/g, " ");
+  if (!s) return "";
+  return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+}
 
-const { Title, Paragraph } = Typography;
-const { useToken } = theme;
+function getRequestOrigin() {
+  const h = headers();
+  const host = h.get("x-forwarded-host") || h.get("host") || "";
+  const proto = h.get("x-forwarded-proto") || "https";
+  return host ? `${proto}://${host}` : "";
+}
 
-const TeamMemberPage: React.FC = () => {
-  const [user, setUser] = useState<UserAPI | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export async function generateMetadata(
+  { params }: { params: { id: string } }
+): Promise<Metadata> {
+  const origin = getRequestOrigin();
+  const idForFetch = encodeURIComponent(params.id);
 
-  const { id: userId } = useParams<{ id: string }>() ?? {};
-  const { token } = useToken();
+  let personName = "Team Member";
+  let bio = "";
+  let ogImageRaw: string | undefined;
 
-  const { language } = useLanguage();
+  try {
+    if (origin) {
+      const res = await fetch(`${origin}/api/team/${idForFetch}`, { cache: "no-store" });
+      if (res.ok) {
+        const u: any = await res.json();
 
-  const tError = useMemo(() => t(language, "common.error"), [language]);
-  const tFailedToLoad = useMemo(() => t(language, "team.failedToLoadUser"), [language]);
-  const tNotFound = useMemo(() => t(language, "team.userNotFound"), [language]);
-  const tNoBio = useMemo(() => t(language, "team.noBiography"), [language]);
-  const tCoverAltSuffix = useMemo(() => t(language, "team.coverAltSuffix"), [language]);
+        const who = String(u?.name ?? u?.username ?? "").trim();
+        if (who) personName = who;
 
-  useEffect(() => {
-    if (!userId) return;
+        bio = String(u?.bio ?? "").trim();
 
-    (async () => {
-      try {
-        const { data } = await apiClient.get<UserAPI>(`/team/${userId}`);
-        setUser(data);
-      } catch (e) {
-        console.error(e);
-        setError(tFailedToLoad);
-      } finally {
-        setLoading(false);
+        // optional: promote a better OG image if you have it
+        const img = String(u?.cover_image ?? u?.avatar ?? "").trim();
+        if (img) ogImageRaw = img;
       }
-    })();
-  }, [userId, tFailedToLoad]);
+    }
+  } catch { }
 
-  if (loading) return <Spin size="large" style={{ display: "block", margin: 40 }} />;
+  const desc = shortText(bio);
 
-  if (error || !user)
-    return (
-      <Alert
-        message={tError}
-        description={error ?? tNotFound}
-        type="error"
-        showIcon
-        style={{ margin: 40 }}
-      />
-    );
+  return buildPageMetadata({
+    path: `/team-members/${params.id}`,
+    fallbackTitle: "Team Member",
+    title: personName,
+    description: desc || undefined,
+    ogImageRaw,
+    type: "profile",
+  });
+}
 
-  const glass = rgba(token.colorBgContainer, 0.2);
-
-  const coverSrc = user.cover_image ?? "/images/default-cover.jpg";
-
-  const who = String(user.name ?? user.username ?? "").trim();
-  const alt = who ? `${who} ${tCoverAltSuffix}` : tCoverAltSuffix;
-
-  const displayName = user.name ?? user.username;
-
-  return (
-    <div className="tm-page" style={{ color: token.colorTextBase }}>
-      {/* decorative wave */}
-      <svg viewBox="0 0 1440 320" className="tm-wave">
-        <path
-          fill={token.colorTextBase}
-          fillOpacity="0.03"
-          d="M0,224L48,224C96,224,192,224,288,202.7C384,181,480,139,576,138.7C672,139,768,181,864,186.7C960,192,1056,160,1152,165.3C1248,171,1344,213,1392,234.7L1440,256V320H0Z"
-        />
-      </svg>
-
-      {/* card */}
-      <div className="tm-card" style={{ background: glass }}>
-        <div className="tm-cover" style={{ position: "relative" }}>
-          <Image
-            src={coverSrc}
-            alt={alt}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 900px"
-            style={{ objectFit: "cover" }}
-          />
-        </div>
-
-        <div className="tm-details">
-          <Title level={2} style={{ marginBottom: 8, color: token.colorTextHeading }}>
-            {displayName}
-          </Title>
-
-          {user.position && (
-            <Title level={4} style={{ marginBottom: 16, color: token.colorTextDescription }}>
-              {user.position}
-            </Title>
-          )}
-
-          <Paragraph style={{ fontSize: 16, lineHeight: 1.6 }}>
-            {user.bio || tNoBio}
-          </Paragraph>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default TeamMemberPage;
+export default function Page() {
+  return <TeamMemberContent />;
+}

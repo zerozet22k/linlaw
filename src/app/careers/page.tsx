@@ -1,6 +1,6 @@
-// app/careers/page.tsx
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import React from "react";
 import CareersContent from "./content";
 
@@ -11,19 +11,35 @@ import {
 
 import { getPageSettings } from "@/utils/server/pageSettings";
 import { valuesOf } from "@/utils/typed";
-const CareersPage = async () => {
-  const defaults: CAREER_PAGE_SETTINGS_TYPES = {
-    [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: {
-      section: undefined,
-      items: [],
-    },
-  };
+import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
 
-  const data = await getPageSettings({
+const defaults: CAREER_PAGE_SETTINGS_TYPES = {
+  [CAREER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: undefined,
+  [CAREER_PAGE_SETTINGS_KEYS.JOBS_SECTION]: {
+    section: undefined,
+    items: [],
+  },
+};
+
+async function loadData() {
+  return getPageSettings({
     keys: valuesOf(CAREER_PAGE_SETTINGS_KEYS),
     defaults,
   });
+}
 
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await loadData();
+
+  return buildPageMetadata({
+    path: "/careers",
+    fallbackTitle: "Careers",
+    pageContent: data[CAREER_PAGE_SETTINGS_KEYS.PAGE_CONTENT],
+  });
+}
+
+const CareersPage = async () => {
+  const data = await loadData();
   return <CareersContent data={data} />;
 };
 

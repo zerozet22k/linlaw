@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { Menu, MenuProps } from "antd";
 import { useUser } from "@/hooks/useUser";
 import { UserAPI } from "@/models/UserModel";
 import { hasPermission } from "../permissions";
-
 import { usePathname } from "next/navigation";
 import {
   dashboardMenu,
@@ -12,6 +11,8 @@ import {
   NavigationMenuItem,
 } from "@/config/navigations/menu";
 import { DynamicIcon } from "./IconMapper";
+import { useLanguage } from "@/hooks/useLanguage";
+import { t } from "@/i18n";
 
 const buildMenu = (
   user: UserAPI | null,
@@ -21,14 +22,17 @@ const buildMenu = (
     menu: NavigationMenuItem
   ): NavigationMenuItem | null => {
     if (menu.access && !hasPermission(user, menu.access, true)) return null;
+
     if (menu.children) {
       const filteredChildren = menu.children
         .map(filterNavigationMenuItems)
         .filter((item): item is NavigationMenuItem => item !== null);
+
       return filteredChildren.length > 0
         ? { ...menu, children: filteredChildren }
         : null;
     }
+
     return menu;
   };
 
@@ -37,24 +41,6 @@ const buildMenu = (
     .filter((item): item is NavigationMenuItem => item !== null);
 };
 
-const generateNavigationMenuItems = (
-  menuData: NavigationMenuItem[]
-): MenuProps["items"] => {
-  return menuData.map((menu) => ({
-    key: menu.key,
-    icon: menu.icon ? DynamicIcon({ name: menu.icon }) : null,
-    label: menu.link ? (
-      <Link href={menu.link} passHref>
-        {menu.label}
-      </Link>
-    ) : (
-      <span>{menu.label}</span>
-    ),
-    children: menu.children
-      ? generateNavigationMenuItems(menu.children)
-      : undefined,
-  }));
-};
 export const getSelectedKey = (
   user: UserAPI | null,
   pathname: string,
@@ -73,6 +59,7 @@ interface AppMenuProps {
   isMobile: boolean;
   onMenuClick?: MenuProps["onClick"];
 }
+
 const AppMenu: React.FC<AppMenuProps> = ({
   menuMode = "vertical",
   isDashboard,
@@ -81,32 +68,62 @@ const AppMenu: React.FC<AppMenuProps> = ({
 }) => {
   const { user, logout } = useUser();
   const pathname = usePathname();
+  const { language } = useLanguage();
 
   const menuConfig = isDashboard ? dashboardMenu : mainMenu;
-  const NavigationMenuItems = buildMenu(user, menuConfig);
-  const items = generateNavigationMenuItems(NavigationMenuItems) ?? [];
+  const navMenu = useMemo(() => buildMenu(user, menuConfig), [user, menuConfig]);
 
-  const selectedKey = getSelectedKey(user, pathname, isDashboard);
+  const items: MenuProps["items"] = useMemo(() => {
+    const renderLabel = (m: NavigationMenuItem) =>
+      t(language, m.navKey ?? "", (m as any).label ?? m.key);
 
-  if (isMobile) {
+    const walk = (menuData: NavigationMenuItem[]): MenuProps["items"] =>
+      menuData.map((menu) => ({
+        key: menu.key,
+        icon: menu.icon ? DynamicIcon({ name: menu.icon }) : null,
+        label: menu.link ? (
+          <Link href={menu.link} passHref>
+            {renderLabel(menu)}
+          </Link>
+        ) : (
+          <span>{renderLabel(menu)}</span>
+        ),
+        children: menu.children ? walk(menu.children) : undefined,
+      }));
+
+    const base = walk(navMenu) ?? [];
+
+    if (!isMobile) return base;
+
     if (user) {
-      items.push({
+      base.push({
         key: "logout",
         icon: DynamicIcon({ name: "LogoutOutlined" }),
-        label: <span onClick={() => logout()}>Logout</span>,
+        label: (
+          <span onClick={() => logout()}>
+            {t(language, "nav.actions.logout", "Logout")}
+          </span>
+        ),
       });
     } else {
-      items.push({
+      base.push({
         key: "login",
         icon: DynamicIcon({ name: "LogoutOutlined" }),
         label: (
           <Link href="/login" passHref>
-            Login
+            {t(language, "nav.actions.login", "Login")}
           </Link>
         ),
       });
     }
-  }
+
+    return base;
+  }, [navMenu, isMobile, user, logout, language]);
+
+  const selectedKey = useMemo(
+    () => getSelectedKey(user, pathname, isDashboard),
+    [user, pathname, isDashboard]
+  );
 
   return (
     <Menu

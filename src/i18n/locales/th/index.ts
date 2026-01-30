@@ -10,7 +10,7 @@ import { team } from "./team";
 import { faq } from "./faq";
 import { aboutUs } from "./aboutUs";
 import { BaseLocale } from "@/i18n/languages";
-
+import { nav } from "./nav";
 export const th = {
     contact,
     common,
@@ -21,4 +21,5 @@ export const th = {
     team,
     faq,
     aboutUs,
+    nav
 } as const satisfies BaseLocale;

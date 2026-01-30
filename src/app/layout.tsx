@@ -8,37 +8,28 @@ import { Analytics } from "@vercel/analytics/next";
 
 import { SettingsProvider } from "@/providers/SettingsProvider";
 import LayoutContent from "./layout-content";
-import { getPublicSettings, getSiteName, getSiteUrl, getSeo, toAbsoluteUrl } from "@/utils/server/publicSiteSettings";
 
+import { getPublicSettings, getSiteName, getSiteUrl } from "@/utils/server/publicSiteSettings";
+import { buildPageMetadata } from "@/utils/server/metadata/buildPageMetadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
-
   const siteName = getSiteName(settings);
-  const siteUrl = getSiteUrl(settings);
-  const { description, keywords, ogImageRaw } = getSeo(settings);
-  const ogImage = toAbsoluteUrl(ogImageRaw, siteUrl);
+  const siteUrl = getSiteUrl(settings).replace(/\/$/, "");
+
+  const base = await buildPageMetadata({
+    path: "/",
+    fallbackTitle: siteName,
+  });
 
   return {
     metadataBase: new URL(siteUrl),
-    title: siteName,
-    description,
-    keywords,
-
-    openGraph: {
-      title: siteName,
-      description,
-      images: [{ url: ogImage }],
-      type: "website",
-      url: siteUrl,
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
     },
 
-    twitter: {
-      card: "summary_large_image",
-      title: siteName,
-      description,
-      images: [ogImage],
-    },
+    ...base,
   };
 }
 
@@ -48,7 +39,6 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const settings = await getPublicSettings({ syncRoles: true });
-
   const GA_ID = process.env.NEXT_PUBLIC_GA_ID?.trim();
 
   return (
@@ -76,7 +66,6 @@ export default async function AppLayout({
         <SettingsProvider settings={settings}>
           <LayoutContent>{children}</LayoutContent>
         </SettingsProvider>
-
         <Analytics />
       </body>
     </html>

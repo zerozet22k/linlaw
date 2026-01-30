@@ -8,6 +8,7 @@ import { career } from "./career";
 import { team } from "./team";
 import { faq } from "./faq";
 import { aboutUs } from "./aboutUs";
+import { nav } from "./nav";
 
 export const en = {
   contact,
@@ -19,6 +20,7 @@ export const en = {
   team,
   faq,
   aboutUs,
+  nav,
 } as const;
 
 type DeepWiden<T> =
