@@ -17,7 +17,7 @@ export const contact = {
   yourPhoneNumber: "Votre numéro de téléphone",
   yourEmail: "Votre e-mail",
 
-  subject: "Sujet",
+  subject: "Sujet", 
   message: "Message",
 
   sendEmail: "Envoyer l'e-mail",
