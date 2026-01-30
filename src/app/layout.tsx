@@ -21,7 +21,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(siteUrl),
-    alternates: { canonical: siteUrl },
     title: siteName,
     description,
     keywords,
