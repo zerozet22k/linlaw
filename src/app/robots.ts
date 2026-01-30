@@ -8,14 +8,13 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const settings = await getPublicSettings();
   const base = getSiteUrl(settings).replace(/\/$/, "");
 
-  // keep this list aligned with pages you set `noindex: true`
+  // keep aligned with `noindex: true` pages
   const privatePaths = [
-    "/api",
-    "/dashboard",
+    "/api/",            // blocks /api/*
+    "/dashboard/",      // blocks /dashboard/*
     "/login",
     "/signup",
     "/profile",
-    "/forget-password",
     "/reset-password",
     "/verify-email",
   ];
@@ -26,7 +25,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         userAgent: "*",
         allow: "/",
         disallow: privatePaths,
-      },
+      },  
     ],
     sitemap: `${base}/sitemap.xml`,
   };
