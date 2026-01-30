@@ -305,7 +305,6 @@ const Testimonials: React.FC<TestimonialsProps> = ({
           );
         })}
       </CustomCarousel>
-
       <style jsx global>{`
         .tsCard.ant-card {
           transition: box-shadow 160ms ease, border-color 160ms ease;
