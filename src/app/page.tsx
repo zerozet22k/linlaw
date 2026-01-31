@@ -1,4 +1,4 @@
-// src/app/page.tsx
+
 export const dynamic = "force-dynamic";
 
 import React from "react";
@@ -15,12 +15,9 @@ import { valuesOf } from "@/utils/typed";
 import type { SectionProps } from "@/config/CMS/fields/SECTION_SETTINGS";
 
 import {
-  getPublicSettings,
-  getSiteName,
-  getSiteUrl,
-  getSeo,
-  toAbsoluteUrl,
-} from "@/utils/server/publicSiteSettings";
+  buildPageMetadataFromRequest,
+  type LangSearchParams,
+} from "@/utils/server/metadata/buildPageMetadata";
 
 const defaultSection: SectionProps = { enabled: false };
 
@@ -72,39 +69,26 @@ async function loadData() {
   });
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getPublicSettings();
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: LangSearchParams;
+}): Promise<Metadata> {
+  const base = await buildPageMetadataFromRequest({
+    searchParams,
+    path: "/",
+    preferFallbackTitle: true,
+  });
 
-  const siteName = getSiteName(settings);
-  const siteUrl = getSiteUrl(settings).replace(/\/$/, "");
-  const { description, keywords, ogImageRaw } = getSeo(settings);
-
-  const ogImage = ogImageRaw ? toAbsoluteUrl(ogImageRaw, siteUrl) : undefined;
-  const canonical = `${siteUrl}/`;
+  const siteTitle =
+    typeof base.openGraph?.title === "string" ? base.openGraph.title : undefined;
 
   return {
-    title: { absolute: siteName },
-    description,
-    keywords,
-    alternates: { canonical },
+    ...base,
 
-    openGraph: {
-      title: siteName,
-      description,
-      images: ogImage ? [{ url: ogImage }] : undefined,
-      type: "website",
-      url: canonical,
-    },
-
-    twitter: {
-      card: ogImage ? "summary_large_image" : "summary",
-      title: siteName,
-      description,
-      images: ogImage ? [ogImage] : undefined,
-    },
+    title: { absolute: siteTitle || "Home" },
   };
 }
-
 
 const HomePage = async () => {
   const data = await loadData();
