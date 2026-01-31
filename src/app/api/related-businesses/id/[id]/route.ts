@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { Types } from "mongoose";
-import RelatedBusinessRepository from "@/repositories/RelatedBusinessRepository";
+import RelatedBusinessService from "@/services/RelatedBusinessService";
 
 const toPlain = (v: any) => JSON.parse(JSON.stringify(v));
-
 
 export async function GET(
   _req: Request,
@@ -13,8 +12,9 @@ export async function GET(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  const repo = new RelatedBusinessRepository();
-  const business = await repo.findById(new Types.ObjectId(params.id));
+  const service = new RelatedBusinessService();
+  const business = await service.getBusinessById(params.id);
+
   if (!business) {
     return NextResponse.json({ message: "Not found" }, { status: 404 });
   }
@@ -30,11 +30,11 @@ export async function PUT(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  const repo = new RelatedBusinessRepository();
+  const service = new RelatedBusinessService();
   const body = await req.json();
 
   try {
-    const updated = await repo.update(new Types.ObjectId(params.id), body);
+    const updated = await service.updateBusiness(params.id, body);
 
     if (!updated) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
@@ -64,8 +64,9 @@ export async function DELETE(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  const repo = new RelatedBusinessRepository();
-  const deleted = await repo.delete(new Types.ObjectId(params.id));
+  const service = new RelatedBusinessService();
+
+  const deleted = await service.deleteBusiness(params.id);
 
   if (!deleted) {
     return NextResponse.json({ message: "Not found" }, { status: 404 });

@@ -31,7 +31,10 @@ export const ROUTE_KEYS = {
   HOME: "home",
   ABOUT: "about",
   SERVICES: "services",
+
   TEAM_MEMBERS: "team-members",
+  TEAM_MEMBER_INFO: "team-member-info", // ✅ public detail route
+
   CAREERS: "careers",
   LOGIN: "login",
   REGISTER: "register",
@@ -45,13 +48,18 @@ export const ROUTE_KEYS = {
   EDIT_NEWSLETTER: "edit-newsletter",
 
   NEWSLETTERS: "newsletters",
-  NEWSLETTER_INFO: "newsletters-info",
+  NEWSLETTER_INFO: "newsletters-info", // ✅ public detail route
 
   RELATED_BUSINESSES_LIST: "related-businesses-list",
   CREATE_RELATED_BUSINESS: "create-related-business",
   EDIT_RELATED_BUSINESS: "edit-related-business",
 
   RELATED_BUSINESSES: "related-businesses",
+  RELATED_BUSINESS_INFO: "related-business-info", // ✅ public detail route
+
+  // ✅ missing dashboard detail routes
+  DASHBOARD_NEWSLETTER_INFO: "dashboard-newsletter-info",
+  DASHBOARD_RELATED_BUSINESS_INFO: "dashboard-related-business-info",
 } as const;
 
 export type RouteKey = (typeof ROUTE_KEYS)[keyof typeof ROUTE_KEYS];
@@ -163,6 +171,8 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     access: [APP_PERMISSIONS.CREATE_NEWSLETTER, APP_PERMISSIONS.ADMIN],
     loginRequired: true,
   },
+
+  // existing dashboard edit route
   [ROUTE_KEYS.EDIT_NEWSLETTER]: {
     key: ROUTE_KEYS.EDIT_NEWSLETTER,
     path: `${dashboardRoute}/newsletters/:id`,
@@ -171,6 +181,18 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     access: [APP_PERMISSIONS.EDIT_NEWSLETTER, APP_PERMISSIONS.ADMIN],
     loginRequired: true,
     noAccessMessage: "You do not have permission to edit this newsletter.",
+    exactMatch: true,
+  },
+
+  // ✅ added: dashboard info route (same path as EDIT, but separate key if you want different title/behavior)
+  // If you don’t need a separate route key, remove this block.
+  [ROUTE_KEYS.DASHBOARD_NEWSLETTER_INFO]: {
+    key: ROUTE_KEYS.DASHBOARD_NEWSLETTER_INFO,
+    path: `${dashboardRoute}/newsletters/:newsletterId`,
+    navKey: "nav.routes.dashboardNewsletterInfo",
+    icon: null,
+    access: [APP_PERMISSIONS.VIEW_NEWSLETTER, APP_PERMISSIONS.ADMIN],
+    loginRequired: true,
     exactMatch: true,
   },
 
@@ -190,6 +212,8 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     access: [APP_PERMISSIONS.ADMIN],
     loginRequired: true,
   },
+
+  // existing dashboard edit route
   [ROUTE_KEYS.EDIT_RELATED_BUSINESS]: {
     key: ROUTE_KEYS.EDIT_RELATED_BUSINESS,
     path: `${dashboardRoute}/related-businesses/:id`,
@@ -199,6 +223,18 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: true,
     exactMatch: true,
     noAccessMessage: "You do not have permission to edit this related business.",
+  },
+
+  // ✅ added: dashboard info route (optional)
+  // If you don’t need it separate from EDIT, remove this block.
+  [ROUTE_KEYS.DASHBOARD_RELATED_BUSINESS_INFO]: {
+    key: ROUTE_KEYS.DASHBOARD_RELATED_BUSINESS_INFO,
+    path: `${dashboardRoute}/related-businesses/:relatedBusinessId`,
+    navKey: "nav.routes.dashboardRelatedBusinessInfo",
+    icon: null,
+    access: [APP_PERMISSIONS.VIEW_RELATED_BUSINESSES, APP_PERMISSIONS.ADMIN],
+    loginRequired: true,
+    exactMatch: true,
   },
 
   [ROUTE_KEYS.FILES_LIST]: {
@@ -250,6 +286,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     loginRequired: true,
   },
 
+  // public routes
   [ROUTE_KEYS.HOME]: {
     key: ROUTE_KEYS.HOME,
     path: "/",
@@ -284,6 +321,17 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     showGoTop: true,
   },
 
+  // ✅ added public detail route
+  [ROUTE_KEYS.TEAM_MEMBER_INFO]: {
+    key: ROUTE_KEYS.TEAM_MEMBER_INFO,
+    path: "/team-members/:id",
+    navKey: "nav.routes.teamMemberInfo",
+    icon: "SolutionOutlined",
+    loginRequired: false,
+    showGoTop: true,
+    exactMatch: true,
+  },
+
   [ROUTE_KEYS.NEWSLETTERS]: {
     key: ROUTE_KEYS.NEWSLETTERS,
     path: "/newsletters",
@@ -300,6 +348,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     icon: "FileTextOutlined",
     loginRequired: false,
     showGoTop: true,
+    exactMatch: true,
   },
 
   [ROUTE_KEYS.RELATED_BUSINESSES]: {
@@ -309,6 +358,16 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     icon: "ApartmentOutlined",
     loginRequired: false,
     showGoTop: true,
+  },
+  
+  [ROUTE_KEYS.RELATED_BUSINESS_INFO]: {
+    key: ROUTE_KEYS.RELATED_BUSINESS_INFO,
+    path: "/related-businesses/:slug",
+    navKey: "nav.routes.relatedBusinessInfo",
+    icon: "ApartmentOutlined",
+    loginRequired: false,
+    showGoTop: true,
+    exactMatch: true,
   },
 
   [ROUTE_KEYS.CAREERS]: {
@@ -320,7 +379,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     showGoTop: true,
   },
 
-  // auth routes (no label in config; you translate in UI actions)
+  // auth routes
   [ROUTE_KEYS.LOGIN]: {
     key: ROUTE_KEYS.LOGIN,
     path: "/login",
@@ -333,6 +392,7 @@ export const ROUTES: Record<RouteKey, RouteConfig> = {
     path: "/signup",
     IfLoggedInRedirectUrl: "/dashboard",
   },
+
   [ROUTE_KEYS.FORGOT_PASSWORD]: {
     key: ROUTE_KEYS.FORGOT_PASSWORD,
     path: "/forget-password",

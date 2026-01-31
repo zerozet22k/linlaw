@@ -48,13 +48,12 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   const { language } = useLanguage();
 
   const pathname = usePathname();
-  const hash = useHash(); // "#services" etc.
+  const hash = useHash();
   const router = useRouter();
 
   const isDashboardRoute = pathname?.startsWith("/dashboard");
   const [loading, setLoading] = useState(false);
 
-  // NOTE: hash-only navigation should not trigger your spinner; it breaks anchor UX.
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => setLoading(false), 200);
@@ -62,10 +61,9 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
   }, [pathname]);
 
   const routeConfig = useMemo(() => {
-    const fullPath = `${pathname}${hash}`; // "/#services"
+    const fullPath = `${pathname}${hash}`;
     return (
       Object.values(ROUTES).find((route) => pathToRegex(route.path).test(fullPath)) ||
-      // fallback to pathname-only match for non-hash routes
       Object.values(ROUTES).find((route) => pathToRegex(route.path).test(pathname)) ||
       null
     );
@@ -77,7 +75,6 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
     return hasPermission(user, routeConfig.access || [], true);
   }, [user, routeConfig]);
 
-  // title = SiteName | translated route navKey
   useEffect(() => {
     const siteName =
       settings[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteName?.trim() ||
