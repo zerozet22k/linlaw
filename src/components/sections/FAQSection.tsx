@@ -20,6 +20,8 @@ type FAQItem = NonNullable<FAQData["items"]>[number];
 const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
 const clamp = (s: string, n: number) => (s.length > n ? `${s.slice(0, n).trim()}…` : s);
 
+const MAX_PREVIEW = 200;
+
 const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, language }) => {
   const { token } = theme.useToken();
 
@@ -40,15 +42,17 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
 
         const key = String((faq as any)?._id ?? (faq as any)?.id ?? index);
 
-        return { key, q, a, perks };
-      })
-      .filter((f): f is { key: string; q: string; a: string; perks: string[] } => {
-        return Boolean(f.q || f.a || f.perks.length > 0);
-      });
-  }, [data, language]);
+        // Ensure we don't render an empty header label
+        const qSafe = q || clean(t(language, "faq.untitled", `FAQ ${index + 1}`));
 
-  const tReadMore = useMemo(() => clean(t(language, "faq.readMore")), [language]);
-  const tReadLess = useMemo(() => clean(t(language, "faq.readLess")), [language]);
+        return { key, q: qSafe, a, perks };
+      })
+      // Require a question (label) and at least one content source
+      .filter((f) => Boolean(f.q) && Boolean(f.a || f.perks.length > 0));
+  }, [data?.items, language]);
+
+  const tReadMore = useMemo(() => clean(t(language, "faq.readMore", "Read more")), [language]);
+  const tReadLess = useMemo(() => clean(t(language, "faq.readLess", "Read less")), [language]);
 
   const toggleBody = (key: string) => {
     setExpandedBodies((prev) => {
@@ -59,6 +63,14 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
     });
   };
 
+  const onAccordionChange: CollapseProps["onChange"] = (key) => {
+    const next = Array.isArray(key) ? key[0] : key;
+    setActiveKey(next);
+
+    // Reset expanded "read more" state when switching accordion panels
+    setExpandedBodies(() => (next ? new Set([next]) : new Set()));
+  };
+
   const items = useMemo<NonNullable<CollapseProps["items"]>>(() => {
     const border = `1px solid ${token.colorBorderSecondary}`;
 
@@ -66,8 +78,8 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
       const isOpen = activeKey === f.key;
       const isBodyExpanded = expandedBodies.has(f.key);
 
-      const preview = clamp(f.a, 200);
-      const showToggle = f.a.length > 200;
+      const showToggle = (f.a || "").length > MAX_PREVIEW;
+      const preview = showToggle ? clamp(f.a, MAX_PREVIEW) : f.a;
 
       const label = (
         <div
@@ -149,6 +161,7 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
           {showToggle ? (
             <Button
               type="link"
+              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
                 toggleBody(f.key);
@@ -203,7 +216,7 @@ const FAQSection: React.FC<{ data: FAQData; language: string }> = ({ data, langu
         bordered={false}
         items={items}
         activeKey={activeKey}
-        onChange={(key) => setActiveKey(Array.isArray(key) ? key[0] : key)}
+        onChange={onAccordionChange}
         expandIcon={() => null}
         style={{ background: "transparent" }}
       />

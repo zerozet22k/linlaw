@@ -198,16 +198,21 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
       },
     },
   },
-
   [HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]: {
     label: "Related Businesses",
     type: NestedFieldType.JSON,
     design: JsonDesign.PARENT,
-    slots: { extra: ["section"] },
+    slots: { extra: ["section"], body: ["limit"] },
     fields: {
       section: SECTION,
+      limit: {
+        label: "Max items",
+        guide: "How many partners to show on the homepage (1–24).",
+        formType: FormType.NUMBER,
+      },
     },
   },
+
 
   [HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION]: {
     label: "Services Section",
@@ -448,6 +453,7 @@ export type HOME_PAGE_SETTINGS_TYPES = {
 
   [HOME_PAGE_SETTINGS_KEYS.RELATED_BUSINESS]: {
     section?: SectionProps;
+    limit?: number;
   };
 
   [HOME_PAGE_SETTINGS_KEYS.SERVICES_SECTION]: {

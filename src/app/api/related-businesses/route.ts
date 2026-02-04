@@ -58,7 +58,6 @@ export async function GET(req: Request) {
   });
 }
 
-// NOTE: lock this down with auth/permissions in your app
 export async function POST(req: Request) {
   const service = new RelatedBusinessService();
   const body = await req.json();

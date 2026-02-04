@@ -1,13 +1,10 @@
-/* components/sections/NewsletterSection.tsx */
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Typography, Alert, Empty, Card, Skeleton, theme, Grid, Button } from "antd";
+import React, { useMemo } from "react";
+import { Typography, Empty, Card, theme, Grid, Button } from "antd";
 import Link from "next/link";
 
-import apiClient from "@/utils/api/apiClient";
-import { INewsletterAPI } from "@/models/Newsletter";
-import { useLanguage } from "@/hooks/useLanguage";
+import type { INewsletterAPI } from "@/models/Newsletter";
 import { t } from "@/i18n";
 
 import {
@@ -21,8 +18,9 @@ const { useToken } = theme;
 type NewsletterData = HOME_PAGE_SETTINGS_TYPES[typeof K.NEWSLETTER_SECTION];
 
 type Props = {
-  data?: NewsletterData; // kept for consistency (outer section handles header/title)
+  data?: NewsletterData;
   language: string;
+  items?: INewsletterAPI[];
 };
 
 function resolveLocalized(val: any, language: string): string {
@@ -42,9 +40,9 @@ function extractPreview(item: any, language: string): string {
 }
 
 function clampText(s: string, max = 140) {
-  const tt = (s || "").replace(/\s+/g, " ").trim();
-  if (!tt) return "";
-  return tt.length > max ? `${tt.slice(0, max).trim()}…` : tt;
+  const tt2 = (s || "").replace(/\s+/g, " ").trim();
+  if (!tt2) return "";
+  return tt2.length > max ? `${tt2.slice(0, max).trim()}…` : tt2;
 }
 
 function formatDotDate(d?: string | number | Date) {
@@ -76,57 +74,27 @@ function getCategoryKey(item: any) {
     .trim();
 }
 
-const NewsletterSection: React.FC<Props> = ({ language }) => {
+const NewsletterSection: React.FC<Props> = ({ language, items }) => {
   const { token } = useToken();
   const screens = Grid.useBreakpoint();
   const isLgUp = !!screens.lg;
   const isMdUp = !!screens.md;
 
-  const [newsletters, setNewsletters] = useState<INewsletterAPI[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const tError = useMemo(() => t(language, "common.error"), [language]);
   const tReadMore = useMemo(() => t(language, "common.readMore"), [language]);
   const tViewAll = useMemo(() => t(language, "newsletter.viewAll"), [language]);
-  const tFailedToLoad = useMemo(() => t(language, "newsletter.failedToLoad"), [language]);
   const tNoData = useMemo(() => t(language, "common.noData"), [language]);
 
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const res = await apiClient.get(`/newsletters?search=&page=1&limit=6`);
-        const list = Array.isArray(res?.data?.newsletters) ? (res.data.newsletters as INewsletterAPI[]) : [];
-        if (mounted) setNewsletters(list);
-      } catch (e) {
-        console.error("Newsletter fetch error:", e);
-        if (mounted) setError(tFailedToLoad);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [tFailedToLoad]);
-
   const sorted = useMemo(() => {
-    const arr = Array.isArray(newsletters) ? [...newsletters] : [];
-    arr.sort((a, b) => {
+    const arr = Array.isArray(items) ? [...items] : [];
+    arr.sort((a: any, b: any) => {
       const ad = a?.createdAt ? new Date(a.createdAt as any).getTime() : 0;
       const bd = b?.createdAt ? new Date(b.createdAt as any).getTime() : 0;
       return bd - ad;
     });
     return arr;
-  }, [newsletters]);
+  }, [items]);
 
-  // 2 big + 3 small (prefer categories if present; otherwise just latest)
+  // 2 big + up to 3 small
   const { bigLeft, bigRight, small } = useMemo(() => {
     const arr = sorted;
 
@@ -142,6 +110,15 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
 
     return { bigLeft: left, bigRight: right, small: rest };
   }, [sorted]);
+
+  if (!bigLeft) {
+    // Keep it silent if no newsletters configured / exist
+    return (
+      <div data-component="NewsletterSection" aria-busy="false" style={{ width: "100%" }}>
+        <Empty description={tNoData} />
+      </div>
+    );
+  }
 
   const containerStyle: React.CSSProperties = {
     width: "100%",
@@ -165,12 +142,9 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     marginTop: token.marginLG,
   };
 
-  const glassBorder = "1px solid rgba(255,255,255,0.28)";
-  const glassShadow = "0 18px 40px rgba(0,0,0,0.25)";
-
   const darkCardStyle: React.CSSProperties = {
     borderRadius: token.borderRadiusLG,
-    border: glassBorder,
+    border: "1px solid rgba(255,255,255,0.28)",
     overflow: "hidden",
     height: isMdUp ? 260 : "auto",
     background: "rgba(10, 20, 30, 0.45)",
@@ -223,17 +197,6 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
     color: token.colorTextSecondary,
   };
 
-  const hoverHandlers = {
-    onMouseEnter: (e: any) => {
-      e.currentTarget.style.transform = "translateY(-2px)";
-      e.currentTarget.style.boxShadow = glassShadow;
-    },
-    onMouseLeave: (e: any) => {
-      e.currentTarget.style.transform = "";
-      e.currentTarget.style.boxShadow = "";
-    },
-  };
-
   const renderBigCard = (item: any) => {
     if (!item) return null;
 
@@ -250,11 +213,11 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
         aria-label={`${t(language, "common.open")} newsletter: ${title}`}
       >
         <Card
+          className="nlCard nlCardDark"
           variant="borderless"
           hoverable
           style={darkCardStyle}
           styles={{ body: { padding: 0, height: "100%" } }}
-          {...hoverHandlers}
         >
           <div
             style={{
@@ -280,14 +243,7 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
             </div>
 
             {preview && (
-              <Text
-                style={{
-                  color: "#fff",
-                  opacity: 0.92,
-                  lineHeight: 1.65,
-                  fontSize: 14.5,
-                }}
-              >
+              <Text style={{ color: "#fff", opacity: 0.92, lineHeight: 1.65, fontSize: 14.5 }}>
                 {preview}
               </Text>
             )}
@@ -328,41 +284,21 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
         aria-label={`${t(language, "common.open")} newsletter: ${title}`}
       >
         <Card
+          className="nlCard nlCardLight"
           variant="borderless"
           hoverable
           style={lightCardStyle}
           styles={{ body: { padding: 24, height: "100%" } }}
-          {...hoverHandlers}
         >
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
+          <div style={{ height: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
             <Text style={labelStyleLight}>{cat}</Text>
 
-            <div
-              style={{
-                fontSize: 20,
-                fontWeight: 850,
-                lineHeight: 1.2,
-                color: token.colorText,
-              }}
-            >
+            <div style={{ fontSize: 20, fontWeight: 850, lineHeight: 1.2, color: token.colorText }}>
               {title}
             </div>
 
             {preview && (
-              <Text
-                style={{
-                  color: token.colorTextSecondary,
-                  lineHeight: 1.6,
-                  fontSize: 14,
-                }}
-              >
+              <Text style={{ color: token.colorTextSecondary, lineHeight: 1.6, fontSize: 14 }}>
                 {preview}
               </Text>
             )}
@@ -373,52 +309,6 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
       </Link>
     );
   };
-
-  if (!loading && !error && sorted.length === 0) return null;
-
-  if (loading) {
-    return (
-      <div data-component="NewsletterSection" aria-busy="true" style={containerStyle}>
-        <div style={gridTopStyle}>
-          {Array.from({ length: 2 }).map((_, i) => (
-            <Card key={i} variant="borderless" style={darkCardStyle} styles={{ body: { padding: 26 } }}>
-              <Skeleton active title paragraph={{ rows: 3 }} />
-            </Card>
-          ))}
-        </div>
-
-        <div style={gridBottomStyle}>
-          {Array.from({ length: isLgUp ? 3 : isMdUp ? 2 : 3 }).map((_, i) => (
-            <Card key={i} variant="borderless" style={lightCardStyle} styles={{ body: { padding: 24 } }}>
-              <Skeleton active title paragraph={{ rows: 2 }} />
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
-        <Alert
-          message={tError}
-          description={error}
-          type="error"
-          showIcon
-          style={{ borderRadius: token.borderRadiusLG }}
-        />
-      </div>
-    );
-  }
-
-  if (!bigLeft) {
-    return (
-      <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
-        <Empty description={tNoData} />
-      </div>
-    );
-  }
 
   return (
     <div data-component="NewsletterSection" aria-busy="false" style={containerStyle}>
@@ -449,6 +339,10 @@ const NewsletterSection: React.FC<Props> = ({ language }) => {
       <style jsx global>{`
         .ant-card-hoverable {
           cursor: pointer;
+        }
+        .nlCard:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
         }
       `}</style>
     </div>
