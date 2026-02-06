@@ -53,22 +53,14 @@ const langPick = (req: NextRequest): SupportedLanguage => {
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const pathname = url.pathname || "/";
-
   const seg = langSegment(pathname);
   const basePath = seg ? stripLangPrefix(pathname) : pathname;
-
-
-
   if (seg && isBypass(basePath)) {
     const u = url.clone();
     u.pathname = basePath;
     return NextResponse.redirect(u);
   }
-
-
   const lang = langPick(req);
-
-
   const h = new Headers(req.headers);
   h.set("x-lang-requested", lang);
 
@@ -78,21 +70,13 @@ export function middleware(req: NextRequest) {
     cookieWriteIfChanged(req, res, lang);
     return res;
   }
-
-
-
-
   if (!seg) {
     const u = url.clone();
     u.pathname = ensureLangPrefix(pathname, lang);
-
-
     const res = NextResponse.rewrite(u, { request: { headers: h } });
     cookieWriteIfChanged(req, res, lang);
     return res;
   }
-
-
   const res = NextResponse.next({ request: { headers: h } });
   cookieWriteIfChanged(req, res, lang);
   return res;
