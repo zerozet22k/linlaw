@@ -47,7 +47,7 @@ const HomePageContent: React.FC<Props> = ({ data, relatedBusinesses, newsletters
   const newslettersCfg = data[K.NEWSLETTER_SECTION] ?? {};
 
   const sections: SectionListItem[] = [
-    { id: IDS.PROMO_SHOWCASE, node: <PromoShowcaseSection data={promoShowcase} /> },
+    { id: IDS.PROMO_SHOWCASE, node: <PromoShowcaseSection data={promoShowcase} language={language} /> },
 
     {
       id: IDS.RELATED_BUSINESSES,

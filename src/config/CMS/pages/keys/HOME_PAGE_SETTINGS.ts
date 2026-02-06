@@ -12,14 +12,12 @@ import {
   ResponsiveImagesType,
   TEXT_ALIGN_OPTIONS,
 
-  // generalized options (from your settings file)
   HORIZONTAL_SIDE_OPTIONS,
   FLOW_DIRECTION_OPTIONS,
   BUTTON_VARIANT_OPTIONS,
   LINK_TARGET_OPTIONS,
   OVERLAY_OPACITY_GUIDE,
 
-  // strongly-typed values
   HorizontalSideValue,
   FlowDirectionValue,
   ButtonVariantValue,
@@ -105,19 +103,18 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
           imageTitle: {
             label: "Image Headline",
             guide: "Large title shown on the image (optional).",
-            formType: FormType.TEXT,
+            formType: FormType.LANGUAGE_JSON_TEXT,
           },
           panelTitle: {
             label: "Content Title",
             guide: "Title shown in the panel (optional).",
-            formType: FormType.TEXT,
+            formType: FormType.LANGUAGE_JSON_TEXT,
           },
           panelText: {
             label: "Content Description",
             guide: "Short description shown in the panel (optional).",
-            formType: FormType.TEXTAREA,
+            formType: FormType.LANGUAGE_JSON_TEXTAREA,
           },
-
           // ===== New promo controls (generic options) =====
           imageSide: {
             label: "Image Side",
@@ -180,7 +177,7 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
           buttonText: {
             label: "Button Label",
             guide: "Text shown on the button.",
-            formType: FormType.TEXT,
+            formType: FormType.LANGUAGE_JSON_TEXT,
           },
           buttonVariant: {
             label: "Button Variant",
@@ -423,13 +420,14 @@ export type HOME_PAGE_SETTINGS_TYPES = {
     textAlign: TextAlign;
   }[];
 
-  [HOME_PAGE_SETTINGS_KEYS.PROMO_SHOWCASE]: {
+[HOME_PAGE_SETTINGS_KEYS.PROMO_SHOWCASE]: {
     section?: SectionProps;
     items: {
       image: string;
-      imageTitle?: string;
-      panelTitle?: string;
-      panelText?: string;
+
+      imageTitle?: LanguageJson;
+      panelTitle?: LanguageJson;
+      panelText?: LanguageJson;
 
       imageSide?: HorizontalSideValue;
       overlayDirection?: FlowDirectionValue;
@@ -445,7 +443,7 @@ export type HOME_PAGE_SETTINGS_TYPES = {
       minHeightMobile?: number;
 
       link?: string;
-      buttonText?: string;
+      buttonText?: LanguageJson;
       buttonVariant?: ButtonVariantValue;
       linkTarget?: LinkTargetModeValue;
     }[];

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -63,6 +63,24 @@ export default function HeroSliderSection({
 }: HeroSliderProps) {
   const { language } = useLanguage();
 
+  // ✅ MOBILE DETECTION: disable aspect-ratio on mobile so image can fill full slide height
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+
+    update();
+
+    if (mq.addEventListener) mq.addEventListener("change", update);
+    else mq.addListener(update);
+
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", update);
+      else mq.removeListener(update);
+    };
+  }, []);
+
   const desktopSize = sizes?.desktop ?? "100vw";
   const tabletSize = sizes?.tablet ?? "100vw";
   const mobileSize = sizes?.mobile ?? "100vw";
@@ -80,9 +98,6 @@ export default function HeroSliderSection({
 
   const normalized = useMemo(() => {
     return (slides ?? []).map((slide, index) => {
-      // Choose a single "best available" src; Next/Image will generate multiple widths from it.
-      // This is generally better than manual desktop/tablet/mobile files unless your originals
-      // are already correctly sized and compressed.
       const src = pick(slide.images.desktop, slide.images.tablet, slide.images.mobile);
 
       const headerText = tt(language, slide.header, "");
@@ -133,7 +148,8 @@ export default function HeroSliderSection({
           return (
             <SwiperSlide key={s.key}>
               <div className="heroSlide">
-                <div className="heroMedia" style={{ aspectRatio }}>
+                {/* ✅ apply aspectRatio only on non-mobile */}
+                <div className="heroMedia" style={isMobile ? undefined : { aspectRatio }}>
                   <Image
                     src={s.src}
                     alt={s.altText}
