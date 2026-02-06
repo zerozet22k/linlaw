@@ -8,7 +8,7 @@ import PusherService from "@/ThirdPartyServices/PusherService";
 const inquiryService = new InquiryService();
 
 async function handleDeleteReplyRequest(
-  request: Request,
+  _request: Request,
   user: User,
   params: { id: string; replyId: string }
 ) {

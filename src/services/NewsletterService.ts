@@ -102,7 +102,7 @@ class NewsletterService {
     newsletterId: string,
     attachment: Partial<INewsletterAttachmentBase>
   ): Promise<INewsletter | null> {
-    const { folder, fileName, fileType, urlFriendlyFilePath } =
+    const { fileName, urlFriendlyFilePath } =
       getFileFolderWithType(attachment.rawFilePath);
 
     const formattedAttachment: Partial<INewsletterAttachmentBase> = {

@@ -6,8 +6,8 @@ import { APP_PERMISSIONS } from "@/config/permissions";
 
 const handleSendEmails = async (
   req: Request,
-  user: any,
-  params: { id: string }
+  _user: any,
+  _params: { id: string }
 ) => {
   try {
     const body = await req.json();

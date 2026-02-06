@@ -1,6 +1,10 @@
-import React, { useState, useRef } from "react";
-import { message, Button, Modal, Avatar, Spin } from "antd";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import { message, Button, Modal, Spin } from "antd";
 import { CameraOutlined } from "@ant-design/icons";
+import Image from "next/image";
+
 import ImageCropper from "./ImageCropper";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
@@ -25,91 +29,100 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   const [coverUrl, setCoverUrl] = useState<string>(
     user?.cover_image || defaultCover
   );
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [uploading, setUploading] = useState<boolean>(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploadingFor, setUploadingFor] = useState<"avatar" | "cover">(
-    "avatar"
-  );
+  const [uploadingFor, setUploadingFor] = useState<"avatar" | "cover">("avatar");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const cropRef = useRef<any>(null);
+  const uploadingForRef = useRef<"avatar" | "cover">("avatar");
+  useEffect(() => {
+    setAvatarUrl(user?.avatar || defaultAvatar);
+    setCoverUrl(user?.cover_image || defaultCover);
+  }, [user?.avatar, user?.cover_image]);
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
-  /** Handle file selection */
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: "avatar" | "cover"
-  ) => {
-    if (e.target.files?.length) {
-      const file = e.target.files[0];
-
-      const objectUrl = URL.createObjectURL(file);
-      setPreviewUrl(objectUrl);
-
-      e.target.value = "";
-
-      setUploadingFor(type);
-      setModalVisible(true);
-    }
+  const openFilePicker = (type: "avatar" | "cover") => {
+    uploadingForRef.current = type;
+    setUploadingFor(type);
+    fileInputRef.current?.click();
   };
 
-  /** Save the cropped image */
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
+
+    const file = e.target.files[0];
+
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    e.target.value = "";
+
+    setModalVisible(true);
+  };
+
   const handleSaveCroppedImage = async () => {
-    if (cropRef.current && imageRef.current) {
-      try {
-        const croppedImage = await cropRef.current.getCroppedImg();
-        if (!croppedImage) {
-          message.error("Please crop the image before saving.");
-          return;
-        }
-        await uploadToServer(croppedImage, uploadingFor);
-      } catch (error) {
-        console.error(error);
-        message.error("Failed to process cropped image.");
+    if (!cropRef.current || !imageRef.current) return;
+
+    try {
+      const croppedImage = await cropRef.current.getCroppedImg();
+      if (!croppedImage) {
+        message.error("Please crop the image before saving.");
+        return;
       }
+      await uploadToServer(croppedImage, uploadingFor);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to process cropped image.");
     }
   };
 
-  /** Upload image via signed URL */
-  const uploadToServer = async (
-    imageDataUrl: string,
-    type: "avatar" | "cover"
-  ) => {
+  const uploadToServer = async (imageDataUrl: string, type: "avatar" | "cover") => {
+    if (!user?._id) {
+      message.error("User not found. Please sign in again.");
+      return;
+    }
+
     setUploading(true);
+
     const contentType = imageDataUrl.startsWith("data:image/png")
       ? "image/png"
       : "image/jpeg";
 
     try {
       const response = await apiClient.post(
-        `/users/${user?._id}/getSignedUrl?type=${type}`,
+        `/users/${user._id}/getSignedUrl?type=${type}`,
         { contentType }
       );
+
       if (response.status !== 200) throw new Error("Upload URL fetch failed");
-      const uploadUrl = response.data.uploadUrl;
+
+      const uploadUrl: string = response.data.uploadUrl;
 
       const base64Data = imageDataUrl.split(",")[1];
-      const imageBlob = new Blob(
-        [
-          new Uint8Array(
-            atob(base64Data)
-              .split("")
-              .map((c) => c.charCodeAt(0))
-          ),
-        ],
-        { type: contentType }
-      );
+      const bytes = atob(base64Data)
+        .split("")
+        .map((c) => c.charCodeAt(0));
+      const imageBlob = new Blob([new Uint8Array(bytes)], { type: contentType });
 
       const uploadResponse = await fetch(uploadUrl, {
         method: "PUT",
         body: imageBlob,
         headers: { "Content-Type": contentType },
       });
+
       if (!uploadResponse.ok) throw new Error("Upload failed");
 
       const publicUrl = uploadUrl.split("?")[0];
       await updateUserImage(publicUrl, type);
+
       setModalVisible(false);
     } catch (error) {
       console.error(error);
@@ -119,14 +132,13 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
     }
   };
 
-  /** Update user in DB */
-  const updateUserImage = async (
-    newImageUrl: string,
-    type: "avatar" | "cover"
-  ) => {
+  const updateUserImage = async (newImageUrl: string, type: "avatar" | "cover") => {
+    if (!user?._id) return;
+
     try {
       const fieldKey = type === "avatar" ? "avatar" : "cover_image";
-      await apiClient.put(`/users/${user?._id}`, { [fieldKey]: newImageUrl });
+      await apiClient.put(`/users/${user._id}`, { [fieldKey]: newImageUrl });
+
       if (type === "avatar") {
         setAvatarUrl(newImageUrl);
         onAvatarChange?.(newImageUrl);
@@ -134,6 +146,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
         setCoverUrl(newImageUrl);
         onCoverChange?.(newImageUrl);
       }
+
       message.success(`Updated ${type} successfully!`);
     } catch (error) {
       console.error(error);
@@ -146,65 +159,70 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
       style={{
         position: "relative",
         width: "100%",
-        height: "400px",
-        borderRadius: "8px",
+        height: 400,
+        borderRadius: 8,
         backgroundColor: "#f0f0f0",
         boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-        marginBottom: "60px",
+        marginBottom: 60,
+        overflow: "hidden",
       }}
     >
-      {/* Cover Image */}
-      <img
+      {/* Cover image uses next/image for LCP-friendly optimization */}
+      <Image
         src={coverUrl}
         alt="Cover"
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        fill
+        priority
+        sizes="100vw"
+        style={{ objectFit: "cover" }}
+        onError={() => setCoverUrl(defaultCover)}
       />
 
-      {/* Cover Camera Icon */}
       <div
         style={{
           position: "absolute",
-          top: "10px",
-          right: "10px",
+          top: 10,
+          right: 10,
           background: "rgba(0, 0, 0, 0.5)",
           borderRadius: "50%",
-          padding: "8px",
+          padding: 8,
           cursor: "pointer",
+          zIndex: 2,
         }}
-        onClick={() => {
-          setUploadingFor("cover");
-          fileInputRef.current?.click();
-        }}
+        onClick={() => openFilePicker("cover")}
       >
-        <CameraOutlined style={{ color: "#fff", fontSize: "18px" }} />
+        <CameraOutlined style={{ color: "#fff", fontSize: 18 }} />
       </div>
 
-      {/* Avatar Overlapping the Cover by Half */}
       <div
         style={{
           position: "absolute",
           left: "50%",
           bottom: 0,
           transform: "translate(-50%, 50%)",
-          width: "120px",
-          height: "120px",
+          width: 120,
+          height: 120,
           borderRadius: "50%",
           border: "4px solid white",
           overflow: "hidden",
           backgroundColor: "#fff",
           boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           cursor: "pointer",
+          zIndex: 2,
         }}
-        onClick={() => {
-          setUploadingFor("avatar");
-          fileInputRef.current?.click();
-        }}
+        onClick={() => openFilePicker("avatar")}
       >
-        <Avatar
-          src={avatarUrl}
-          size={120}
-          style={{ width: "100%", height: "100%" }}
-        />
+        <div style={{ position: "relative", width: "100%", height: "100%" }}>
+          <Image
+            src={avatarUrl}
+            alt="Avatar"
+            fill
+            sizes="120px"
+            style={{ objectFit: "cover" }}
+            onError={() => setAvatarUrl(defaultAvatar)}
+          />
+        </div>
+
         <div
           style={{
             position: "absolute",
@@ -215,25 +233,21 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
             padding: "4px 0",
           }}
         >
-          <CameraOutlined style={{ color: "#fff", fontSize: "16px" }} />
+          <CameraOutlined style={{ color: "#fff", fontSize: 16 }} />
         </div>
       </div>
 
-      {/* Hidden File Input */}
       <input
         type="file"
         accept="image/png, image/jpeg"
         style={{ display: "none" }}
         ref={fileInputRef}
-        onChange={(e) => handleFileChange(e, uploadingFor)}
+        onChange={handleFileChange}
       />
 
-      {/* Cropping Modal */}
       <Modal
         open={modalVisible}
-        title={`Crop Your ${
-          uploadingFor === "avatar" ? "Avatar" : "Cover (Portrait)"
-        }`}
+        title={`Crop Your ${uploadingFor === "avatar" ? "Avatar" : "Cover (Portrait)"}`}
         onCancel={() => setModalVisible(false)}
         width="90vw"
         style={{ top: 20 }}
@@ -247,6 +261,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           },
         }}
         maskClosable={false}
+        destroyOnHidden
         footer={[
           <Button
             key="cancel"
@@ -268,6 +283,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
         {uploading && (
           <Spin size="large" style={{ position: "absolute", zIndex: 1 }} />
         )}
+
         {previewUrl && (
           <ImageCropper
             ref={cropRef}

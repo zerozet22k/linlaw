@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Form,
@@ -16,31 +17,31 @@ import {
 import { debounce } from "lodash";
 import apiClient from "@/utils/api/apiClient";
 
+import type { UserAPI } from "@/models/UserModel";
+
 const { Title } = Typography;
 
-interface RoleOption {
-  _id: string;
-  name: string;
-}
-
-interface UserItem {
-  _id: string;
-  username: string;
-  email: string;
-  roles: RoleOption[];
-}
+const PAGE_SIZE = 50;
 
 const SendEmailPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
+
   const [filterLoading, setFilterLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   const [includeRoles, setIncludeRoles] = useState<string[]>([]);
   const [excludeRoles, setExcludeRoles] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [matchingUsers, setMatchingUsers] = useState<UserItem[]>([]);
+
+  const [matchingUsers, setMatchingUsers] = useState<UserAPI[]>([]);
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [hasLoadedUsers, setHasLoadedUsers] = useState(false);
+
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const loadingRef = useRef<boolean>(false);
+
+  const loadingRef = useRef(false);
+  const requestIdRef = useRef(0);
 
   const rowSelection = {
     selectedRowKeys: selectedUserIds,
@@ -56,30 +57,60 @@ const SendEmailPage: React.FC = () => {
       title: "Roles",
       dataIndex: "roles",
       key: "roles",
-      render: (roles: RoleOption[]) => roles.map((r) => r.name).join(", "),
+      render: (roles: UserAPI["roles"]) =>
+        (roles ?? []).map((r) => r.name).join(", "),
     },
   ];
 
-  const loadMatchingUsers = async () => {
-    setFilterLoading(true);
+  const fetchUsers = async (nextPage: number, mode: "replace" | "append") => {
+    const reqId = ++requestIdRef.current;
+
+    if (mode === "replace") setFilterLoading(true);
+    else setLoadingMore(true);
+
+    loadingRef.current = true;
+
     try {
       const response = await apiClient.post("/data", {
         type: "users",
         searchQuery,
         includeRoles,
         excludeRoles,
-        page: 1,
-        limit: 1000,
-      });
-      setMatchingUsers(response.data.items);
+        page: nextPage,
+        limit: PAGE_SIZE,
+      })
+      if (reqId !== requestIdRef.current) return;
+
+      const items: UserAPI[] = response.data.items ?? [];
+      const apiHasMore: boolean = !!response.data.hasMore;
+
       setHasLoadedUsers(true);
+      setHasMore(apiHasMore);
+      setPage(nextPage);
+
+      setMatchingUsers((prev) =>
+        mode === "append" ? [...prev, ...items] : items
+      );
     } catch (error) {
       console.error("Error loading matching users:", error);
       message.error("Error loading matching users.");
     } finally {
-      setFilterLoading(false);
       loadingRef.current = false;
+      setFilterLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const loadMatchingUsers = async () => {
+    setSelectedUserIds([]);
+    setHasMore(true);
+    setPage(1);
+    await fetchUsers(1, "replace");
+  };
+
+  const loadMoreUsers = async () => {
+    if (!hasMore || loadingRef.current) return;
+    await fetchUsers(page + 1, "append");
   };
 
   const debouncedSetSearch = useMemo(
@@ -87,7 +118,7 @@ const SendEmailPage: React.FC = () => {
       debounce((value: string) => {
         setSearchQuery(value);
       }, 500),
-    [setSearchQuery]
+    []
   );
 
   useEffect(() => {
@@ -102,12 +133,8 @@ const SendEmailPage: React.FC = () => {
 
   const onPopupScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
-    if (
-      scrollTop + clientHeight >= scrollHeight - 20 &&
-      hasMore &&
-      !loadingRef.current
-    ) {
-      loadingRef.current = true;
+    if (scrollTop + clientHeight >= scrollHeight - 20) {
+      loadMoreUsers();
     }
   };
 
@@ -137,6 +164,7 @@ const SendEmailPage: React.FC = () => {
       <Title level={3} style={{ marginBottom: 16 }}>
         Send Emails
       </Title>
+
       <Row gutter={16}>
         <Col xs={24} md={8}>
           <div style={{ position: "sticky", top: 80 }}>
@@ -155,6 +183,7 @@ const SendEmailPage: React.FC = () => {
                 <Select.Option value="editor">Editor</Select.Option>
                 <Select.Option value="user">User</Select.Option>
               </Select>
+
               <label style={{ display: "block", marginBottom: 6 }}>
                 Exclude Roles
               </label>
@@ -169,6 +198,7 @@ const SendEmailPage: React.FC = () => {
                 <Select.Option value="editor">Editor</Select.Option>
                 <Select.Option value="user">User</Select.Option>
               </Select>
+
               <label style={{ display: "block", marginBottom: 6 }}>
                 Search Query
               </label>
@@ -177,6 +207,7 @@ const SendEmailPage: React.FC = () => {
                 onChange={onSearchChange}
                 style={{ marginBottom: 16 }}
               />
+
               <Button
                 type="primary"
                 block
@@ -188,58 +219,69 @@ const SendEmailPage: React.FC = () => {
             </Card>
           </div>
         </Col>
+
         <Col xs={24} md={16}>
-          <Card
-            size="small"
-            title="Matching Users"
-            style={{ marginBottom: 16 }}
-          >
+          <Card size="small" title="Matching Users" style={{ marginBottom: 16 }}>
             {hasLoadedUsers ? (
-              <div
-                style={{ height: 300, overflowY: "auto" }}
-                onScroll={onPopupScroll}
-              >
-                <Table
-                  rowKey="_id"
-                  columns={columns}
-                  dataSource={matchingUsers}
-                  rowSelection={rowSelection}
-                  size="middle"
-                  pagination={false}
-                />
-              </div>
+              <>
+                <div
+                  style={{ height: 300, overflowY: "auto" }}
+                  onScroll={onPopupScroll}
+                >
+                  <Table<UserAPI>
+                    rowKey="_id"
+                    columns={columns as any}
+                    dataSource={matchingUsers}
+                    rowSelection={rowSelection}
+                    size="middle"
+                    pagination={false}
+                    loading={filterLoading}
+                  />
+                </div>
+
+                {loadingMore && (
+                  <div style={{ textAlign: "center", padding: 12 }}>
+                    <Spin />
+                  </div>
+                )}
+
+                {!hasMore && matchingUsers.length > 0 && (
+                  <div style={{ textAlign: "center", padding: 8, opacity: 0.7 }}>
+                    End of results
+                  </div>
+                )}
+              </>
             ) : (
               <div style={{ textAlign: "center", padding: 40 }}>
                 <Spin spinning={filterLoading} />
                 {!filterLoading && (
                   <p style={{ marginTop: 16 }}>
-                    No users loaded yet. Use filters and click &quot;Load
-                    Matching Users&quot;.
+                    No users loaded yet. Use filters and click &quot;Load Matching
+                    Users&quot;.
                   </p>
                 )}
               </div>
             )}
           </Card>
+
           <Card size="small" title="Compose Email">
             <Form layout="vertical" onFinish={onFinish}>
               <Form.Item
                 label="Subject"
                 name="subject"
-                rules={[
-                  { required: true, message: "Please input the subject." },
-                ]}
+                rules={[{ required: true, message: "Please input the subject." }]}
               >
                 <Input placeholder="Email subject" />
               </Form.Item>
+
               <Form.Item
                 label="Message"
                 name="message"
-                rules={[
-                  { required: true, message: "Please input the message." },
-                ]}
+                rules={[{ required: true, message: "Please input the message." }]}
               >
                 <Input.TextArea rows={6} placeholder="Email message" />
               </Form.Item>
+
               <Form.Item>
                 <Button
                   type="primary"

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import {
   Upload,
   message,
-  Card,
   Button,
   List,
   Input,
@@ -22,7 +21,7 @@ import { useFile } from "@/hooks/useFile";
 import UploadProgressList from "./UploadProgressList";
 
 const { Dragger } = Upload;
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 function splitNameAndExtension(filename: string) {
   const parts = filename.split(".");

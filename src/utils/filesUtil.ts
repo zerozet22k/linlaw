@@ -89,3 +89,10 @@ export function humanizeExt(ext: string): string {
   if (!ext) return "";
   return ext.toUpperCase();
 }
+
+export const isPdfExt = (ext: string) => ext === "pdf";
+export const isOfficeDocExt = (ext: string) => ext === "doc" || ext === "docx" || ext === "ppt" || ext === "pptx" || ext === "xls" || ext === "xlsx";
+export const isImageExt = (ext: string) =>
+  ext === "png" || ext === "jpg" || ext === "jpeg" || ext === "webp" || ext === "gif" || ext === "svg";
+
+export const isPreviewable = (ext: string) => isPdfExt(ext) || isOfficeDocExt(ext) || isImageExt(ext);

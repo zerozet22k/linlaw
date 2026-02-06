@@ -1,6 +1,6 @@
 // repositories/NewsletterRepository.ts
 import dbConnect from "@/db";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 import NewsletterModel, {
   INewsletter,
   INewsletterAttachmentBase,

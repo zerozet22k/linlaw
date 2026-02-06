@@ -8,7 +8,7 @@ const userService = new UserService();
 const ALLOWED_STUDENT_FIELDS = ["name", "username", "email", "password", "bio"];
 
 async function handleGetUserProfileRequest(
-  request: Request,
+  _request: Request,
   user: User | null
 ) {
   try {

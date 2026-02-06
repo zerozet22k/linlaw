@@ -42,6 +42,6 @@ export const POST = async (
   request: Request,
   context: { params: { newsletterId: string } }
 ) =>
-  withAuthMiddleware((req, user) => handleAddAttachment(req, context), true, [
+  withAuthMiddleware((req, _user) => handleAddAttachment(req, context), true, [
     APP_PERMISSIONS.UPLOAD_NEWSLETTER_ATTACHMENT,
   ])(request);

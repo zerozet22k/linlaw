@@ -67,9 +67,6 @@ export default function HeroSliderSection({
   const tabletSize = sizes?.tablet ?? "100vw";
   const mobileSize = sizes?.mobile ?? "100vw";
 
-  // This string is what drives which responsive widths the browser will fetch.
-  // If your hero is visually constrained (e.g. max 1280px), set desktopSize to "1280px"
-  // so it never downloads 2000-4000px wide assets unnecessarily.
   const sizesAttr = useMemo(
     () =>
       `(min-width: 1024px) ${desktopSize}, (min-width: 768px) ${tabletSize}, ${mobileSize}`,

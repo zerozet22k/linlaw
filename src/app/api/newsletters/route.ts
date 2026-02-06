@@ -31,7 +31,7 @@ export const GET = async (request: Request) => {
 
 export const POST = async (request: Request) =>
   withAuthMiddleware(
-    async (req, user) => {
+    async (req, _user) => {
       try {
         const data = await req.json();
         if (!data.title) {

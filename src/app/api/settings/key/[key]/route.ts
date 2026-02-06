@@ -7,7 +7,7 @@ import { ValidSettingKey } from "@/config/CMS/settings/settingKeys";
 const settingService = new SettingService();
 
 async function handleGetSettingByKey(
-  request: Request,
+  _request: Request,
   params: { key: ValidSettingKey }
 ) {
   try {
@@ -32,7 +32,7 @@ export const GET = async (
   context: { params: { key: ValidSettingKey } }
 ) =>
   withAuthMiddleware(
-    (req, user) => handleGetSettingByKey(req, context.params),
+    (req, _user) => handleGetSettingByKey(req, context.params),
     true,
     [APP_PERMISSIONS.ADMIN]
   )(request);

@@ -1,17 +1,16 @@
-// src/components/router/LayoutRouter.tsx  (or wherever yours lives)
+
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Typography } from "antd";
 
-import DashboardLayout from "../layouts/DashboardLayout";
-import MainLayout from "../layouts/MainLayout";
+import DashboardLayout from "@/layouts/DashboardLayout";
+import MainLayout from "@/layouts/MainLayout";
 import "@/styles/globals.css";
 
 import { useUser } from "@/hooks/useUser";
 import LoadingSpin from "@/components/loaders/LoadingSpin";
-import { ROUTES } from "@/config/navigations/routes";
 import { APP_PERMISSIONS, hasPermission } from "@/config/permissions";
 import { LayoutProvider } from "@/providers/LayoutProvider";
 import { useSettings } from "@/hooks/useSettings";
@@ -19,55 +18,29 @@ import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS
 
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
-
 import { useHash } from "@/hooks/useHash";
+
+import { matchRoute } from "@/router/routeMatch";
+import { stripLangPrefix } from "@/i18n/path"; 
 
 const { Title, Text } = Typography;
 
-interface LayoutRouterProps {
-  children: React.ReactNode;
-}
-
-const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const pathToRegex = (path: string) => {
-  // supports:
-  // - "/newsletters/:id"
-  // - "/#services"
-  // - "/dashboard/users"
-  const parts = path.split("/").map((p) => {
-    if (p.startsWith(":")) return "[^/]+";
-    return escapeRegex(p);
-  });
-  return new RegExp(`^${parts.join("/")}$`);
-};
-
-const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
+const LayoutRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, initialLoading } = useUser();
   const { settings } = useSettings();
   const { language } = useLanguage();
 
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
   const hash = useHash();
   const router = useRouter();
 
-  const isDashboardRoute = pathname?.startsWith("/dashboard");
-  const [loading, setLoading] = useState(false);
+  const isDashboardRoute = pathname.startsWith("/dashboard");
 
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 200);
-    return () => clearTimeout(timer);
-  }, [pathname]);
-
+  
   const routeConfig = useMemo(() => {
-    const fullPath = `${pathname}${hash}`;
-    return (
-      Object.values(ROUTES).find((route) => pathToRegex(route.path).test(fullPath)) ||
-      Object.values(ROUTES).find((route) => pathToRegex(route.path).test(pathname)) ||
-      null
-    );
-  }, [pathname, hash]);
+    const basePath = isDashboardRoute ? pathname : stripLangPrefix(pathname);
+    return matchRoute(basePath, hash);
+  }, [pathname, hash, isDashboardRoute]);
 
   const hasAccess = useMemo(() => {
     if (!routeConfig) return true;
@@ -75,37 +48,38 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
     return hasPermission(user, routeConfig.access || [], true);
   }, [user, routeConfig]);
 
+  
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 120);
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
   useEffect(() => {
     const siteName =
       settings[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteName?.trim() ||
       process.env.NEXT_PUBLIC_SITE_NAME ||
       "Default Site";
 
-    const pageTitle = routeConfig?.navKey
-      ? t(language, routeConfig.navKey, routeConfig.key)
-      : "";
-
+    const pageTitle = routeConfig?.navKey ? t(language, routeConfig.navKey, routeConfig.key) : "";
     document.title = pageTitle ? `${siteName} | ${pageTitle}` : siteName;
   }, [routeConfig, settings, language]);
 
   useEffect(() => {
     if (initialLoading) return;
 
-    const redirectTo = (target: string) => {
-      router.replace(target);
-    };
-
     if (!user && routeConfig?.loginRequired) {
-      redirectTo(routeConfig.IfNotLoggedInRedirectUrl || "/login");
+      router.replace(routeConfig.IfNotLoggedInRedirectUrl || "/login");
       return;
     }
 
     if (user && pathname === "/login") {
-      if (hasPermission(user, [APP_PERMISSIONS.VIEW_DASHBOARD])) {
-        redirectTo(routeConfig?.IfLoggedInRedirectUrl || "/dashboard");
-      } else {
-        redirectTo("/");
-      }
+      router.replace(
+        hasPermission(user, [APP_PERMISSIONS.VIEW_DASHBOARD])
+          ? routeConfig?.IfLoggedInRedirectUrl || "/dashboard"
+          : "/"
+      );
     }
   }, [initialLoading, user, routeConfig, pathname, router]);
 
@@ -113,21 +87,9 @@ const LayoutRouter: React.FC<LayoutRouterProps> = ({ children }) => {
 
   const content =
     user && routeConfig?.access && !hasAccess ? (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", textAlign: "center" }}>
         <Title level={2}>❌</Title>
-        <Text strong>
-          {routeConfig?.noAccessMessage || "You do not have permission to view this page."}
-        </Text>
+        <Text strong>{routeConfig?.noAccessMessage || "You do not have permission to view this page."}</Text>
       </div>
     ) : (
       children

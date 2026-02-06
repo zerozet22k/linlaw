@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { Card, theme } from "antd";
-import { darken } from "polished";
 import FieldTitle from "../extra/FieldTitle";
 
 type FieldParentCardProps = {

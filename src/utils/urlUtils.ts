@@ -1,3 +1,5 @@
+// src/utils/urlUtils.ts
+
 export const normalizeUrl = (url?: string): string => {
   const u = String(url || "").trim();
   if (!u) return "";
@@ -19,3 +21,12 @@ export const platformLabel = (p: string): string => {
   if (x === "linkedin") return "LinkedIn";
   return p?.trim() || "Link";
 };
+
+export const isSameOriginReferrer = (referrer: string, origin: string): boolean => {
+  try {
+    return new URL(referrer).origin === origin;
+  } catch {
+    return false;
+  }
+};
+

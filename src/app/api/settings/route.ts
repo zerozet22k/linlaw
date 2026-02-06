@@ -6,7 +6,7 @@ import { APP_PERMISSIONS } from "@/config/permissions";
 
 const settingService = new SettingService();
 
-async function handleGetAllSettingsRequest(request: Request) {
+async function handleGetAllSettingsRequest(_request: Request) {
   try {
     const settings = await settingService.getAllSettings();
 
@@ -53,7 +53,7 @@ async function handleUpsertSettingsRequest(request: Request) {
 }
 
 export const GET = async (request: Request) =>
-  withAuthMiddleware((req, userId) => handleGetAllSettingsRequest(req), true, [
+  withAuthMiddleware((req, _userId) => handleGetAllSettingsRequest(req), true, [
     APP_PERMISSIONS.ADMIN,
   ])(request);
 

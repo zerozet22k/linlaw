@@ -7,14 +7,14 @@ import {
   FREE_PERMISSIONS,
 } from "@/config/permissions";
 import { getHighestRoleWithPermission } from "@/utils/roleUtils";
-import { User, UserAPI } from "@/models/UserModel";
+import { User } from "@/models/UserModel";
 
 const roleService = new RoleService();
 
 async function handleGetRoleByIdRequest(
-  request: Request,
+  _request: Request,
   params: { id: string },
-  user: User
+  _user: User
 ) {
   try {
     const role = await roleService.getRoleById(params.id);
@@ -91,9 +91,9 @@ async function handleUpdateRoleRequest(
 }
 
 async function handleDeleteRoleRequest(
-  request: Request,
+  _request: Request,
   params: { id: string },
-  user: User
+  _user: User
 ) {
   try {
     await roleService.deleteRole(params.id);

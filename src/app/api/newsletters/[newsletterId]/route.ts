@@ -10,7 +10,7 @@ export const GET = async (
   { params }: { params: { newsletterId: string } }
 ) =>
   withAuthMiddleware(
-    async (req, user) => {
+    async (_req, _user) => {
       try {
         const newsletter = await newsletterService.getNewsletterById(
           params.newsletterId
@@ -39,7 +39,7 @@ export const PUT = async (
   { params }: { params: { newsletterId: string } }
 ) =>
   withAuthMiddleware(
-    async (req, user) => {
+    async (req, _user) => {
       try {
         const data = await req.json();
         const updatedNewsletter = await newsletterService.updateNewsletter(
@@ -76,7 +76,7 @@ export const DELETE = async (
   { params }: { params: { newsletterId: string } }
 ) =>
   withAuthMiddleware(
-    async (req, user) => {
+    async (_req, _user) => {
       try {
         const deletedNewsletter = await newsletterService.deleteNewsletter(
           params.newsletterId

@@ -3,14 +3,12 @@ import FileService from "@/services/FileService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import { APP_PERMISSIONS } from "@/config/permissions";
 import { User } from "@/models/UserModel";
-import UserService from "@/services/UserService";
 
 const fileService = new FileService();
-const userService = new UserService();
 
 async function getSignedUrl(
   request: Request,
-  user: User,
+  _user: User,
   params: { id: string }
 ) {
   try {

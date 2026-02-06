@@ -94,7 +94,6 @@ const resolveEffectiveSource = (
 
 const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
 
-// "services", "#services", "/#services", " Services " -> "services"
 const normalizeDomId = (raw: string) => {
   const s = String(raw ?? "").trim();
   if (!s) return "";

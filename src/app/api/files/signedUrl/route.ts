@@ -5,7 +5,7 @@ import { APP_PERMISSIONS } from "@/config/permissions";
 
 const fileService = new FileService();
 
-async function generateSignedUrl(request: Request, user: any) {
+async function generateSignedUrl(request: Request, _user: any) {
   try {
     const { fileName, contentType } = await request.json();
     if (!fileName || !contentType) {

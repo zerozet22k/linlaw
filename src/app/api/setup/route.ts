@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import UserService from "@/services/UserService";
 import SettingService from "@/services/SettingService";
 import { SETTINGS_KEYS } from "@/config/CMS/settings/settingKeys";
-import userRepository from "@/repositories/UserRepository";
 
 const userService = new UserService();
 const settingService = new SettingService();

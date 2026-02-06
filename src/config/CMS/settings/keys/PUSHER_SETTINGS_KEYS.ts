@@ -3,7 +3,6 @@ import {
   GeneralConfig,
   NestedFieldType,
   JsonDesign,
-  FieldDesign,
   JsonFunctionality,
 } from "..";
 

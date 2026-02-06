@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Row,
   Col,
@@ -78,7 +78,8 @@ const makePhoneValidator = (msg: string) => ({
     if (!okChars) return Promise.reject(new Error(msg));
 
     const digits = String(value).replace(/\D/g, "");
-    if (digits.length < 7 || digits.length > 15) return Promise.reject(new Error(msg));
+    if (digits.length < 7 || digits.length > 15)
+      return Promise.reject(new Error(msg));
 
     return Promise.resolve();
   },
@@ -88,7 +89,8 @@ function toRgba(color: string, a: number) {
   const c = String(color || "").trim();
 
   if (c.startsWith("rgba(")) return c.replace(/,\s*[\d.]+\s*\)$/, `, ${a})`);
-  if (c.startsWith("rgb(")) return c.replace("rgb(", "rgba(").replace(")", `, ${a})`);
+  if (c.startsWith("rgb("))
+    return c.replace("rgb(", "rgba(").replace(")", `, ${a})`);
 
   if (c.startsWith("#")) {
     const hex = c.slice(1);
@@ -126,10 +128,15 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
   const nameRef = useRef<InputRef>(null);
   const tutorialTimerRef = useRef<number | null>(null);
 
-  // i18n (no hardcoded fallbacks)
-  const tCTAHeader = useMemo(() => t(language, "contact.clickToActionHeader"), [language]);
+  const tCTAHeader = useMemo(
+    () => t(language, "contact.clickToActionHeader"),
+    [language]
+  );
   const tCTASub = useMemo(() => t(language, "contact.subheader"), [language]);
-  const tCTAButton = useMemo(() => t(language, "contact.buttonLabel"), [language]);
+  const tCTAButton = useMemo(
+    () => t(language, "contact.buttonLabel"),
+    [language]
+  );
 
   const tAddress = useMemo(() => t(language, "contact.address"), [language]);
   const tPhone = useMemo(() => t(language, "contact.phoneNumber"), [language]);
@@ -138,47 +145,76 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
 
   const tModal = useMemo(() => t(language, "contact.modalTitle"), [language]);
   const tYourName = useMemo(() => t(language, "contact.yourName"), [language]);
-  const tYourNameReq = useMemo(() => t(language, "contact.yourNameRequired"), [language]);
+  const tYourNameReq = useMemo(
+    () => t(language, "contact.yourNameRequired"),
+    [language]
+  );
 
-  const tYourPhone = useMemo(() => t(language, "contact.yourPhoneNumber"), [language]);
-  const tYourPhoneReq = useMemo(() => t(language, "contact.yourPhoneNumberRequired"), [language]);
+  const tYourPhone = useMemo(
+    () => t(language, "contact.yourPhoneNumber"),
+    [language]
+  );
+  const tYourPhoneReq = useMemo(
+    () => t(language, "contact.yourPhoneNumberRequired"),
+    [language]
+  );
 
   const tYourEmail = useMemo(() => t(language, "contact.yourEmail"), [language]);
-  const tYourEmailReq = useMemo(() => t(language, "contact.yourEmailRequired"), [language]);
+  const tYourEmailReq = useMemo(
+    () => t(language, "contact.yourEmailRequired"),
+    [language]
+  );
 
   const tSubject = useMemo(() => t(language, "contact.subject"), [language]);
-  const tSubjectReq = useMemo(() => t(language, "contact.subjectRequired"), [language]);
+  const tSubjectReq = useMemo(
+    () => t(language, "contact.subjectRequired"),
+    [language]
+  );
 
   const tMessage = useMemo(() => t(language, "contact.message"), [language]);
-  const tMessageReq = useMemo(() => t(language, "contact.messageRequired"), [language]);
+  const tMessageReq = useMemo(
+    () => t(language, "contact.messageRequired"),
+    [language]
+  );
 
   const tSend = useMemo(() => t(language, "contact.sendEmail"), [language]);
 
   const tOk = useMemo(() => t(language, "contact.notifSuccess"), [language]);
   const tBad = useMemo(() => t(language, "contact.notifFailure"), [language]);
-  const tErr = useMemo(() => t(language, "contact.notifGenericFailure"), [language]);
+  const tErr = useMemo(
+    () => t(language, "contact.notifGenericFailure"),
+    [language]
+  );
 
   const tCancel = useMemo(() => t(language, "common.cancel"), [language]);
   const tLocation = useMemo(() => t(language, "contact.location"), [language]);
   const tOpen = useMemo(() => t(language, "common.open"), [language]);
   const tOpenMap = useMemo(() => t(language, "contact.openMap"), [language]);
-  const tMapTitle = useMemo(() => t(language, "contact.locationMapTitle"), [language]);
-  const tSearchPlaceholder = useMemo(
-    () => t(language, "contact.mapTitle"), // optional if you already have one; safe to keep localized
+  const tMapTitle = useMemo(
+    () => t(language, "contact.locationMapTitle"),
     [language]
   );
 
-  const phoneRule = useMemo(() => makePhoneValidator(tYourPhoneReq), [tYourPhoneReq]);
+  const phoneRule = useMemo(
+    () => makePhoneValidator(tYourPhoneReq),
+    [tYourPhoneReq]
+  );
 
-  const glowStrong = useMemo(() => toRgba(token.colorPrimary, 0.58), [token.colorPrimary]);
-  const glowSoft = useMemo(() => toRgba(token.colorPrimary, 0.18), [token.colorPrimary]);
+  const glowStrong = useMemo(
+    () => toRgba(token.colorPrimary, 0.58),
+    [token.colorPrimary]
+  );
+  const glowSoft = useMemo(
+    () => toRgba(token.colorPrimary, 0.18),
+    [token.colorPrimary]
+  );
 
-  const clearHash = () => {
+  const clearHash = useCallback(() => {
     const url = window.location.pathname + window.location.search;
     window.history.replaceState(null, "", url);
-  };
+  }, []);
 
-  const startTutorial = () => {
+  const startTutorial = useCallback(() => {
     setTutorialOn(true);
     setVisible(true);
 
@@ -190,7 +226,7 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
     }, 250);
 
     window.setTimeout(() => clearHash(), 350);
-  };
+  }, [clearHash]);
 
   useEffect(() => {
     const run = () => {
@@ -203,7 +239,7 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
       window.removeEventListener("hashchange", run);
       if (tutorialTimerRef.current) window.clearTimeout(tutorialTimerRef.current);
     };
-  }, []);
+  }, [startTutorial]);
 
   const handleSendEmail = async (values: any) => {
     setSending(true);
@@ -265,7 +301,7 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
       open={visible}
       onCancel={() => !sending && setVisible(false)}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       width={920}
       maskClosable={!sending}
       styles={{ body: { paddingTop: token.paddingMD } }}
@@ -275,7 +311,11 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
           <Form form={form} layout="vertical" onFinish={handleSendEmail}>
             <Row gutter={token.sizeLG}>
               <Col xs={24} md={12}>
-                <Form.Item label={tYourName} name="name" rules={[{ required: true, message: tYourNameReq }]}>
+                <Form.Item
+                  label={tYourName}
+                  name="name"
+                  rules={[{ required: true, message: tYourNameReq }]}
+                >
                   <Input ref={nameRef} autoComplete="name" />
                 </Form.Item>
               </Col>
@@ -298,19 +338,36 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
               <Input autoComplete="email" />
             </Form.Item>
 
-            <Form.Item label={tSubject} name="subject" rules={[{ required: true, message: tSubjectReq }]}>
+            <Form.Item
+              label={tSubject}
+              name="subject"
+              rules={[{ required: true, message: tSubjectReq }]}
+            >
               <Input />
             </Form.Item>
 
-            <Form.Item label={tMessage} name="message" rules={[{ required: true, message: tMessageReq }]}>
+            <Form.Item
+              label={tMessage}
+              name="message"
+              rules={[{ required: true, message: tMessageReq }]}
+            >
               <Input.TextArea rows={5} />
             </Form.Item>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <Button onClick={() => setVisible(false)} disabled={sending} style={{ borderRadius: 10 }}>
+              <Button
+                onClick={() => setVisible(false)}
+                disabled={sending}
+                style={{ borderRadius: 10 }}
+              >
                 {tCancel}
               </Button>
-              <Button type="primary" htmlType="submit" loading={sending} style={{ borderRadius: 10 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={sending}
+                style={{ borderRadius: 10 }}
+              >
                 {tSend}
               </Button>
             </div>
@@ -350,15 +407,31 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                 <Text strong style={{ fontSize: 13 }}>
                   {tAddress}
                 </Text>
-                <Text style={{ color: token.colorTextSecondary, fontSize: 13, wordBreak: "break-word" }}>
+                <Text
+                  style={{
+                    color: token.colorTextSecondary,
+                    fontSize: 13,
+                    wordBreak: "break-word",
+                  }}
+                >
                   {address}
                 </Text>
 
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 6 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 12,
+                    marginTop: 6,
+                  }}
+                >
                   {!isPlaceholder(phone) ? (
                     <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                       <PhoneOutlined style={{ color: token.colorSuccess }} />
-                      <a href={`tel:${String(phone).replace(/\s+/g, "")}`} style={{ color: token.colorPrimary }}>
+                      <a
+                        href={`tel:${String(phone).replace(/\s+/g, "")}`}
+                        style={{ color: token.colorPrimary }}
+                      >
                         {phone}
                       </a>
                     </span>
@@ -415,8 +488,16 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                     }}
                   >
                     <div>
-                      <EnvironmentOutlined style={{ fontSize: 28, color: token.colorTextQuaternary }} />
-                      <div style={{ marginTop: 10, color: token.colorTextSecondary, fontSize: 13.5 }}>
+                      <EnvironmentOutlined
+                        style={{ fontSize: 28, color: token.colorTextQuaternary }}
+                      />
+                      <div
+                        style={{
+                          marginTop: 10,
+                          color: token.colorTextSecondary,
+                          fontSize: 13.5,
+                        }}
+                      >
                         {tMapNote}
                       </div>
                     </div>
@@ -453,7 +534,13 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
           >
             <Row gutter={[token.sizeLG, token.sizeSM]} align="middle">
               <Col xs={24} md={15}>
-                <div style={{ display: "flex", flexDirection: "column", gap: tight ? 4 : 6 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: tight ? 4 : 6,
+                  }}
+                >
                   <Title level={tight ? 5 : 4} style={{ margin: 0, lineHeight: 1.15 }}>
                     {tCTAHeader}
                   </Title>
@@ -495,7 +582,10 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                     {!isPlaceholder(phone) ? (
                       <span style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
                         <PhoneOutlined style={{ color: token.colorSuccess }} />
-                        <a href={`tel:${String(phone).replace(/\s+/g, "")}`} style={{ color: token.colorPrimary }}>
+                        <a
+                          href={`tel:${String(phone).replace(/\s+/g, "")}`}
+                          style={{ color: token.colorPrimary }}
+                        >
                           {phone}
                         </a>
                       </span>
@@ -589,7 +679,10 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                     {tCTASub}
                   </Text>
 
-                  <Space size={10} style={{ marginTop: token.marginMD, flexWrap: "wrap" }}>
+                  <Space
+                    size={10}
+                    style={{ marginTop: token.marginMD, flexWrap: "wrap" }}
+                  >
                     {CTAButtonWithSpotlight("large")}
                     {externalHref ? (
                       <Button
@@ -616,7 +709,9 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                   }}
                 >
                   <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                    <EnvironmentOutlined style={{ fontSize: 18, color: token.colorWarning, marginTop: 2 }} />
+                    <EnvironmentOutlined
+                      style={{ fontSize: 18, color: token.colorWarning, marginTop: 2 }}
+                    />
                     <div style={{ minWidth: 0 }}>
                       <Text strong>{tAddress}</Text>
                       <div
@@ -633,12 +728,17 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                   </div>
 
                   <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                    <PhoneOutlined style={{ fontSize: 18, color: token.colorSuccess, marginTop: 2 }} />
+                    <PhoneOutlined
+                      style={{ fontSize: 18, color: token.colorSuccess, marginTop: 2 }}
+                    />
                     <div>
                       <Text strong>{tPhone}</Text>
                       <div style={{ marginTop: 4 }}>
                         {!isPlaceholder(phone) ? (
-                          <a href={`tel:${String(phone).replace(/\s+/g, "")}`} style={{ color: token.colorPrimary }}>
+                          <a
+                            href={`tel:${String(phone).replace(/\s+/g, "")}`}
+                            style={{ color: token.colorPrimary }}
+                          >
                             {phone}
                           </a>
                         ) : (
@@ -649,7 +749,9 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                   </div>
 
                   <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                    <MailOutlined style={{ fontSize: 18, color: token.colorInfo, marginTop: 2 }} />
+                    <MailOutlined
+                      style={{ fontSize: 18, color: token.colorInfo, marginTop: 2 }}
+                    />
                     <div>
                       <Text strong>{tEmail}</Text>
                       <div style={{ marginTop: 4 }}>
@@ -730,7 +832,9 @@ const ClickToAction: React.FC<Props> = ({ variant = "footer", tight = false }) =
                       }}
                     >
                       <div>
-                        <EnvironmentOutlined style={{ fontSize: 28, color: token.colorTextQuaternary }} />
+                        <EnvironmentOutlined
+                          style={{ fontSize: 28, color: token.colorTextQuaternary }}
+                        />
                         <div
                           style={{
                             marginTop: token.marginSM,

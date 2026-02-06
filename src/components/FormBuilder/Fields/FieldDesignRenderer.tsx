@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { Typography, Tooltip, theme } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
 
 import FieldParentCard from "./FieldDesigns/FieldParentCard";
 import FieldDefaultCard from "./FieldDesigns/FieldDefaultCard";
@@ -28,7 +26,6 @@ const FieldDesignRenderer: React.FC<FieldDesignRendererProps> = ({
   style = {},
   surface = "body",
 }) => {
-  const { token } = theme.useToken();
 
   if (surface === "header") {
     return (

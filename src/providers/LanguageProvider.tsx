@@ -1,42 +1,51 @@
 "use client";
 
-import {
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-  useCallback,
-} from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ReactNode, useEffect, useMemo, useState, useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
 import { LanguageContext } from "@/contexts/LanguageContext";
 import { useSettings } from "@/hooks/useSettings";
-import { DEFAULT_LANG, type SupportedLanguage } from "@/i18n/languages";
+import {
+  DEFAULT_LANG,
+  isSupportedLanguageLocal,
+  type SupportedLanguage,
+} from "@/i18n/languages";
 
-const LANGUAGE_STORAGE_KEY = "selected_language";
-const LANGUAGE_COOKIE_KEY = "language";
+import { langSegment, ensureLangPrefix, replaceLangPrefix } from "@/i18n/path";
 
-const readCookie = (key: string) => {
+const LS_KEY = "selected_language";
+const CK_KEY = "language";
+
+const ckRead = (key: string) => {
   const m = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`));
   return m ? decodeURIComponent(m[1]) : null;
 };
 
-const writeCookie = (key: string, value: string) => {
+const ckWrite = (key: string, value: string) => {
   document.cookie = `${key}=${encodeURIComponent(
     value
   )}; Path=/; Max-Age=31536000; SameSite=Lax`;
 };
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+const segFromPath = (pathname: string): SupportedLanguage | null => {
+  const seg = (pathname.split("/")[1] || "").trim();
+  return seg && isSupportedLanguageLocal(seg) ? (seg as SupportedLanguage) : null;
+};
+
+const safeLocal = (raw: string | null): SupportedLanguage | null => {
+  const v = (raw || "").trim();
+  return v && isSupportedLanguageLocal(v) ? (v as SupportedLanguage) : null;
+};
+
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { supportedLanguages } = useSettings();
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const supportedReady = !!supportedLanguages?.length;
 
-  const effectiveSupported = useMemo<SupportedLanguage[]>(
+  
+  const enabled = useMemo<SupportedLanguage[]>(
     () =>
       (supportedLanguages?.length
         ? supportedLanguages
@@ -45,59 +54,61 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   );
 
   const [language, setLanguageState] = useState<SupportedLanguage>(() => {
-    if (typeof window === "undefined") return DEFAULT_LANG as SupportedLanguage;
+    if (typeof window === "undefined") return DEFAULT_LANG;
 
-    const urlLang = new URLSearchParams(window.location.search).get("lang");
-    const cookieLang = readCookie(LANGUAGE_COOKIE_KEY);
-    const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    
+    const fromPath = segFromPath(window.location.pathname);
+    if (fromPath) return fromPath;
 
-    return (urlLang || cookieLang || stored || DEFAULT_LANG) as SupportedLanguage;
+    
+    const fromCookie = safeLocal(ckRead(CK_KEY));
+    if (fromCookie) return fromCookie;
+
+    const fromLS = safeLocal(localStorage.getItem(LS_KEY));
+    if (fromLS) return fromLS;
+
+    return DEFAULT_LANG;
   });
 
   const [currentSupportedLanguages, setCurrentSupportedLanguages] =
-    useState<SupportedLanguage[]>(effectiveSupported);
+    useState<SupportedLanguage[]>(enabled);
 
   useEffect(() => {
-    setCurrentSupportedLanguages(effectiveSupported);
-  }, [effectiveSupported]);
+    setCurrentSupportedLanguages(enabled);
+  }, [enabled]);
 
-  // persist whenever language changes
+  
   useEffect(() => {
     if (typeof window === "undefined") return;
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-    writeCookie(LANGUAGE_COOKIE_KEY, language);
+    localStorage.setItem(LS_KEY, language);
+    ckWrite(CK_KEY, language);
   }, [language]);
 
-  const validate = useCallback(
+  
+  const clamp = useCallback(
     (raw: SupportedLanguage) => {
-      if (!supportedReady) return raw;
-      if (supportedLanguages!.includes(raw)) return raw;
-      return (supportedLanguages![0] || DEFAULT_LANG) as SupportedLanguage;
+      if (!supportedReady) return raw; 
+      if (enabled.includes(raw)) return raw;
+      return (enabled[0] || DEFAULT_LANG) as SupportedLanguage;
     },
-    [supportedReady, supportedLanguages]
+    [supportedReady, enabled]
   );
 
-  const syncUrlLang = useCallback(
+  const syncPath = useCallback(
     (langToSync: SupportedLanguage, mode: "router" | "history") => {
       if (typeof window === "undefined") return;
 
       const url = new URL(window.location.href);
+      const cur = `${url.pathname}${url.search}${url.hash}`;
 
-      const desired = langToSync === DEFAULT_LANG ? null : langToSync;
-      const current = url.searchParams.get("lang");
-
-      const ok =
-        (desired === null && current === null) ||
-        (desired !== null && current === desired);
-
-      if (ok) return;
-
-      if (desired === null) url.searchParams.delete("lang");
-      else url.searchParams.set("lang", desired);
+      const seg = langSegment(url.pathname);
+      url.pathname = seg
+        ? replaceLangPrefix(url.pathname, langToSync)
+        : ensureLangPrefix(url.pathname, langToSync);
 
       const next = `${url.pathname}${url.search}${url.hash}`;
+      if (next === cur) return;
 
-      // On hash-only changes, using router.replace can interrupt scroll.
       if (mode === "history") {
         window.history.replaceState(null, "", next);
       } else {
@@ -108,55 +119,51 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   );
 
   const setLanguage = useCallback(
-    (lang: SupportedLanguage) => {
-      const next = validate(lang);
+    (raw: SupportedLanguage) => {
+      const next = clamp(raw);
       setLanguageState(next);
-      // ensure URL reflects selection immediately (preserve hash)
-      syncUrlLang(next, "router");
+      syncPath(next, "router");
     },
-    [syncUrlLang, validate]
+    [clamp, syncPath]
   );
 
-  // If URL explicitly has ?lang=..., it wins
+  
   useEffect(() => {
-    const raw = searchParams?.get("lang");
-    if (!raw) return;
+    const fromPath = segFromPath(pathname || "/");
+    if (!fromPath) return;
 
-    const next = validate(raw as SupportedLanguage);
+    const next = clamp(fromPath);
     if (next === language) return;
 
     setLanguageState(next);
-  }, [searchParams, language, validate]);
+  }, [pathname, clamp, language]);
 
-  // Once settings are ready, enforce allowed languages
+  
   useEffect(() => {
     if (!supportedReady) return;
-    if (supportedLanguages!.includes(language)) return;
+    if (enabled.includes(language)) return;
 
-    const fallback = (supportedLanguages![0] || DEFAULT_LANG) as SupportedLanguage;
+    const fallback = (enabled[0] || DEFAULT_LANG) as SupportedLanguage;
     setLanguageState(fallback);
-    syncUrlLang(fallback, "router");
-  }, [supportedReady, supportedLanguages, language, syncUrlLang]);
+    syncPath(fallback, "router");
+  }, [supportedReady, enabled, language, syncPath]);
 
-  // Carry ?lang across *path* navigations (when links forget it)
+  
   useEffect(() => {
     if (!pathname) return;
-    syncUrlLang(language, "router");
-  }, [pathname, language, syncUrlLang]);
+    if (pathname.startsWith("/dashboard")) return; 
+    const seg = segFromPath(pathname);
+    if (seg) return;
 
-  // Carry ?lang across hash navigations without breaking scroll
-  useEffect(() => {
-    const onHash = () => syncUrlLang(language, "history");
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, [language, syncUrlLang]);
+    syncPath(language, "router");
+  }, [pathname, language, syncPath]);
 
   return (
     <LanguageContext.Provider
       value={{
         language,
         setLanguage,
-        supportedLanguages: effectiveSupported,
+        supportedLanguages: enabled,
         currentSupportedLanguages,
         setCurrentSupportedLanguages,
       }}

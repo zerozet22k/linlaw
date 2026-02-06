@@ -15,7 +15,6 @@ type JsonDesignRendererProps = {
   renderItem: () => React.ReactNode;
   label?: string | null;
   guide?: string | null;
-  value: any;
   extra?: React.ReactNode;
   style?: React.CSSProperties;
   modalBehavior: { [key in ModalBehaviorType]?: boolean };
@@ -31,7 +30,6 @@ const JsonDesignRenderer: React.FC<JsonDesignRendererProps> = ({
   renderItem,
   label,
   guide,
-  value,
   extra,
   style = {},
   modalBehavior,

@@ -35,6 +35,9 @@ type JsonFieldRendererProps = {
   surface?: RenderSurface;
 };
 
+// Stable fallback so `fields` doesn't become a new `{}` on every render
+const EMPTY_FIELDS = Object.freeze({}) as Record<string, any>;
+
 const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
   config,
   value,
@@ -51,11 +54,13 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
   const functionalities: JsonFunctionality[] = config.jsonFunctionalities || [];
   const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
 
-  const fields = config.fields ?? {};
-  const slots: SlotsShape | undefined = (config as any).slots;
+  // Keep `fields` reference stable even when config.fields is undefined
+  const fields = config.fields ?? EMPTY_FIELDS;
 
-  const openInModalPlacement = (config as any)
-    .openInModalPlacement as OpenInModalPlacement | undefined;
+  // Use typed slots directly (no `as any`)
+  const slots = config.slots;
+
+  const openInModalPlacement = config.openInModalPlacement;
 
   const { bodyKeys, extraKeys } = useMemo(() => {
     const allKeys = Object.keys(fields);
@@ -72,7 +77,7 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
     })();
 
     return { bodyKeys: body, extraKeys: extra };
-  }, [fields, slots]);
+  }, [fields, slots?.body, slots?.extra, slots?.hidden]);
 
   const hasBody = bodyKeys.length > 0;
 
@@ -105,7 +110,7 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
   const handlePasteJson = async () => {
     try {
       const clipboardText = await navigator.clipboard.readText();
-      let parsed;
+      let parsed: any;
       try {
         parsed = JSON5.parse(clipboardText);
       } catch {
@@ -149,22 +154,21 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
     );
   };
 
-  const intelligentButton =
-    functionalities.includes(JsonFunctionality.INTELLIGENT) ? (
-      <Button
-        onClick={handlePasteJson}
-        style={{
-          backgroundColor: token.colorPrimary,
-          color: "#fff",
-          border: "none",
-          borderRadius: "6px",
-          padding: "6px 12px",
-          boxShadow: `0 2px 6px ${darken(0.1, token.colorBgContainer)}`,
-        }}
-      >
-        Paste JSON
-      </Button>
-    ) : null;
+  const intelligentButton = functionalities.includes(JsonFunctionality.INTELLIGENT) ? (
+    <Button
+      onClick={handlePasteJson}
+      style={{
+        backgroundColor: token.colorPrimary,
+        color: "#fff",
+        border: "none",
+        borderRadius: "6px",
+        padding: "6px 12px",
+        boxShadow: `0 2px 6px ${darken(0.1, token.colorBgContainer)}`,
+      }}
+    >
+      Paste JSON
+    </Button>
+  ) : null;
 
   const headerFields =
     extraKeys.length > 0 ? (
@@ -199,7 +203,6 @@ const JsonFieldRenderer: React.FC<JsonFieldRendererProps> = ({
       design={design}
       label={config.label}
       guide={config.guide}
-      value={value}
       renderItem={renderItem}
       style={style}
       modalBehavior={modalBehavior}

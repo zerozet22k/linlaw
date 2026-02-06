@@ -6,8 +6,8 @@ import { APP_PERMISSIONS } from "@/config/permissions";
 
 const pageService = new PageService();
 
-// ✅ Handle GET request for fetching all pages
-async function handleGetAllPagesRequest(request: Request) {
+
+async function handleGetAllPagesRequest(_request: Request) {
   try {
     const pages = await pageService.getAllPages();
     return NextResponse.json(pages);
@@ -20,7 +20,7 @@ async function handleGetAllPagesRequest(request: Request) {
   }
 }
 
-// ✅ Handle PUT request for updating pages
+
 async function handleUpsertPagesRequest(request: Request) {
   try {
     const { pages } = await request.json();
@@ -49,9 +49,9 @@ async function handleUpsertPagesRequest(request: Request) {
   }
 }
 
-// ✅ Export GET and PUT routes with authentication middleware
+
 export const GET = async (request: Request) =>
-  withAuthMiddleware((req, userId) => handleGetAllPagesRequest(req), true, [
+  withAuthMiddleware((req, _userId) => handleGetAllPagesRequest(req), true, [
     APP_PERMISSIONS.ADMIN,
   ])(request);
 

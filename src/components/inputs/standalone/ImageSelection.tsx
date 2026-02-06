@@ -1,6 +1,6 @@
 "use client";
 import React, { CSSProperties } from "react";
-import { Button, Input, Tooltip, Space, Typography } from "antd";
+import { Button, Input, Tooltip, Space } from "antd";
 import { PictureOutlined, SyncOutlined } from "@ant-design/icons";
 import { useFile } from "@/hooks/useFile";
 import { FileType } from "@/models/FileModel";

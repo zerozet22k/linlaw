@@ -8,7 +8,7 @@ import { getFlagUrl } from "@/config/navigations/IconMapper";
 import {
   languageFlags,
   languageNames,
-  isSupportedLanguage,
+  isSupportedLanguageLocal,
   type SupportedLanguage,
 } from "@/i18n/languages";
 
@@ -39,7 +39,7 @@ const SupportedLanguageSelector: React.FC<Props> = ({
     const { value: langValue, closable, onClose } = props;
     const lang = typeof langValue === "string" ? langValue : "";
 
-    const flagCode = isSupportedLanguage(lang) ? languageFlags[lang] : "un";
+    const flagCode = isSupportedLanguageLocal(lang) ? languageFlags[lang] : "un";
     const flag = getFlagUrl(flagCode, 20);
 
     return (

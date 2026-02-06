@@ -11,7 +11,7 @@ import { LANGUAGE_SETTINGS_KEYS } from "@/config/CMS/settings/keys/LANGUAGE_SETT
 import { PUSHER_SETTINGS_KEYS } from "@/config/CMS/settings/keys/PUSHER_SETTINGS_KEYS";
 import apiClient from "@/utils/api/apiClient";
 import { SettingsContext } from "@/contexts/SettingsContext";
-import { isSupportedLanguage, type SupportedLanguage } from "@/i18n/languages";
+import { isSupportedLanguageLocal, type SupportedLanguage } from "@/i18n/languages";
 
 const replacePublicSettings = (
   baseSettings: Partial<SettingsInterface>,
@@ -57,7 +57,7 @@ export const SettingsProvider: React.FC<{
       ? languageSettingsRaw.filter((x): x is string => typeof x === "string")
       : [];
 
-    const filtered = fromSettings.filter(isSupportedLanguage);
+    const filtered = fromSettings.filter(isSupportedLanguageLocal);
 
     const merged = Array.from(new Set<SupportedLanguage>(["en", ...filtered]));
 

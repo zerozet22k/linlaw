@@ -2,7 +2,6 @@ import {
   FormType,
   GeneralConfig,
   NestedFieldType,
-  JsonDesign,
   ArrayDesign,
   ArrayFunctionality,
   FieldDesign,

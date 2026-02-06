@@ -9,7 +9,7 @@ import { getHighestRoleWithPermission } from "@/utils/roleUtils";
 const userService = new UserService();
 const roleService = new RoleService();
 
-async function handleGetAllUsersRequest(request: Request, currentUser: User) {
+async function handleGetAllUsersRequest(_request: Request, _currentUser: User) {
   try {
     const users = (await userService.getAllUsers()).users;
     return NextResponse.json(users);
@@ -90,7 +90,7 @@ export const GET = async (request: Request) =>
 
 export const POST = async (request: Request) =>
   withAuthMiddleware(
-    (req, user) => handleCreateUserRequest(request, user),
+    (_req, user) => handleCreateUserRequest(request, user),
     true,
     [APP_PERMISSIONS.CREATE_USER]
   )(request);

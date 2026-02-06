@@ -3,7 +3,7 @@ import {
   langs,
   DEFAULT_LANG,
   SUPPORTED_LANGS,
-  isSupportedLanguage,
+  isSupportedLanguageLocal,
   type SupportedLanguage,
   type BaseLocale,
   languageFlags,
@@ -16,7 +16,7 @@ export {
   langs as messages,
   DEFAULT_LANG,
   SUPPORTED_LANGS,
-  isSupportedLanguage,
+  isSupportedLanguageLocal,
   languageFlags,
   languageNames,
   languageNativeNames,
@@ -48,7 +48,7 @@ export function t(
   keyOrValue: string | LanguageJson | undefined,
   fallback = ""
 ): string {
-  const safeLang: SupportedLanguage = isSupportedLanguage(lang) ? lang : DEFAULT_LANG;
+  const safeLang: SupportedLanguage = isSupportedLanguageLocal(lang) ? lang : DEFAULT_LANG;
 
   if (isLanguageJson(keyOrValue)) {
     return keyOrValue[safeLang] || keyOrValue.en || fallback;

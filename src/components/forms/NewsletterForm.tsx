@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Card, message, Divider, Upload, Space } from "antd";
 import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
 import LanguageTextInput from "../inputs/LanguageTextInput";
@@ -15,8 +14,6 @@ interface NewsletterFormProps {
 
 const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
   const [form] = Form.useForm();
-  const router = useRouter();
-
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const [currentNewsletter, setCurrentNewsletter] =

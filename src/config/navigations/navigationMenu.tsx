@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import Link from "next/link";
 import { Menu, MenuProps } from "antd";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { useUser } from "@/hooks/useUser";
 import { UserAPI } from "@/models/UserModel";
@@ -18,11 +18,10 @@ import { DynamicIcon } from "./IconMapper";
 
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
-import { DEFAULT_LANG, type SupportedLanguage } from "@/i18n/languages";
+import { useHash } from "@/hooks/useHash";
 
-// -----------------------------
-// menu build helpers
-// -----------------------------
+import { hrefLang, stripLangPrefix } from "@/i18n/path";
+
 const buildMenu = (
   user: UserAPI | null,
   menuConfig: NavigationMenuItem[]
@@ -53,7 +52,6 @@ const buildMenu = (
 const flattenMenu = (menuData: NavigationMenuItem[]) =>
   menuData.flatMap((item) => [item, ...(item.children || [])]);
 
-// currentPathWithHash should be `${pathname}${hash}` (NO query)
 export const getSelectedKey = (
   user: UserAPI | null,
   currentPathWithHash: string,
@@ -62,13 +60,9 @@ export const getSelectedKey = (
   const menuData = buildMenu(user, isDashboard ? dashboardMenu : mainMenu);
   const flat = flattenMenu(menuData);
 
-  // 1) Exact match first (fixes "/#services", "/#about")
   const exact = flat.find((item) => item.link === currentPathWithHash)?.key;
   if (exact) return exact;
 
-  // 2) Prefix match for detail pages ("/newsletters/123" => "/newsletters")
-  //    - Avoid "/" matching everything
-  //    - Skip hash-links for prefix matching (only exact match for those)
   const prefixCandidates = flat
     .filter((item) => !!item.link)
     .filter((item) => item.link !== "/")
@@ -80,47 +74,6 @@ export const getSelectedKey = (
   )?.key;
 };
 
-// -----------------------------
-// hash tracking (history patch)
-// -----------------------------
-let historyPatched = false;
-const patchHistoryOnce = (onChange: () => void) => {
-  if (typeof window === "undefined") return () => {};
-  if (historyPatched) return () => {};
-  historyPatched = true;
-
-  const fire = () => onChange();
-
-  const origPush = window.history.pushState;
-  const origReplace = window.history.replaceState;
-
-  const wrap =
-    (fn: typeof window.history.pushState) =>
-    function (this: History, ...args: Parameters<typeof fn>) {
-      const ret = fn.apply(this, args as any);
-      fire();
-      return ret;
-    };
-
-  window.history.pushState = wrap(origPush);
-  window.history.replaceState = wrap(origReplace);
-
-  window.addEventListener("popstate", fire);
-  window.addEventListener("hashchange", fire);
-
-  return () => {
-    // restore (still safe even if multiple components mount/unmount over time)
-    window.history.pushState = origPush;
-    window.history.replaceState = origReplace;
-    window.removeEventListener("popstate", fire);
-    window.removeEventListener("hashchange", fire);
-    historyPatched = false;
-  };
-};
-
-// -----------------------------
-// component
-// -----------------------------
 interface AppMenuProps {
   menuMode?: MenuProps["mode"];
   isDashboard: boolean;
@@ -136,45 +89,19 @@ const AppMenu: React.FC<AppMenuProps> = ({
 }) => {
   const { user, logout } = useUser();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { language } = useLanguage();
+  const hash = useHash();
 
-  // Hash state that updates even when Next changes URL via history API
-  const [hash, setHash] = useState<string>("");
+  // IMPORTANT: menu config links are unprefixed; normalize current URL to match.
+  const currentForMenuMatch = useMemo(() => {
+    const base = isDashboard ? (pathname || "/") : stripLangPrefix(pathname || "/");
+    return `${base}${hash}`;
+  }, [pathname, hash, isDashboard]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const update = () => setHash(window.location.hash || "");
-    update();
-
-    const cleanup = patchHistoryOnce(update);
-    return cleanup;
-  }, []);
-
-  const currentPathWithHash = `${pathname}${hash}`; // "/#services"
-
-  // carry lang in links so menu clicks don’t drop it
-  const langToCarry = useMemo(() => {
-    const fromUrl = searchParams?.get("lang") || "";
-    if (fromUrl) return fromUrl as SupportedLanguage;
-    return (language !== DEFAULT_LANG ? language : "") as SupportedLanguage;
-  }, [searchParams, language]);
-
-  const withLang = useCallback(
-    (href: string) => {
-      if (!langToCarry || langToCarry === DEFAULT_LANG) return href;
-
-      const [pathPart, hashPart] = href.split("#");
-      const url = new URL(pathPart || "/", "http://local"); // safe parser
-
-      if (!url.searchParams.get("lang")) url.searchParams.set("lang", langToCarry);
-
-      const qs = url.searchParams.toString();
-      const out = `${url.pathname}${qs ? `?${qs}` : ""}`;
-      return hashPart !== undefined ? `${out}#${hashPart}` : out;
-    },
-    [langToCarry]
+  // Link builder: dashboard untouched; public menu prefixed.
+  const toHref = useCallback(
+    (href: string) => (isDashboard ? href : hrefLang(href, language)),
+    [isDashboard, language]
   );
 
   const menuConfig = isDashboard ? dashboardMenu : mainMenu;
@@ -189,9 +116,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
         key: menu.key,
         icon: menu.icon ? DynamicIcon({ name: menu.icon }) : null,
         label: menu.link ? (
-          <Link href={withLang(menu.link)}>
-            {renderLabel(menu)}
-          </Link>
+          <Link href={toHref(menu.link)}>{renderLabel(menu)}</Link>
         ) : (
           <span>{renderLabel(menu)}</span>
         ),
@@ -217,7 +142,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
         key: "login",
         icon: DynamicIcon({ name: "LogoutOutlined" }),
         label: (
-          <Link href={withLang("/login")}>
+          <Link href={toHref("/login")}>
             {t(language, "nav.actions.login", "Login")}
           </Link>
         ),
@@ -225,11 +150,11 @@ const AppMenu: React.FC<AppMenuProps> = ({
     }
 
     return base;
-  }, [navMenu, isMobile, user, logout, language, withLang]);
+  }, [navMenu, isMobile, user, logout, language, toHref]);
 
   const selectedKey = useMemo(
-    () => getSelectedKey(user, currentPathWithHash, isDashboard),
-    [user, currentPathWithHash, isDashboard]
+    () => getSelectedKey(user, currentForMenuMatch, isDashboard),
+    [user, currentForMenuMatch, isDashboard]
   );
 
   return (

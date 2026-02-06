@@ -168,7 +168,7 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         color: TXT,
         fontSize: FONT_SIZE,
         padding: isMobile ? PAD_MOB : PAD_DESK,
-        paddingRight: padRight, // dynamic, matches pill width
+        paddingRight: padRight,
         position: "relative",
         zIndex: 999,
         overflow: "hidden",
@@ -178,7 +178,6 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         paddingInlineEnd: "calc(env(safe-area-inset-right, 0px) + 0px)",
       }}
     >
-      {/* Right-aligned compact language switcher (flag-only) */}
       <div
         ref={pillRef}
         style={{
@@ -186,7 +185,7 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
           right: isMobile ? RIGHT_OFFSET_MOBILE : RIGHT_OFFSET_DESKTOP,
           top: "50%",
           transform: "translateY(-50%)",
-          pointerEvents: "none", // wrapper inert; only the pill is clickable
+          pointerEvents: "none", 
           zIndex: 2,
         }}
       >
@@ -195,7 +194,6 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         </div>
       </div>
 
-      {/* Marquee / ticker */}
       <div
         ref={viewportRef}
         style={{ width: "100%", overflow: "hidden", whiteSpace: "nowrap" }}

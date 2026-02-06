@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import apiClient from "@/utils/api/apiClient";
 import { message } from "antd";
-import { UploadedFile, FailedFile, PendingItem } from "@/contexts/FileContext";
+import { FailedFile, PendingItem } from "@/contexts/FileContext";
 import { shortenFileName } from "@/utils/filesUtil";
 import { FileDataAPI } from "@/models/FileModel";
 
@@ -50,7 +50,7 @@ export const useFileUpload = () => {
 
     let successCount = 0;
     let failCount = 0;
-    const total = pendingFiles.length;
+    // const total = pendingFiles.length;
 
     const totalSize = pendingFiles.reduce(
       (sum, { file }) => sum + file.size,

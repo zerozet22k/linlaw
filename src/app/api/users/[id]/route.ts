@@ -11,8 +11,8 @@ const userService = new UserService();
 const roleService = new RoleService();
 
 async function handleGetUserRequest(
-  request: Request,
-  currentUser: User,
+  _request: Request,
+  _currentUser: User,
   params: { id: string }
 ) {
   try {
@@ -103,7 +103,7 @@ async function handleUpdateUserRequest(
 }
 
 async function handleDeleteUserRequest(
-  request: Request,
+  _request: Request,
   currentUser: User,
   params: { id: string }
 ) {

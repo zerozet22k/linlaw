@@ -64,17 +64,17 @@ async function handleUpdateInquiryRequest(
   }
 }
 
-async function handleDeleteInquiryRequest(user: User, params: { id: string }) {
+async function handleDeleteInquiryRequest(_user: User, params: { id: string }) {
   try {
     const existingInquiry = await inquiryService.getInquiryById(params.id);
     if (!existingInquiry) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
 
-    const isOwner = existingInquiry.user_id.toString() === user._id.toString();
+    const isOwner = existingInquiry.user_id.toString() === _user._id.toString();
     if (
       !isOwner &&
-      !checkPermission(user, [APP_PERMISSIONS.DELETE_ANY_INQUIRY])
+      !checkPermission(_user, [APP_PERMISSIONS.DELETE_ANY_INQUIRY])
     ) {
       return NextResponse.json(
         { error: "Forbidden: You cannot delete this inquiry." },
@@ -83,8 +83,6 @@ async function handleDeleteInquiryRequest(user: User, params: { id: string }) {
     }
 
     await inquiryService.deleteInquiry(params.id);
-
-    // Trigger Pusher event for inquiry deletion
     const pusherService = PusherService.getInstance();
     await pusherService.trigger("inquiries", "deleted-inquiry", {
       inquiryId: params.id,
@@ -100,14 +98,12 @@ async function handleDeleteInquiryRequest(user: User, params: { id: string }) {
   }
 }
 
-async function handleCloseInquiryRequest(user: User, params: { id: string }) {
+async function handleCloseInquiryRequest(_user: User, params: { id: string }) {
   try {
     const closedInquiry = await inquiryService.closeInquiry(params.id);
     if (!closedInquiry) {
       return NextResponse.json({ error: "Inquiry not found" }, { status: 404 });
     }
-
-    // Trigger Pusher event for inquiry closure
     const pusherService = PusherService.getInstance();
     await pusherService.trigger("inquiries", "closed-inquiry", {
       inquiry: closedInquiry,
@@ -148,7 +144,7 @@ export const DELETE = async (
   context: { params: { id: string } }
 ) =>
   withAuthMiddleware(
-    (req, user) => handleDeleteInquiryRequest(user, context.params),
+    (_req, user) => handleDeleteInquiryRequest(user, context.params),
     true,
     [APP_PERMISSIONS.DELETE_OWN_INQUIRY, APP_PERMISSIONS.DELETE_ANY_INQUIRY],
     false
@@ -159,7 +155,7 @@ export const PATCH = async (
   context: { params: { id: string } }
 ) =>
   withAuthMiddleware(
-    (req, user) => handleCloseInquiryRequest(user, context.params),
+    (_req, user) => handleCloseInquiryRequest(user, context.params),
     true,
     [APP_PERMISSIONS.CLOSE_INQUIRY]
   )(request);

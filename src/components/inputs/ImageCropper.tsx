@@ -161,7 +161,7 @@ const ImageCropper = forwardRef(
             }}
           />
         </ReactCrop>
-      </div>
+      </div>  
     );
   }
 );

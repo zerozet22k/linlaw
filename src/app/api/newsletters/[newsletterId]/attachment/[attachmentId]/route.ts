@@ -10,7 +10,7 @@ export const PUT = async (
   { params }: { params: { newsletterId: string; attachmentId: string } }
 ) =>
   withAuthMiddleware(
-    async (req, user) => {
+    async (req, _user) => {
       try {
         const { newName } = await req.json();
         if (!newName) {
@@ -54,7 +54,7 @@ export const DELETE = async (
   { params }: { params: { newsletterId: string; attachmentId: string } }
 ) =>
   withAuthMiddleware(
-    async (req, user) => {
+    async (_req, _user) => {
       try {
         const updatedNewsletter = await newsletterService.deleteAttachment(
           params.newsletterId,

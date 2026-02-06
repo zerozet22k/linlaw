@@ -2,13 +2,9 @@
 
 import { FileType } from "@/models/FileModel";
 import {
-  VideoCameraOutlined,
-  FileZipOutlined,
-  AudioOutlined,
   CodeOutlined,
-  FileExcelOutlined,
-  FilePptOutlined,
   FileOutlined,
+  VideoCameraOutlined
 } from "@ant-design/icons";
 const FileThumbnail = ({ file }: { file: any }) => {
   const baseStyle = {

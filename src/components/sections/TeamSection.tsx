@@ -2,14 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { Spin, Alert, Typography } from "antd";
-import ImageComponent from "@/components/ui/ImageComponent";
+import Image from "next/image";
 import apiClient from "@/utils/api/apiClient";
 import CustomCarousel from "@/components/sections/CustomCarousel";
 import {
   TEAM_PAGE_SETTINGS_KEYS,
   TEAM_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
-import { UserAPI } from "@/models/UserModel";
 import { TeamBlockAPI } from "@/models/TeamBlock";
 
 const { Title, Text } = Typography;
@@ -17,6 +16,14 @@ const { Title, Text } = Typography;
 type TeamSectionProps = {
   teamSection: TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 };
+
+function normalizeImageSrc(src?: string | null) {
+  const s = (src ?? "").trim();
+  if (!s) return "/images/default-avatar.webp";
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  if (s.startsWith("/")) return s;
+  return `/${s}`;
+}
 
 const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
   const maxMembers = teamSection.maxMembersCount ?? 0;
@@ -28,9 +35,7 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
   useEffect(() => {
     (async () => {
       try {
-        const { data: apiBlocks } = await apiClient.get<TeamBlockAPI[]>(
-          "/team"
-        );
+        const { data: apiBlocks } = await apiClient.get<TeamBlockAPI[]>("/team");
 
         if (maxMembers > 0) {
           let remaining = maxMembers;
@@ -86,9 +91,8 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
         Meet Our Team
       </Title>
 
-      {blocks.map((block) => (
+      {blocks.map((block, blockIndex) => (
         <div key={block.teamName} style={{ marginBottom: 64 }}>
-          {/* Team name sub‑heading */}
           <Title
             level={3}
             style={{ textAlign: "center", color: "#fff", marginBottom: 24 }}
@@ -98,53 +102,63 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
 
           <div style={{ margin: "0 auto", maxWidth: 1200 }}>
             <CustomCarousel autoplay slidesToShow={3} dots infinite>
-              {block.members.map((m) => (
-                <div
-                  key={m._id}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    textAlign: "center",
-                    padding: 20,
-                    height: 300,
-                  }}
-                >
-                  <ImageComponent
-                    src={m.avatar || "/images/default-avatar.webp"}
-                    alt={m.name || m.username}
-                    width={120}
-                    height={120}
-                    objectFit="cover"
+              {block.members.map((m, memberIndex) => {
+                const avatarSrc = normalizeImageSrc(m.avatar);
+                const altText = m.name || m.username || "Team member";
+                const shouldPriority = blockIndex === 0 && memberIndex < 3; // only first few
+
+                return (
+                  <div
+                    key={m._id}
                     style={{
-                      borderRadius: "50%",
-                      border: "4px solid #1890ff",
-                      marginBottom: 10,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      textAlign: "center",
+                      padding: 20,
+                      height: 300,
                     }}
-                    priority
-                  />
-
-                  <Title
-                    level={4}
-                    style={{ color: "#fff", margin: "10px 0 5px" }}
                   >
-                    {m.name || m.username}
-                  </Title>
-
-                  {/* Still show their position */}
-                  {m.position && (
-                    <Text
-                      style={{ color: "#ccc", fontSize: 12, marginBottom: 8 }}
+                    <div
+                      style={{
+                        width: 120,
+                        height: 120,
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        border: "4px solid #1890ff",
+                        marginBottom: 10,
+                        position: "relative",
+                      }}
                     >
-                      {m.position}
-                    </Text>
-                  )}
+                      <Image
+                        src={avatarSrc}
+                        alt={altText}
+                        fill
+                        sizes="120px"
+                        style={{ objectFit: "cover" }}
+                        priority={shouldPriority}
+                      />
+                    </div>
 
-                  <Text style={{ color: "#fff", fontSize: 14 }}>
-                    {m.bio || "No bio available."}
-                  </Text>
-                </div>
-              ))}
+                    <Title
+                      level={4}
+                      style={{ color: "#fff", margin: "10px 0 5px" }}
+                    >
+                      {m.name || m.username}
+                    </Title>
+
+                    {m.position && (
+                      <Text style={{ color: "#ccc", fontSize: 12, marginBottom: 8 }}>
+                        {m.position}
+                      </Text>
+                    )}
+
+                    <Text style={{ color: "#fff", fontSize: 14 }}>
+                      {m.bio || "No bio available."}
+                    </Text>
+                  </div>
+                );
+              })}
             </CustomCarousel>
           </div>
         </div>

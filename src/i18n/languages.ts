@@ -11,15 +11,16 @@ import { my } from "./locales/my/index";
 
 export const langs = { en, fr, de, es, zh, ja, ko, th, ms, my } as const;
 
-/** Canonical language union */
 export type SupportedLanguage = keyof typeof langs;
 
 export const DEFAULT_LANG: SupportedLanguage = "en";
 export const SUPPORTED_LANGS = Object.keys(langs) as SupportedLanguage[];
 
-export const isSupportedLanguage = (x: string): x is SupportedLanguage => x in langs;
+export const isSupportedLanguageLocal = (x: string): x is SupportedLanguage =>
+  Object.prototype.hasOwnProperty.call(langs, x);
 
-// compile-time shape check
+
+
 const _localeShapeCheck = langs satisfies Record<SupportedLanguage, BaseLocale>;
 void _localeShapeCheck;
 

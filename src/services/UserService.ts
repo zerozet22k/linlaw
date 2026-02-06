@@ -62,15 +62,12 @@ class UserService {
     const { maxMembersCount, teamGroups = [] } = sections;
     const result: TeamBlock[] = [];
 
-    // 1️⃣ build each team block
     for (const group of teamGroups) {
       if (!group.members.length) continue;
 
-      // preserve picker order
       const ids = group.members.map(toObjectId);
       const users = await userRepository.findByIdsPreserveOrder(ids);
 
-      // 2️⃣ optional intra‑team sort
       if (group.intraSort === "createdAsc") {
         users.sort((a, b) => +a.created_at - +b.created_at);
       } else if (group.intraSort === "createdDesc") {
@@ -202,11 +199,6 @@ class UserService {
         )
       );
     }
-
-    await Promise.all(updates).then((results) => {
-      const validRoles = results.filter((role) => role !== null);
-    });
-
     await cacheRepository.set("lastRoleSyncTime", Date.now(), ONE_HOUR);
   }
 

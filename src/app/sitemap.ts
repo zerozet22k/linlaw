@@ -1,13 +1,7 @@
+// src/app/sitemap.ts
 import type { MetadataRoute } from "next";
-import {
-  getPublicSettings,
-  getSiteUrl,
-} from "@/utils/server/publicSiteSettings";
+import { getPublicSettings, getSiteUrl } from "@/utils/server/publicSiteSettings";
 import { ROUTES } from "@/config/navigations/routes";
-
-// ✅ cache sitemap output (pick your interval)
-export const revalidate = 60 * 60; // 1 hour
-// export const dynamic = "force-dynamic";
 
 import UserService from "@/services/UserService";
 import PageService from "@/services/PageService";
@@ -19,6 +13,13 @@ import {
   TEAM_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 import { TeamBlock } from "@/models/TeamBlock";
+
+import type { SettingsInterface } from "@/config/CMS/settings/settingKeys";
+import { langsFromSettings } from "@/middlewares/langMiddleware";
+import { DEFAULT_LANG, type SupportedLanguage } from "@/i18n/languages";
+
+// cache sitemap output
+export const revalidate = 60 * 60; // 1 hour
 
 const UNIQUE = <T,>(arr: T[]) => Array.from(new Set(arr));
 
@@ -50,12 +51,19 @@ const toDateOr = (v: unknown, fallback: Date): Date => {
   return Number.isNaN(d.getTime()) ? fallback : d;
 };
 
+const pfx = (lang: SupportedLanguage, path: string) => {
+  const p = (path || "/").startsWith("/") ? path : `/${path}`;
+  return p === "/" ? `/${lang}` : `/${lang}${p}`;
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const settings = await getPublicSettings();
+  const settings = (await getPublicSettings()) as Partial<SettingsInterface>;
   const base = getSiteUrl(settings).replace(/\/$/, "");
   const now = new Date();
 
-  // 1) static routes
+  const enabled = langsFromSettings(settings);
+  const langs = enabled.length ? enabled : ([DEFAULT_LANG] as SupportedLanguage[]);
+
   const staticPaths = UNIQUE(
     Object.values(ROUTES)
       .map((r) => r.path)
@@ -63,12 +71,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((p) => !NOINDEX_PATHS.has(p))
   );
 
-  const staticEntries: MetadataRoute.Sitemap = staticPaths.map((p) => ({
-    url: `${base}${p === "/" ? "/" : p}`,
-    lastModified: now,
-  }));
+  const staticEntries: MetadataRoute.Sitemap = langs.flatMap((lang) =>
+    staticPaths.map((p) => ({
+      url: `${base}${pfx(lang, p)}`,
+      lastModified: now,
+    }))
+  );
 
-  // 2) dynamic routes built without HTTP
   const userService = new UserService();
   const pageService = new PageService();
   const newsletterService = new NewsletterService();
@@ -85,17 +94,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         if (!sections) return [];
 
-        const blocks: TeamBlock[] = await userService.getTeamMembersOrdered(
-          sections
-        );
+        const blocks: TeamBlock[] = await userService.getTeamMembersOrdered(sections);
 
         const lastModById = new Map<string, Date>();
 
         for (const blk of blocks ?? []) {
-          const members = Array.isArray((blk as any)?.members)
-            ? (blk as any).members
-            : [];
-
+          const members = Array.isArray((blk as any)?.members) ? (blk as any).members : [];
           for (const m of members) {
             const id = String(m?._id || "").trim();
             if (!id) continue;
@@ -106,10 +110,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           }
         }
 
-        return Array.from(lastModById.entries()).map(([id, lastModified]) => ({
-          url: `${base}/team-members/${encodeURIComponent(id)}`,
-          lastModified,
-        }));
+        const ids = Array.from(lastModById.entries());
+        return langs.flatMap((lang) =>
+          ids.map(([id, lastModified]) => ({
+            url: `${base}${pfx(lang, `/team-members/${encodeURIComponent(id)}`)}`,
+            lastModified,
+          }))
+        );
       })(),
 
       (async (): Promise<MetadataRoute.Sitemap> => {
@@ -127,10 +134,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             const id = String(n?._id || "").trim();
             if (!id) continue;
 
-            out.push({
-              url: `${base}/newsletters/${encodeURIComponent(id)}`,
-              lastModified: toDateOr(n?.updatedAt ?? n?.createdAt, now),
-            });
+            const lastModified = toDateOr(n?.updatedAt ?? n?.createdAt, now);
+            for (const lang of langs) {
+              out.push({
+                url: `${base}${pfx(lang, `/newsletters/${encodeURIComponent(id)}`)}`,
+                lastModified,
+              });
+            }
           }
 
           if (!hasMore || list.length === 0) break;
@@ -147,16 +157,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         let guard = 0;
 
         while (guard++ < 200) {
-          // includeInactive=true so pagination covers everything,
-          // then skip inactive when emitting URLs.
           const { businesses, hasMore } =
-            await relatedBusinessService.getAllBusinesses(
-              "",
-              page,
-              limit,
-              [],
-              true
-            );
+            await relatedBusinessService.getAllBusinesses("", page, limit, [], true);
 
           const list = Array.isArray(businesses) ? businesses : [];
           for (const b of list as any[]) {
@@ -165,10 +167,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             const slug = String(b?.slug || "").trim();
             if (!slug) continue;
 
-            out.push({
-              url: `${base}/related-businesses/${encodeURIComponent(slug)}`,
-              lastModified: toDateOr(b?.updatedAt ?? b?.createdAt, now),
-            });
+            const lastModified = toDateOr(b?.updatedAt ?? b?.createdAt, now);
+            for (const lang of langs) {
+              out.push({
+                url: `${base}${pfx(lang, `/related-businesses/${encodeURIComponent(slug)}`)}`,
+                lastModified,
+              });
+            }
           }
 
           if (!hasMore || list.length === 0) break;
@@ -179,17 +184,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })(),
     ]);
 
-  // 3) dedupe by URL and keep newest lastModified
   const byUrl = new Map<string, { url: string; lastModified: Date }>();
 
   const push = (items: MetadataRoute.Sitemap) => {
     for (const it of items) {
-      const lm = toDateOr((it as any)?.lastModified, now); // normalize to Date
+      const lm = toDateOr((it as any)?.lastModified, now);
       const prev = byUrl.get(it.url);
-
-      if (!prev || lm > prev.lastModified) {
-        byUrl.set(it.url, { url: it.url, lastModified: lm });
-      }
+      if (!prev || lm > prev.lastModified) byUrl.set(it.url, { url: it.url, lastModified: lm });
     }
   };
 

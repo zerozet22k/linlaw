@@ -1,6 +1,5 @@
 "use client";
 import React, { CSSProperties, useState, useEffect } from "react";
-import { theme } from "antd";
 import { v4 as uuidv4 } from "uuid";
 import CombinedField from "../CombinedField";
 import {
@@ -80,7 +79,7 @@ const ArrayFieldRenderer: React.FC<ArrayFieldRendererProps> = ({
             keyPrefix={`${uniqueKey}.${fieldKey}`}
             config={fieldConfig}
             values={item[fieldKey] || ""}
-            onChange={(childKey, childValue) => {
+            onChange={(_childKey, childValue) => {
               const updatedArray = [...arrayValue];
               updatedArray[index] = {
                 ...updatedArray[index],
@@ -99,7 +98,6 @@ const ArrayFieldRenderer: React.FC<ArrayFieldRendererProps> = ({
         childDesign={childDesign}
         key={uniqueKey}
         label={getItemTitle(index)}
-        item={item}
         index={index}
         renderItemContent={content}
         onRemove={handleRemoveArrayItem}

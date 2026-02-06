@@ -7,7 +7,7 @@ interface LoadingSpinProps {
   message?: string;
 }
 
-const LoadingSpin: FC<LoadingSpinProps> = ({ message = "" }) => {
+const LoadingSpin: FC<LoadingSpinProps> = ({ }) => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();

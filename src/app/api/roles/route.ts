@@ -10,7 +10,7 @@ import { getHighestRoleWithPermission } from "@/utils/roleUtils";
 
 const roleService = new RoleService();
 
-async function handleGetAllRolesRequest(user: any) {
+async function handleGetAllRolesRequest(_user: any) {
   try {
     const roles = (await roleService.getAllRoles()).roles;
     return NextResponse.json(roles);

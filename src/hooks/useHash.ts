@@ -3,29 +3,32 @@
 
 import { useEffect, useState } from "react";
 
-let patched = false;
+const EVENT = "locationchange";
 
 function patchHistoryOnce() {
   if (typeof window === "undefined") return;
-  if (patched) return;
-  patched = true;
 
-  const fire = () => window.dispatchEvent(new Event("locationchange"));
+  const w = window as unknown as { __hashHistoryPatched?: boolean };
+  if (w.__hashHistoryPatched) return;
+  w.__hashHistoryPatched = true;
+
+  const fireAsync = () => {
+    setTimeout(() => window.dispatchEvent(new Event(EVENT)), 0);
+  };
 
   const _pushState = history.pushState;
   history.pushState = function (...args) {
-    _pushState.apply(this, args);
-    fire();
+    const ret = _pushState.apply(this, args as any);
+    fireAsync();
+    return ret;
   };
 
   const _replaceState = history.replaceState;
   history.replaceState = function (...args) {
-    _replaceState.apply(this, args);
-    fire();
+    const ret = _replaceState.apply(this, args as any);
+    fireAsync();
+    return ret;
   };
-
-  window.addEventListener("popstate", fire);
-  window.addEventListener("hashchange", fire);
 }
 
 export function useHash() {
@@ -36,17 +39,23 @@ export function useHash() {
   useEffect(() => {
     patchHistoryOnce();
 
-    const update = () => setHash(window.location.hash || "");
+    const update = () => {
+      const next = window.location.hash || "";
+      setHash((prev) => (prev === next ? prev : next));
+    };
 
     update();
-    window.addEventListener("locationchange", update);
+
+    window.addEventListener(EVENT, update);
     window.addEventListener("hashchange", update);
+    window.addEventListener("popstate", update);
 
     return () => {
-      window.removeEventListener("locationchange", update);
+      window.removeEventListener(EVENT, update);
       window.removeEventListener("hashchange", update);
+      window.removeEventListener("popstate", update);
     };
   }, []);
 
-  return hash; // includes leading "#", or ""
+  return hash;
 }

@@ -15,6 +15,8 @@ import {
   DeleteOutlined,
   CopyOutlined,
 } from "@ant-design/icons";
+import Image from "next/image";
+
 import { useFile } from "@/hooks/useFile";
 import {
   defaultInputStyle,
@@ -22,7 +24,6 @@ import {
   previewImageStyle as defaultPreviewImageStyle,
 } from "../../InputStyle";
 import { FileType } from "@/models/FileModel";
-import Image from "next/image";
 
 const { Text } = Typography;
 
@@ -42,41 +43,14 @@ interface MediaSelectorProps {
 
   showField?: boolean;
   placeholder?: string;
-
-  /** Outer dashed preview box height (tile mode) */
   previewHeight?: number;
 
-  /** Outer wrapper style (dashed box) */
   previewContainerStyle?: CSSProperties;
-
-  /**
-   * Style applied to the media element (<img>/<video>).
-   * Use this for objectFit/objectPosition to simulate "cover" like hero.
-   */
   previewMediaStyle?: CSSProperties;
 
-  /**
-   * Controls INNER frame sizing (NOT the outer dashed box).
-   * - Use maxWidth/maxHeight to cap the frame
-   * - width/height are treated as aliases for maxWidth/maxHeight
-   */
   tileFrameStyle?: CSSProperties;
-
-  /**
-   * Force an inner-frame aspect ratio (e.g. 16/9, "16/9", 1.777...).
-   * Useful to preview 1920x1080 behavior (16:9), or a hero container ratio.
-   */
   tileFrameAspectRatio?: number | `${number}/${number}` | string;
-
-  /**
-   * Visual chrome for the inner frame.
-   * - "none": no border/shadow (your request)
-   * - "border": subtle border only
-   * - "card": border + shadow
-   */
   tileFrameAppearance?: TileFrameAppearance;
-
-  /** Inner frame corner radius (defaults to 10) */
   tileFrameRadius?: number;
 
   disabled?: boolean;
@@ -98,14 +72,12 @@ const parseAspectRatio = (v: MediaSelectorProps["tileFrameAspectRatio"]) => {
     const s = v.trim();
     if (!s) return undefined;
 
-    // "16/9"
     if (s.includes("/")) {
       const [a, b] = s.split("/").map((x) => Number(x.trim()));
       if (isFinite(a) && isFinite(b) && a > 0 && b > 0) return a / b;
       return undefined;
     }
 
-    // "1.7777"
     const n = Number(s);
     if (isFinite(n) && n > 0) return n;
   }
@@ -158,7 +130,6 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     if (disabled) return;
 
     setMediaOk(true);
-
     openModal(
       (selectedUrl) => {
         setMediaOk(true);
@@ -179,7 +150,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
     try {
       await navigator.clipboard.writeText(value);
     } catch {
-      // ignore
+      // Intentionally ignored
     }
   }, [value]);
 
@@ -198,16 +169,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
   const objectFit = (previewMediaStyle as any)?.objectFit ?? "contain";
   const objectPosition = (previewMediaStyle as any)?.objectPosition ?? "center";
 
-  // inner frame constraints
   const frameMaxWRaw = tileFrameStyle?.maxWidth ?? tileFrameStyle?.width;
   const frameMaxHRaw = tileFrameStyle?.maxHeight ?? tileFrameStyle?.height;
 
   const ratio = parseAspectRatio(tileFrameAspectRatio);
-
-  // available area inside outer box (height known, width unknown -> treat as infinite)
   const areaMaxH = Math.max(0, previewHeight - tilePadding * 2);
 
-  // if numeric constraints + ratio, compute actual W/H to preserve ratio and fit height
   const frameWn = typeof frameMaxWRaw === "number" ? frameMaxWRaw : undefined;
   const frameHnFromProp =
     typeof frameMaxHRaw === "number" ? frameMaxHRaw : undefined;
@@ -220,7 +187,6 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
     if (!isFinite(maxH) && !isFinite(maxW)) return undefined;
 
-    // pick the largest size that fits BOTH maxW and maxH while keeping ratio
     const w = Math.min(maxW, maxH * ratio);
     const h = w / ratio;
 
@@ -228,24 +194,26 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
 
     return { w, h };
   }, [ratio, frameHnFromProp, frameWn, areaMaxH]);
+  
+  const mediaStyle = useMemo<CSSProperties>(() => {
+    const base: CSSProperties = {
+      ...defaultPreviewImageStyle,
+      ...previewMediaStyle,
+      display: "block",
+    };
 
-  const mediaStyle: CSSProperties = hasCustomSize
-    ? {
-        ...defaultPreviewImageStyle,
-        ...previewMediaStyle,
-        display: "block",
-      }
-    : {
-        ...defaultPreviewImageStyle,
-        ...previewMediaStyle,
-        display: "block",
-        width: "100%",
-        height: "100%",
-        objectFit: objectFit as any,
-        objectPosition: objectPosition as any,
-      };
+    if (hasCustomSize) return base;
 
-  const frameChromeStyle: CSSProperties = useMemo(() => {
+    return {
+      ...base,
+      width: "100%",
+      height: "100%",
+      objectFit: objectFit as any,
+      objectPosition: objectPosition as any,
+    };
+  }, [hasCustomSize, previewMediaStyle, objectFit, objectPosition]);
+
+  const frameChromeStyle = useMemo<CSSProperties>(() => {
     if (tileFrameAppearance === "border") {
       return { border: "1px solid rgba(0,0,0,0.10)" };
     }
@@ -255,31 +223,31 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
         boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
       };
     }
-    return {}; // "none"
+    return {};
   }, [tileFrameAppearance]);
 
-  /**
-   * For Next/Image we need a positioned box to `fill`.
-   * - If caller provided explicit width/height in previewMediaStyle, respect it.
-   * - Otherwise fall back to a reasonable thumbnail size (inline mode).
-   */
-  const inlineThumbBoxStyle: CSSProperties = useMemo(() => {
+  const mediaBorderRadius =
+    (previewMediaStyle as any)?.borderRadius ??
+    (defaultPreviewImageStyle as any)?.borderRadius ??
+    10;
+
+  const inlineThumbBoxStyle = useMemo<CSSProperties>(() => {
     const w = (previewMediaStyle as any)?.width ?? 120;
     const h = (previewMediaStyle as any)?.height ?? 80;
+
     return {
       position: "relative",
-      width: typeof w === "number" ? w : w,
-      height: typeof h === "number" ? h : h,
+      width: w,
+      height: h,
       overflow: "hidden",
-      borderRadius: (mediaStyle as any)?.borderRadius ?? 10,
+      borderRadius: mediaBorderRadius,
       flex: "0 0 auto",
     };
-  }, [previewMediaStyle, mediaStyle]);
+  }, [previewMediaStyle, mediaBorderRadius]);
 
   const previewBlock = (() => {
     if (!preview) return null;
 
-    // INLINE MODE
     if (previewMode === "inline") {
       return (
         <div
@@ -400,13 +368,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       );
     }
 
-    // TILE MODE
     const frameStyle: CSSProperties = {
       overflow: "hidden",
       borderRadius: tileFrameRadius,
       ...frameChromeStyle,
-
-      // sizing: preserve ratio if possible; otherwise use maxWidth/maxHeight caps
       ...(computedFrame
         ? {
             width: toCssSize(computedFrame.w),
@@ -425,8 +390,6 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                 : `min(100%, ${toCssSize(areaMaxH)})`,
             ...(ratio ? { aspectRatio: `${ratio}` } : {}),
           }),
-
-      // allow extra overrides (but keeps our computed sizing above working)
       ...(tileFrameStyle ?? {}),
     };
 
@@ -507,7 +470,6 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             </div>
           )}
 
-          {/* Action bar */}
           <div
             style={{
               position: "absolute",

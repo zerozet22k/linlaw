@@ -71,7 +71,7 @@ const JsonChildDesignRenderer: React.FC<JsonChildDesignRendererProps> = ({
             keyPrefix={`${itemKey}`}
             config={config}
             values={values}
-            onChange={(childKey, childValue) =>
+            onChange={(_childKey, childValue) =>
               handleFieldChange(itemKey, childValue)
             }
             zIndex={zIndex + 1}
@@ -94,7 +94,7 @@ const JsonChildDesignRenderer: React.FC<JsonChildDesignRendererProps> = ({
         keyPrefix={`${itemKey}`}
         config={config}
         values={values}
-        onChange={(childKey, childValue) =>
+        onChange={(_childKey, childValue) =>
           handleFieldChange(itemKey, childValue)
         }
         zIndex={zIndex + 1}

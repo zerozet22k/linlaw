@@ -11,7 +11,6 @@ import ArrayChildNoneDesign from "./ArrayChildDesigns/ArrayChildNoneDesign";
 type ArrayChildDesignRendererProps = {
   childDesign?: ChildArrayDesign;
   label: string;
-  item: any;
   index: number;
   renderItemContent: React.ReactNode;
   onRemove: (index: number) => void;
@@ -26,7 +25,6 @@ type ArrayChildDesignRendererProps = {
 const ArrayChildDesignRenderer: React.FC<ArrayChildDesignRendererProps> = ({
   childDesign = ChildArrayDesign.LIST,
   label,
-  item,
   index,
   renderItemContent,
   onRemove,

@@ -7,8 +7,8 @@ const newsletterService = new NewsletterService();
 
 async function handleGenerateSignedUrl(
   request: Request,
-  { params }: { params: { newsletterId: string } },
-  user: any
+  { }: { params: { newsletterId: string } },
+  _user: any
 ) {
   try {
     const { fileName, contentType } = await request.json();

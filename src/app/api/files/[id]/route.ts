@@ -5,7 +5,7 @@ import { APP_PERMISSIONS } from "@/config/permissions";
 
 const fileService = new FileService();
 
-async function handleGetFileRequest(request: Request, fileId: string) {
+async function handleGetFileRequest(_request: Request, fileId: string) {
   try {
     const file = await fileService.getFileById(fileId);
     if (!file)

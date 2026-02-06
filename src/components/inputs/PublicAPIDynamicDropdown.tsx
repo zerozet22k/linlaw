@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Select, Spin } from "antd";
 import { debounce } from "lodash";
 import apiClient from "@/utils/api/apiClient";
@@ -25,14 +25,25 @@ const PublicAPIDynamicDropdown = <T extends Record<string, any>>({
   onChange,
 }: Props<T>) => {
   const [data, setData] = useState<T[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [search, setSearch] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  
+  const hasMoreRef = useRef(hasMore);
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+
+  
+  const requestIdRef = useRef(0);
 
   const fetchData = useCallback(
     async (searchQuery = "", currentPage = 1) => {
-      if (!hasMore && currentPage !== 1) return;
+      if (currentPage !== 1 && !hasMoreRef.current) return;
+
+      const reqId = ++requestIdRef.current;
 
       setLoading(true);
       try {
@@ -44,31 +55,53 @@ const PublicAPIDynamicDropdown = <T extends Record<string, any>>({
           selected,
         });
 
-        setData((prev) =>
-          currentPage === 1
-            ? response.data.items
-            : [...prev, ...response.data.items]
-        );
+        
+        if (reqId !== requestIdRef.current) return;
 
-        setHasMore(response.data.hasMore);
+        const items: T[] = response.data.items ?? [];
+        const nextHasMore: boolean = !!response.data.hasMore;
+
+        setData((prev) => (currentPage === 1 ? items : [...prev, ...items]));
+        setHasMore(nextHasMore);
       } catch (error) {
         console.error(`Error fetching ${type}:`, error);
       } finally {
-        setLoading(false);
+        
+        if (reqId === requestIdRef.current) setLoading(false);
       }
     },
-    [type, hasMore, selected]
+    [type, selected]
   );
 
-  const handleSearch = debounce((value: string) => {
-    setSearch(value);
-    setPage(1);
-    fetchData(value, 1);
-  }, 500);
+  
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((v: string) => {
+        setData([]);
+        setHasMore(true);
+        setPage(1);
+        setSearch(v);
+      }, 500),
+    []
+  );
 
   useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  
+  useEffect(() => {
     fetchData(search, page);
-  }, [page]);
+  }, [fetchData, search, page]);
+
+  
+  useEffect(() => {
+    setData([]);
+    setHasMore(true);
+    setPage(1);
+  }, [type, selected]);
 
   return (
     <Select
@@ -76,21 +109,20 @@ const PublicAPIDynamicDropdown = <T extends Record<string, any>>({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      optionFilterProp="children"
       disabled={disabled}
       notFoundContent={loading ? <Spin size="small" /> : "No options found"}
       filterOption={false}
-      onSearch={handleSearch}
+      onSearch={debouncedSearch}
       style={{ width: "100%" }}
     >
-      {data.map((item) => (
-        <Select.Option
-          key={item[valueKey] as string}
-          value={item[valueKey] as string}
-        >
-          {item[labelKey] as string}
-        </Select.Option>
-      ))}
+      {data.map((item) => {
+        const optionValue = String(item[valueKey]);
+        return (
+          <Select.Option key={optionValue} value={optionValue}>
+            {String(item[labelKey])}
+          </Select.Option>
+        );
+      })}
     </Select>
   );
 };

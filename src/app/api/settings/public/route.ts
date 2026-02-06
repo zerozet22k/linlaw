@@ -3,7 +3,7 @@ import SettingService from "@/services/SettingService";
 
 const settingService = new SettingService();
 
-async function handleGetAllPublicSettingsRequest(request: Request) {
+async function handleGetAllPublicSettingsRequest(_request: Request) {
   try {
     const settings = await settingService.getPublicSettings();
 
