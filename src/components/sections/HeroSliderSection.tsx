@@ -46,38 +46,43 @@ interface HeroSliderProps {
     tablet?: string;
     mobile?: string;
   };
-  aspectRatio?: number;
 }
 
-const clean = (s: string) => (s || "").replace(/\s+/g, " ").trim();
+type Viewport = "mobile" | "tablet" | "desktop";
+
+const clean = (s: unknown) => String(s ?? "").replace(/\s+/g, " ").trim();
 const tt = (lang: string, v: any, fallback = "") => clean(t(lang, v, fallback));
 
 const pick = (...candidates: Array<string | undefined>) =>
   candidates.find(Boolean) ?? "";
 
+function getViewportFromWidth(w: number): Viewport {
+  if (w >= 1024) return "desktop";
+  if (w >= 768) return "tablet";
+  return "mobile";
+}
+
 export default function HeroSliderSection({
   slides,
   delay,
   sizes,
-  aspectRatio = 16 / 9,
 }: HeroSliderProps) {
   const { language } = useLanguage();
 
-  // ✅ MOBILE DETECTION: disable aspect-ratio on mobile so image can fill full slide height
-  const [isMobile, setIsMobile] = useState(false);
+  const [vp, setVp] = useState<Viewport>("desktop");
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const update = () => setIsMobile(mq.matches);
+    const update = () => {
+      setVp(getViewportFromWidth(window.innerWidth));
+    };
 
     update();
-
-    if (mq.addEventListener) mq.addEventListener("change", update);
-    else mq.addListener(update);
+    window.addEventListener("resize", update, { passive: true });
+    window.addEventListener("orientationchange", update);
 
     return () => {
-      if (mq.removeEventListener) mq.removeEventListener("change", update);
-      else mq.removeListener(update);
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
     };
   }, []);
 
@@ -96,31 +101,35 @@ export default function HeroSliderSection({
     [language]
   );
 
-  const normalized = useMemo(() => {
-    return (slides ?? []).map((slide, index) => {
-      const src = pick(slide.images.desktop, slide.images.tablet, slide.images.mobile);
+  const usableSlides = useMemo(() => {
+    const pickSrc = (img: Slide["images"]) => {
+      if (vp === "desktop") return pick(img.desktop, img.tablet, img.mobile);
+      if (vp === "tablet") return pick(img.tablet, img.desktop, img.mobile);
+      return pick(img.mobile, img.tablet, img.desktop);
+    };
 
-      const headerText = tt(language, slide.header, "");
-      const descText = slide.description ? tt(language, slide.description, "") : "";
+    return (slides ?? [])
+      .map((slide, index) => {
+        const src = pickSrc(slide.images);
 
-      const altText =
-        clean(String(slide.alt ?? "")) ||
-        headerText ||
-        tt(language, "common.slideAltFallback", `Slide ${index + 1}`);
+        const headerText = tt(language, slide.header, "");
+        const descText = slide.description ? tt(language, slide.description, "") : "";
+        const altText = clean(slide.alt) || headerText || `Slide ${index + 1}`;
 
-      return {
-        key: `${src || "slide"}:${index}`,
-        src,
-        headerText,
-        descText,
-        altText,
-        textAlign: slide.textAlign,
-        isFirst: index === 0,
-      };
-    });
-  }, [slides, language]);
+        return {
+          key: `${src || "slide"}:${index}`,
+          src,
+          headerText,
+          descText,
+          altText,
+          textAlign: slide.textAlign,
+          isFirst: index === 0,
+        };
+      })
+      .filter((s) => !!s.src);
+  }, [slides, language, vp]);
 
-  if (!normalized.length) return null;
+  if (!usableSlides.length) return null;
 
   return (
     <section className="heroSlider no-select" aria-label={ariaLabel}>
@@ -139,39 +148,44 @@ export default function HeroSliderSection({
         navigation
         pagination={{ clickable: true }}
         keyboard={{ enabled: true }}
-        a11y={{ enabled: true }}
+        a11y={{
+          enabled: true,
+          prevSlideMessage: tt(language, "common.prevSlide", "Previous slide"),
+          nextSlideMessage: tt(language, "common.nextSlide", "Next slide"),
+          paginationBulletMessage: tt(
+            language,
+            "common.goToSlide",
+            "Go to slide {{index}}"
+          ),
+        }}
         modules={[EffectFade, Navigation, Pagination, Autoplay, A11y, Keyboard]}
       >
-        {normalized.map((s) => {
-          if (!s.src) return null;
+        {usableSlides.map((s) => (
+          <SwiperSlide key={s.key}>
+            <div className="heroSlide">
+              {/* ✅ media ALWAYS fills slide height */}
+              <div className="heroMedia" aria-hidden="true">
+                <Image
+                  src={s.src}
+                  alt={s.altText}
+                  fill
+                  priority={s.isFirst}
+                  sizes={sizesAttr}
+                  quality={70}
+                  style={{ objectFit: "cover" }}
+                />
+                <div className="heroOverlay" aria-hidden="true" />
+              </div>
 
-          return (
-            <SwiperSlide key={s.key}>
-              <div className="heroSlide">
-                {/* ✅ apply aspectRatio only on non-mobile */}
-                <div className="heroMedia" style={isMobile ? undefined : { aspectRatio }}>
-                  <Image
-                    src={s.src}
-                    alt={s.altText}
-                    fill
-                    priority={s.isFirst}
-                    sizes={sizesAttr}
-                    quality={70}
-                    style={{ objectFit: "cover" }}
-                  />
-                  <div className="heroOverlay" />
-                </div>
-
-                <div className={`heroContent ${s.textAlign}`}>
-                  <div className="heroContentInner">
-                    <h2 className="heroTitle">{s.headerText}</h2>
-                    {!!s.descText && <p className="heroDesc">{s.descText}</p>}
-                  </div>
+              <div className={`heroContent ${s.textAlign}`}>
+                <div className="heroContentInner">
+                  <h2 className="heroTitle">{s.headerText}</h2>
+                  {!!s.descText && <p className="heroDesc">{s.descText}</p>}
                 </div>
               </div>
-            </SwiperSlide>
-          );
-        })}
+            </div>
+          </SwiperSlide>
+        ))}
       </Swiper>
     </section>
   );
