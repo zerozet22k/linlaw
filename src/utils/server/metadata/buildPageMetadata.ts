@@ -1,4 +1,4 @@
-// src/utils/server/metadata/buildPageMetadata.ts
+
 import type { Metadata } from "next";
 import { cache } from "react";
 
@@ -23,17 +23,17 @@ type SharedPageContentLike = { title?: any; description?: any };
 
 type OpenGraphType =
   Extract<NonNullable<Metadata["openGraph"]>, { type?: any }> extends never
-    ? string
-    : Extract<NonNullable<Metadata["openGraph"]>, { type?: any }>["type"];
+  ? string
+  : Extract<NonNullable<Metadata["openGraph"]>, { type?: any }>["type"];
 
 export type LangParams = { lang?: string };
 
 export type BuildPageMetadataOpts = {
-  path: string; 
+  path: string;
   fallbackTitle?: string;
   pageContent?: SharedPageContentLike;
 
-  lang?: SupportedLanguage; 
+  lang?: SupportedLanguage;
   preferFallbackTitle?: boolean;
 
   title?: string;
@@ -95,7 +95,7 @@ function prefixPath(path: string, lang: SupportedLanguage) {
   const p = cleanPath(path);
   const l = String(lang || DEFAULT_LANG).trim();
 
-  // your system uses /en even for default, so ALWAYS prefix
+
   if (p === "/") return `/${l}`;
   return `/${l}${p}`;
 }
@@ -116,7 +116,7 @@ export async function buildPageMetadata(opts: BuildPageMetadataOpts): Promise<Me
   const fallbackTitle =
     opts.fallbackTitle ?? getFallbackTitleFromRoutes(path, lang, "Page");
 
-  // canonical is PREFIXED path
+
   const canonicalPath = prefixPath(path, lang);
   const canonical = `${siteUrl}${canonicalPath === "/" ? "/" : canonicalPath}`;
 
@@ -130,9 +130,9 @@ export async function buildPageMetadata(opts: BuildPageMetadataOpts): Promise<Me
 
   const descText = String(
     opts.description ??
-      getTranslatedText(opts.pageContent?.description, lang) ??
-      getTranslatedText(opts.pageContent?.description, "en") ??
-      (globalDesc ? String(globalDesc).trim() : "")
+    getTranslatedText(opts.pageContent?.description, lang) ??
+    getTranslatedText(opts.pageContent?.description, "en") ??
+    (globalDesc ? String(globalDesc).trim() : "")
   ).trim();
 
   const ogRaw = opts.ogImageRaw ?? globalOgRaw;
@@ -142,26 +142,31 @@ export async function buildPageMetadata(opts: BuildPageMetadataOpts): Promise<Me
 
   const pageTitle: Metadata["title"] = path === "/" ? { absolute: titleText } : titleText;
 
-  // alternates.languages -> /{lang}{path}
+
   const supported =
-    Array.isArray((settings as any)?.[/* your real key */ "supportedLanguages"])
+    Array.isArray((settings as any)?.["supportedLanguages"])
       ? ((settings as any).supportedLanguages as string[])
       : null;
 
   const supportedLangs =
     supported?.map((x) => String(x).trim()).filter(Boolean).filter(isSupportedLanguageLocal) as
-      | SupportedLanguage[]
-      | undefined;
+    | SupportedLanguage[]
+    | undefined;
 
   const languages =
     supportedLangs && supportedLangs.length
       ? Object.fromEntries(
-          supportedLangs.map((l) => [
-            l,
-            `${siteUrl}${prefixPath(path, l)}`,
-          ])
-        )
+        supportedLangs.map((l) => [
+          l,
+          `${siteUrl}${prefixPath(path, l)}`,
+        ])
+      )
       : undefined;
+  if (typeof window === 'undefined') {
+    console.log("This code is running on the server side.");
+  } else {
+    console.log("This code is running on the client side (in the browser).");
+  }
 
   return {
     title: pageTitle,
@@ -197,5 +202,6 @@ export async function buildPageMetadataFromRequest(
   opts: BuildPageMetadataFromRequestOpts
 ): Promise<Metadata> {
   const lang = langFromParams(opts.params);
+
   return buildPageMetadata({ ...opts, lang });
 }

@@ -94,7 +94,7 @@ const OverlayBar: React.FC<Props> = ({ businessInfo }) => {
         link: `tel:${businessInfo.phoneNumber.trim()}`,
       });
     }
-
+    
     if (businessInfo.email) {
       arr.push({
         id: "mail",

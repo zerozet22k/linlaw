@@ -73,10 +73,11 @@ export function middleware(req: NextRequest) {
   if (!seg) {
     const u = url.clone();
     u.pathname = ensureLangPrefix(pathname, lang);
-    const res = NextResponse.rewrite(u, { request: { headers: h } });
+    const res = NextResponse.redirect(u, 308);
     cookieWriteIfChanged(req, res, lang);
     return res;
   }
+
   const res = NextResponse.next({ request: { headers: h } });
   cookieWriteIfChanged(req, res, lang);
   return res;
