@@ -1,3 +1,4 @@
+// /auth/login
 import { NextRequest, NextResponse } from "next/server";
 import UserService from "@/services/UserService";
 
@@ -15,8 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await userService.getAuthUserByEmail(email);
-
-    if (!user || !(await userService.verifyPassword(password, user))) {
+    if (!user || !userService.verifyPassword(password, user)) {
       return NextResponse.json(
         { message: "Invalid email or password." },
         { status: 401 }
@@ -26,25 +26,18 @@ export async function POST(req: NextRequest) {
     const { token: accessToken, expirationTime: accessTokenExpiry } =
       userService.generateAccessToken(user.id);
 
-    const { token: refreshToken, expirationTime: refreshTokenExpiry } =
-      userService.generateRefreshToken(user.id);
+    const { token: refreshToken } = userService.generateRefreshToken(user.id);
 
     await userService.saveDeviceToken(user.id, deviceName, refreshToken);
 
     const safeUser = await userService.getUserByEmail(email);
 
-    const response = NextResponse.json(
-      {
-        user: safeUser,
-        accessToken,
-        accessTokenExpiry,
-        refreshToken,
-        refreshTokenExpiry,
-      },
+    const res = NextResponse.json(
+      { user: safeUser, accessToken, accessTokenExpiry },
       { status: 200 }
     );
 
-    response.cookies.set("accessToken", accessToken, {
+    res.cookies.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -52,7 +45,7 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    response.cookies.set("refreshToken", refreshToken, {
+    res.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -60,9 +53,9 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    return response;
-  } catch (error) {
-    console.error("Login error:", error);
+    return res;
+  } catch (err) {
+    console.error("Login error:", err);
     return NextResponse.json(
       { message: "Internal server error." },
       { status: 500 }

@@ -162,11 +162,6 @@ export async function buildPageMetadata(opts: BuildPageMetadataOpts): Promise<Me
         ])
       )
       : undefined;
-  if (typeof window === 'undefined') {
-    console.log("This code is running on the server side.");
-  } else {
-    console.log("This code is running on the client side (in the browser).");
-  }
 
   return {
     title: pageTitle,

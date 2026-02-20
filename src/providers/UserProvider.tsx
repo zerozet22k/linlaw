@@ -1,23 +1,44 @@
 "use client";
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useMemo,
-  ReactNode,
-} from "react";
+import React, { useState, useCallback, useEffect, useMemo, ReactNode } from "react";
 import useSWR from "swr";
 import { message } from "antd";
 import apiClient, { saveTokens, clearTokens } from "@/utils/api/apiClient";
 import UserContext from "@/contexts/UserContext";
 import { UserAPI } from "@/models/UserModel";
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserAPI | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [hasShownLogoutMessage, setHasShownLogoutMessage] = useState(false);
+
+  
+  const [tokenVersion, setTokenVersion] = useState(0);
+
+  
+  const [authBooted, setAuthBooted] = useState(false);
+
+  const getBrowserName = useCallback(() => {
+    const userAgent = navigator.userAgent || "Unknown Device";
+    let browserName = "Unknown Device";
+
+    if (
+      userAgent.includes("Chrome") &&
+      userAgent.includes("Safari") &&
+      !userAgent.includes("Edge") &&
+      !userAgent.includes("OPR")
+    ) browserName = "Chrome";
+    else if (userAgent.includes("Edg")) browserName = "Edge";
+    else if (userAgent.includes("OPR")) browserName = "Opera";
+    else if (userAgent.includes("Firefox")) browserName = "Firefox";
+    else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) browserName = "Safari";
+
+    localStorage.setItem("deviceName", browserName);
+    return browserName;
+  }, []);
+
+  useEffect(() => {
+    if (!localStorage.getItem("deviceName")) getBrowserName();
+  }, [getBrowserName]);
 
   const fetcher = useCallback(async (url: string) => {
     try {
@@ -31,69 +52,59 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  const { data, mutate, isValidating } = useSWR<UserAPI>(
-    () => (localStorage.getItem("accessToken") ? "/me" : null),
-    fetcher,
-    {
-      refreshInterval: 10000,
-      revalidateOnFocus: true,
-      shouldRetryOnError: false,
-    }
-  );
+  
+  useEffect(() => {
+    let cancelled = false;
 
+    (async () => {
+      try {
+        const hasAccessToken = !!localStorage.getItem("accessToken");
+        if (hasAccessToken) return;
+
+        let deviceName = localStorage.getItem("deviceName");
+        if (!deviceName) deviceName = getBrowserName();
+
+        const { data } = await apiClient.post("/auth/refresh", { deviceName });
+        
+        saveTokens(data.accessToken, data.accessTokenExpiry);
+
+        if (!cancelled) setTokenVersion((v) => v + 1);
+      } catch {
+        clearTokens();
+        if (!cancelled) setTokenVersion((v) => v + 1);
+      } finally {
+        if (!cancelled) setAuthBooted(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [getBrowserName]);
+
+  
+  const swrKey = useMemo(() => {
+    if (!authBooted) return null;
+    return localStorage.getItem("accessToken") ? ["/me", tokenVersion] : null;
+  }, [authBooted, tokenVersion]);
+
+  const { data, mutate, isValidating } = useSWR<UserAPI>(swrKey, ([url]) => fetcher(url), {
+    
+    refreshInterval: 0,
+    revalidateOnFocus: true,
+    shouldRetryOnError: false,
+    dedupingInterval: 5000,
+  });
+
+  
   useEffect(() => {
     setUser(data || null);
-    if (!isValidating) {
+
+    
+    if (authBooted && initialLoading && !isValidating) {
       setInitialLoading(false);
     }
-  }, [data, isValidating]);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      if (
-        !localStorage.getItem("accessToken") ||
-        !localStorage.getItem("refreshToken")
-      ) {
-        if (user) {
-          logout("Logged out due to session change.");
-        }
-      } else {
-        mutate();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [user, mutate]);
-
-  const getBrowserName = () => {
-    const userAgent = navigator.userAgent || "Unknown Device";
-    let browserName = "Unknown Device";
-    if (
-      userAgent.includes("Chrome") &&
-      userAgent.includes("Safari") &&
-      !userAgent.includes("Edge") &&
-      !userAgent.includes("OPR")
-    ) {
-      browserName = "Chrome";
-    } else if (userAgent.includes("Edg")) {
-      browserName = "Edge";
-    } else if (userAgent.includes("OPR")) {
-      browserName = "Opera";
-    } else if (userAgent.includes("Firefox")) {
-      browserName = "Firefox";
-    } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
-      browserName = "Safari";
-    }
-    localStorage.setItem("deviceName", browserName);
-    return browserName;
-  };
-
-  useEffect(() => {
-    if (!localStorage.getItem("deviceName")) {
-      getBrowserName();
-    }
-  }, []);
+  }, [data, isValidating, authBooted, initialLoading]);
 
   const handleError = useCallback((error: any, defaultMessage: string) => {
     console.error(error);
@@ -117,32 +128,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     async (email: string, password: string) => {
       try {
         let deviceName = localStorage.getItem("deviceName");
-        if (!deviceName) {
-          deviceName = getBrowserName();
-        }
-        const { data } = await apiClient.post("/auth/login", {
-          email,
-          password,
-          deviceName,
-        });
-        const {
-          user: apiUser,
-          accessToken,
-          refreshToken,
-          accessTokenExpiresIn,
-          refreshTokenExpiresIn,
-        } = data;
-        const accessTokenExpiry = Date.now() + accessTokenExpiresIn * 1000;
-        const refreshTokenExpiry = Date.now() + refreshTokenExpiresIn * 1000;
+        if (!deviceName) deviceName = getBrowserName();
 
-        saveTokens(
-          accessToken,
-          refreshToken,
-          accessTokenExpiry,
-          refreshTokenExpiry
-        );
-        setUser(apiUser);
+        const { data } = await apiClient.post("/auth/login", { email, password, deviceName });
+        saveTokens(data.accessToken, data.accessTokenExpiry);
+
         setHasShownLogoutMessage(false);
+        setAuthBooted(true);
+        setTokenVersion((v) => v + 1);
+
         await mutate();
         message.success("Login successful!");
       } catch (error) {
@@ -150,40 +144,22 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         throw error;
       }
     },
-    [mutate, handleError]
+    [mutate, handleError, getBrowserName]
   );
 
   const signUp = useCallback(
     async (username: string, email: string, password: string) => {
       try {
         let deviceName = localStorage.getItem("deviceName");
-        if (!deviceName) {
-          deviceName = getBrowserName();
-        }
-        const { data } = await apiClient.post("/auth/signup", {
-          username,
-          email,
-          password,
-          deviceName,
-        });
-        const {
-          user: apiUser,
-          accessToken,
-          refreshToken,
-          accessTokenExpiresIn,
-          refreshTokenExpiresIn,
-        } = data;
-        const accessTokenExpiry = Date.now() + accessTokenExpiresIn * 1000;
-        const refreshTokenExpiry = Date.now() + refreshTokenExpiresIn * 1000;
+        if (!deviceName) deviceName = getBrowserName();
 
-        saveTokens(
-          accessToken,
-          refreshToken,
-          accessTokenExpiry,
-          refreshTokenExpiry
-        );
-        setUser(apiUser);
+        const { data } = await apiClient.post("/auth/signup", { username, email, password, deviceName });
+        saveTokens(data.accessToken, data.accessTokenExpiry);
+
         setHasShownLogoutMessage(false);
+        setAuthBooted(true);
+        setTokenVersion((v) => v + 1);
+
         await mutate();
         message.success("Signup successful!");
       } catch (error) {
@@ -191,30 +167,29 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         throw error;
       }
     },
-    [mutate, handleError]
+    [mutate, handleError, getBrowserName]
   );
 
   const logout = useCallback(
     async (infoMessage?: string | React.SyntheticEvent) => {
-      const finalMessage =
-        typeof infoMessage === "string" ? infoMessage : "Logging out";
+      const finalMessage = typeof infoMessage === "string" ? infoMessage : "Logging out";
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
         const deviceName = localStorage.getItem("deviceName");
 
         if (!hasShownLogoutMessage) {
           message.info(finalMessage);
           setHasShownLogoutMessage(true);
         }
-        const logoutPromise =
-          refreshToken && deviceName
-            ? apiClient.post("/auth/logout", { refreshToken, deviceName })
-            : Promise.resolve();
+
+        const logoutPromise = deviceName ? apiClient.post("/auth/logout", { deviceName }) : Promise.resolve();
 
         clearTokens();
         setUser(null);
+        setTokenVersion((v) => v + 1);
+
         mutate(undefined, false);
         await logoutPromise;
+
         localStorage.removeItem("deviceName");
       } catch (error) {
         console.error("Unexpected error during logout:", error);
@@ -224,30 +199,34 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     [mutate, hasShownLogoutMessage]
   );
 
-  // We use only SWR's loading states.
-  const loading = initialLoading || isValidating;
+  
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setTokenVersion((v) => v + 1);
+      mutate();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [mutate]);
+
+  
+  const loading = initialLoading;
+  const refreshing = !initialLoading && isValidating;
 
   const value = useMemo(
     () => ({
       user,
       initialLoading,
       loading,
+      refreshing, 
       refreshUser,
       awaitRefreshUser,
       signIn,
       signUp,
       logout,
     }),
-    [
-      user,
-      initialLoading,
-      loading,
-      refreshUser,
-      awaitRefreshUser,
-      signIn,
-      signUp,
-      logout,
-    ]
+    [user, initialLoading, loading, refreshing, refreshUser, awaitRefreshUser, signIn, signUp, logout]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

@@ -13,8 +13,16 @@ class UserRepository {
   }
   async findAuthUserByEmail(email: string): Promise<User | null> {
     await dbConnect();
-    return this.userModel.findOne({ email }).populate("roles").exec();
+    return this.userModel.findOne({ email }).select("+hashedPassword +salt").populate("roles").exec();
   }
+  async findAuthUserById(id: Types.ObjectId): Promise<User | null> {
+    await dbConnect();
+    return this.userModel
+      .findById(id)
+      .populate("roles")
+      .exec();
+  }
+
   async findAll(
     searchQuery = "",
     page?: number,
@@ -44,7 +52,6 @@ class UserRepository {
     }
 
     const users = await query
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
 
@@ -63,7 +70,6 @@ class UserRepository {
     await dbConnect();
     return this.userModel
       .findById(id)
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
   }
@@ -71,7 +77,6 @@ class UserRepository {
     await dbConnect();
     return this.userModel
       .find({ _id: { $in: ids } })
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
   }
@@ -81,7 +86,6 @@ class UserRepository {
     await dbConnect();
     const users = await this.userModel
       .find({ _id: { $in: ids } })
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
 
@@ -97,7 +101,6 @@ class UserRepository {
 
     return this.userModel
       .find({ role_ids: { $in: [roleId] } })
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
   }
@@ -106,7 +109,6 @@ class UserRepository {
     await dbConnect();
     return this.userModel
       .findOne({ email })
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
   }
@@ -124,7 +126,6 @@ class UserRepository {
 
     return this.userModel
       .findByIdAndUpdate(id, updateData, { new: true })
-      .select("-hashedPassword -salt -tokens")
       .populate("roles")
       .exec();
   }
@@ -152,15 +153,13 @@ class UserRepository {
     await user.save();
   }
 
-  async findDeviceToken(
-    userId: Types.ObjectId,
-    token: string
-  ): Promise<boolean> {
+  async findDeviceToken(userId: Types.ObjectId, token: string): Promise<boolean> {
     await dbConnect();
-    const user = await this.userModel.findById(userId);
-    if (!user) return false;
-
-    return user.devices.some((device) => device.token === token);
+    const exists = await this.userModel.exists({
+      _id: userId,
+      "devices.token": token,
+    });
+    return !!exists;
   }
 
   async deleteDeviceToken(
@@ -198,7 +197,8 @@ class UserRepository {
       .findOne({
         $or: [{ role_ids: { $in: [role._id] } }, { email }],
       })
-      .select("-hashedPassword -salt -tokens")
+
+
       .populate("roles")
       .exec();
   }

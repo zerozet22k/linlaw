@@ -5,15 +5,19 @@ import { Layout, Drawer, Typography, theme } from "antd";
 import Link from "next/link";
 import Image from "next/image";
 import { useMediaQuery } from "react-responsive";
+
 import { useSettings } from "@/hooks/useSettings";
+import { useLanguage } from "@/hooks/useLanguage";
+import { DEFAULT_LANG } from "@/i18n/languages";
+
 import { GLOBAL_SETTINGS_KEYS } from "@/config/CMS/settings/keys/GLOBAL_SETTINGS_KEYS";
 import { SettingsInterface } from "@/config/CMS/settings/settingKeys";
+
 import UserAvatar from "../components/ui/UserAvatar";
 import AppMenu from "@/config/navigations/navigationMenu";
 
 const { Sider, Content, Header, Footer } = Layout;
 const { Text } = Typography;
-
 
 const NAV = {
   desktop: {
@@ -30,6 +34,9 @@ const NAV = {
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { settings } = useSettings();
+  const { language } = useLanguage();
+  const homeHref = `/${language || DEFAULT_LANG}`; 
+
   const [collapsed, setCollapsed] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -73,7 +80,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
           width={mobileDrawerWidth}
         >
           <div className="logo" style={{ display: "flex" }}>
-            <Link href="/" style={{ width: "100%" }}>
+            <Link href={homeHref} style={{ width: "100%" }}>
               <div style={{ position: "relative", width: "100%", height: NAV.mobile.logoHeight }}>
                 <Image
                   src={siteLogo}
@@ -119,7 +126,8 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
               padding: "4px",
             }}
           >
-            <Link href="/" style={{ width: "100%" }}>
+            {/* ✅ was href="/" */}
+            <Link href={homeHref} style={{ width: "100%" }}>
               <div
                 style={{
                   position: "relative",

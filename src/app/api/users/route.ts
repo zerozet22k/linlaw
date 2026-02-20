@@ -50,7 +50,6 @@ async function handleCreateUserRequest(request: Request, currentUser: User) {
           { status: 400 }
         );
       }
-      // Ensure every role to be bound is strictly lower than the highestEditableRole.
       for (const role of roles) {
         if (role.level >= highestEditableRole.level) {
           return NextResponse.json(
@@ -64,7 +63,7 @@ async function handleCreateUserRequest(request: Request, currentUser: User) {
       }
     }
 
-    const existingUser = await userService.getAuthUserByEmail(data.email);
+    const existingUser = await userService.getUserByEmail(data.email);
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists with this email" },

@@ -113,7 +113,6 @@ const CareersContent: React.FC<Props> = ({ data }) => {
 
   useEffect(() => {
     if (!open) return;
-    // Focus close button for keyboard users
     const id = window.setTimeout(() => closeBtnRef.current?.focus(), 0);
     return () => window.clearTimeout(id);
   }, [open]);

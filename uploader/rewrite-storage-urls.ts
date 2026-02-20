@@ -66,10 +66,6 @@ async function run() {
   // Safer: only scan the collections that actually contain URLs
   const targetCollections = ["pages", "relatedbusinesses", "settings", "files", "newsletters"];
 
-  console.log("FROM:", FROM);
-  console.log("TO:  ", TO);
-  console.log("Collections:", targetCollections.join(", "));
-
   for (const name of targetCollections) {
     // skip missing collections
     const exists = (await db.listCollections({ name }).toArray()).length > 0;
@@ -97,8 +93,6 @@ async function run() {
         updated++;
       }
     }
-
-    console.log(`${name}: scanned=${scanned} updated=${updated}`);
   }
 
   await mongoose.disconnect();

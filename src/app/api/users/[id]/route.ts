@@ -36,7 +36,7 @@ async function handleUpdateUserRequest(
   params: { id: string }
 ) {
   try {
-    // First, fetch the target user so we know what roles are already assigned.
+
     const targetUser = await userService.getUserById(params.id);
     if (!targetUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -44,10 +44,10 @@ async function handleUpdateUserRequest(
 
     const data = await request.json();
 
-    // Enforce binding restrictions if role_ids are provided.
+
     if (data.role_ids) {
-      // Instead of just checking for the BIND_ROLE permission, use a utility function
-      // to get the highest role of the current user that grants BIND_ROLE.
+
+
       const highestEditableRole = getHighestRoleWithPermission(
         currentUser,
         APP_PERMISSIONS.BIND_ROLE
@@ -66,12 +66,12 @@ async function handleUpdateUserRequest(
         );
       }
 
-      // Get the IDs of roles that were already assigned.
+
       const oldRoleIds = targetUser.roles.map((role: any) =>
         role._id.toString()
       );
 
-      // For every role in the new role_ids that is new, ensure its level is strictly lower than the highestEditableRole.level.
+
       for (const role of roles) {
         if (
           !oldRoleIds.includes(role._id.toString()) &&
@@ -112,14 +112,14 @@ async function handleDeleteUserRequest(
     if (!targetUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    // Prevent deletion if the target user has any system role.
+
     if (targetUser.roles.some((role: any) => role.type === RoleType.SYSTEM)) {
       return NextResponse.json(
         { error: "You cannot delete a user with a system role." },
         { status: 403 }
       );
     }
-    // Use the utility function to get the highest role that grants DELETE_USER permission.
+
     const highestDeletableRole = getHighestRoleWithPermission(
       currentUser,
       APP_PERMISSIONS.DELETE_USER
@@ -130,7 +130,7 @@ async function handleDeleteUserRequest(
         { status: 403 }
       );
     }
-    // Determine the target user's highest role level.
+
     const targetHighest = Math.max(
       ...targetUser.roles.map((r: any) => r.level)
     );

@@ -1,3 +1,4 @@
+// /auth/signup
 import { NextResponse } from "next/server";
 import UserService from "@/services/UserService";
 
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const existingUser = await userService.getAuthUserByEmail(email);
+    const existingUser = await userService.getUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists with this email." },
@@ -26,43 +27,37 @@ export async function POST(request: Request) {
 
     const { token: accessToken, expirationTime: accessTokenExpiry } =
       userService.generateAccessToken(newUser.id);
-    const { token: refreshToken, expirationTime: refreshTokenExpiry } =
-      userService.generateRefreshToken(newUser.id);
+
+    const { token: refreshToken } = userService.generateRefreshToken(newUser.id);
 
     await userService.saveDeviceToken(newUser.id, deviceName, refreshToken);
 
     const safeUser = await userService.getUserByEmail(email);
 
-    const response = NextResponse.json(
-      {
-        user: safeUser,
-        accessToken,
-        accessTokenExpiry,
-        refreshToken,
-        refreshTokenExpiry,
-      },
+    const res = NextResponse.json(
+      { user: safeUser, accessToken, accessTokenExpiry },
       { status: 201 }
     );
 
-    response.cookies.set("accessToken", accessToken, {
+    res.cookies.set("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: Math.floor(accessTokenExpiry / 1000),
+      maxAge: 60 * 60,
     });
 
-    response.cookies.set("refreshToken", refreshToken, {
+    res.cookies.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: Math.floor(refreshTokenExpiry / 1000),
+      maxAge: 60 * 60 * 24 * 30,
     });
 
-    return response;
-  } catch (error) {
-    console.error("Signup error:", error);
+    return res;
+  } catch (err) {
+    console.error("Signup error:", err);
     return NextResponse.json(
       { error: "Internal server error." },
       { status: 500 }

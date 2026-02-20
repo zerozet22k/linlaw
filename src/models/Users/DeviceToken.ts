@@ -15,6 +15,6 @@ export interface DeviceTokenAPI extends BaseDeviceToken {
 }
 export const deviceTokenSchema = new Schema({
   deviceName: { type: String, required: true },
-  token: { type: String, required: true },
+  token: { type: String, required: true, select: false },
   createdAt: { type: Date, default: Date.now },
 });

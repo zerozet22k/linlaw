@@ -7,6 +7,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { useSettings } from "@/hooks/useSettings";
+import { useLanguage } from "@/hooks/useLanguage"; // ✅
+import { DEFAULT_LANG } from "@/i18n/languages"; // ✅
+
 import {
   GLOBAL_SETTINGS_KEYS as G,
   GLOBAL_SETTINGS_TYPES,
@@ -32,6 +35,9 @@ interface Props {
 
 const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
   const { settings } = useSettings();
+  const { language } = useLanguage(); // ✅
+  const homeHref = `/${language || DEFAULT_LANG}`; // ✅
+
   const { showGoTop, scrollToTop, isMobile } = useLayout();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -72,10 +78,8 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
 
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      {/* thin black bar */}
       <OverlayBar businessInfo={b} />
 
-      {/* sticky header */}
       <Header
         style={{
           position: "sticky",
@@ -90,7 +94,8 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
           transition: "background 0.3s ease",
         }}
       >
-        <Link href="/" style={{ display: "flex", alignItems: "center", height: 80 }}>
+        {/* ✅ was href="/" */}
+        <Link href={homeHref} style={{ display: "flex", alignItems: "center", height: 80 }}>
           {logoSrc ? (
             <div style={{ position: "relative", height: 80, width: 80 }}>
               <Image
@@ -115,7 +120,6 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
         </Space>
       </Header>
 
-      {/* main content */}
       <Content style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         {isMobile && (
           <Drawer
@@ -136,7 +140,6 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
         {children}
       </Content>
 
-      {/* footer */}
       <Footer style={{ textAlign: "center", padding: 20 }}>
         <SocialLinks settings={settings} />
         <Text>
@@ -144,7 +147,6 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
         </Text>
       </Footer>
 
-      {/* back-to-top FAB */}
       {showGoTopBtn && (
         <Button
           type="primary"

@@ -92,13 +92,11 @@ const AppMenu: React.FC<AppMenuProps> = ({
   const { language } = useLanguage();
   const hash = useHash();
 
-  // IMPORTANT: menu config links are unprefixed; normalize current URL to match.
   const currentForMenuMatch = useMemo(() => {
     const base = isDashboard ? (pathname || "/") : stripLangPrefix(pathname || "/");
     return `${base}${hash}`;
   }, [pathname, hash, isDashboard]);
 
-  // Link builder: dashboard untouched; public menu prefixed.
   const toHref = useCallback(
     (href: string) => (isDashboard ? href : hrefLang(href, language)),
     [isDashboard, language]

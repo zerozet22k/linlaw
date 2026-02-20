@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import UserService from "@/services/UserService";
@@ -6,30 +7,18 @@ const userService = new UserService();
 
 export async function POST(req: NextRequest) {
   try {
-    const contentType = req.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
+    const refreshToken = req.cookies.get("refreshToken")?.value;
+    if (!refreshToken) {
       return NextResponse.json(
-        { message: "Invalid request format. Expected JSON." },
-        { status: 400 }
+        { message: "Missing refresh token cookie." },
+        { status: 401 }
       );
     }
 
-    let requestBody;
-    try {
-      requestBody = await req.json();
-    } catch (error) {
-      console.error("Failed to parse JSON body:", error);
+    const { deviceName } = await req.json().catch(() => ({}));
+    if (!deviceName) {
       return NextResponse.json(
-        { message: "Invalid JSON body or empty request." },
-        { status: 400 }
-      );
-    }
-
-    const { refreshToken, deviceName } = requestBody;
-
-    if (!refreshToken || !deviceName) {
-      return NextResponse.json(
-        { message: "Refresh token and device name are required." },
+        { message: "Device name is required." },
         { status: 400 }
       );
     }
@@ -44,10 +33,7 @@ export async function POST(req: NextRequest) {
 
     let payload: jwt.JwtPayload;
     try {
-      payload = jwt.verify(
-        refreshToken,
-        process.env.JWT_REFRESH_SECRET!
-      ) as jwt.JwtPayload;
+      payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as jwt.JwtPayload;
     } catch (err) {
       console.error("JWT verification failed:", err);
       return NextResponse.json(
@@ -56,60 +42,67 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!payload.exp) {
+    if (!payload?.userId) {
       return NextResponse.json(
-        { message: "Refresh token is missing expiry information." },
+        { message: "Invalid refresh token payload." },
         { status: 403 }
       );
     }
 
-    const refreshTokenExpiryTime = payload.exp * 1000;
-    const currentTime = Date.now();
-    const timeRemaining = refreshTokenExpiryTime - currentTime;
+    
+    const ok = await userService.findDeviceToken(user.id, refreshToken);
+    if (!ok) {
+      return NextResponse.json(
+        { message: "Refresh token not recognized for this user/device." },
+        { status: 403 }
+      );
+    }
 
-    let newRefreshToken = refreshToken;
-    let newRefreshTokenExpiry = refreshTokenExpiryTime;
+    const refreshTokenExpiryTime = (payload.exp ?? 0) * 1000;
+    const timeRemaining = refreshTokenExpiryTime - Date.now();
 
+    let nextRefreshToken = refreshToken;
+
+    
     if (timeRemaining < 7 * 24 * 60 * 60 * 1000) {
-      const { token: newRefresh, expirationTime: newRefreshExpiry } =
-        await userService.generateRefreshToken(payload.userId as string);
-      newRefreshToken = newRefresh;
-      newRefreshTokenExpiry = newRefreshExpiry;
+      const { token: newRefresh } = userService.generateRefreshToken(payload.userId as string);
+      nextRefreshToken = newRefresh;
+
+      
+      await userService.deleteDeviceToken(user.id, refreshToken);
+      await userService.saveDeviceToken(user.id, deviceName, nextRefreshToken);
     }
 
     const { token: newAccessToken, expirationTime: newAccessTokenExpiry } =
-      await userService.generateAccessToken(payload.userId as string);
+      userService.generateAccessToken(payload.userId as string);
 
-    // ✅ Set the tokens in HttpOnly cookies
-    const response = NextResponse.json(
-      {
-        accessToken: newAccessToken,
-        accessTokenExpiry: newAccessTokenExpiry,
-        refreshToken: newRefreshToken,
-        refreshTokenExpiry: newRefreshTokenExpiry,
-      },
+    const res = NextResponse.json(
+      { accessToken: newAccessToken, accessTokenExpiry: newAccessTokenExpiry },
       { status: 200 }
     );
 
-    response.cookies.set("accessToken", newAccessToken, {
+    res.cookies.set("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60, // 1 hour
+      maxAge: 60 * 60,
       path: "/",
     });
 
-    response.cookies.set("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: "/",
-    });
+    
+    if (nextRefreshToken !== refreshToken) {
+      res.cookies.set("refreshToken", nextRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 30,
+        path: "/",
+      });
+    }
 
-    return response;
-  } catch (error) {
-    console.error("Error during token refresh:", error);
+    return res;
+  } catch (err) {
+    console.error("Error during token refresh:", err);
     return NextResponse.json(
       { message: "An unexpected error occurred during token refresh." },
       { status: 500 }

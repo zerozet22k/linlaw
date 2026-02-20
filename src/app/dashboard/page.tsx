@@ -33,7 +33,6 @@ export default function DashboardPage() {
     const allPerms = new Set<string>();
     roles.forEach((r) => (r.permissions ?? []).forEach((p) => allPerms.add(p)));
 
-    // support either snake_case or camelCase timestamps
     const created =
       (user as any).created_at ?? (user as any).createdAt ?? (user as any).created;
     const updated =

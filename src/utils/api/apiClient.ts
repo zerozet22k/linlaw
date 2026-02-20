@@ -5,6 +5,7 @@ const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
 const apiClient = axios.create({
   baseURL: NEXT_PUBLIC_API_URL,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
@@ -13,55 +14,30 @@ interface CustomAxiosRequestConfig extends AxiosRequestConfig {
 
 const MAX_RETRIES = 3;
 
-const saveTokens = (
-  accessToken: string,
-  refreshToken: string,
-  accessTokenExpiry: number,
-  refreshTokenExpiry: number
-) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("accessTokenExpiry", accessTokenExpiry.toString());
-    localStorage.setItem("refreshTokenExpiry", refreshTokenExpiry.toString());
-  }
+const saveTokens = (accessToken: string, accessTokenExpiry: number) => {
+  localStorage.setItem("accessToken", accessToken);
+  localStorage.setItem("accessTokenExpiry", String(accessTokenExpiry));
 };
 
 const clearTokens = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("deviceName");
-    localStorage.removeItem("accessTokenExpiry");
-    localStorage.removeItem("refreshTokenExpiry");
-  }
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("accessTokenExpiry");
+  localStorage.removeItem("deviceName");
 };
 
-const isTokenExpired = (): boolean => {
-  const accessTokenExpiry = localStorage.getItem("accessTokenExpiry");
-  const refreshTokenExpiry = localStorage.getItem("refreshTokenExpiry");
-
-  const accessTokenExpiryParsed = accessTokenExpiry
-    ? parseInt(accessTokenExpiry, 10)
-    : null;
-  const refreshTokenExpiryParsed = refreshTokenExpiry
-    ? parseInt(refreshTokenExpiry, 10)
-    : null;
-
-  return (
-    (accessTokenExpiryParsed !== null &&
-      accessTokenExpiryParsed * 1000 < Date.now()) ||
-    (refreshTokenExpiryParsed !== null &&
-      refreshTokenExpiryParsed * 1000 < Date.now())
-  );
+const isAccessTokenExpired = (): boolean => {
+  const exp = localStorage.getItem("accessTokenExpiry");
+  const expMs = exp ? parseInt(exp, 10) : null;
+  return expMs !== null && expMs < Date.now();
 };
 
 apiClient.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem("accessToken");
-    if (accessToken && !isTokenExpired()) {
+    if (accessToken && !isAccessTokenExpired()) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
     const deviceName = localStorage.getItem("deviceName");
     if (deviceName) {
       config.headers["Device-Name"] = deviceName;
@@ -76,55 +52,45 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
-    // Prevent retry loop: if the refresh endpoint itself fails, clear tokens.
-    if (originalRequest.url === `${NEXT_PUBLIC_API_URL}/auth/refresh`) {
+    const url = originalRequest?.url ?? "";
+    if (url.includes("/auth/refresh")) {
       clearTokens();
       return Promise.reject(error);
     }
 
-    // If 401 error, try refreshing token (only up to MAX_RETRIES).
     if (
       error.response?.status === 401 &&
       (originalRequest._retryAttempt || 0) < MAX_RETRIES
     ) {
       originalRequest._retryAttempt = (originalRequest._retryAttempt || 0) + 1;
 
-      const refreshToken = localStorage.getItem("refreshToken");
       const deviceName = localStorage.getItem("deviceName");
-
-      if (!refreshToken || !localStorage.getItem("accessToken")) {
+      if (!deviceName) {
         clearTokens();
         return Promise.reject(error);
       }
 
       try {
-        // Call refresh endpoint without triggering interceptors.
         const { data } = await axios.post(
           `${NEXT_PUBLIC_API_URL}/auth/refresh`,
-          { refreshToken, deviceName }
+          { deviceName },
+          { withCredentials: true }
         );
 
-        // Save new tokens and update the authorization header.
-        saveTokens(
-          data.accessToken,
-          data.refreshToken,
-          data.accessTokenExpiry,
-          data.refreshTokenExpiry
-        );
+        saveTokens(data.accessToken, data.accessTokenExpiry);
+
         originalRequest.headers = {
           ...originalRequest.headers,
           Authorization: `Bearer ${data.accessToken}`,
         };
 
-        // Return the retried request.
         return apiClient(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshErr) {
         clearTokens();
-        return Promise.reject(refreshError);
+        return Promise.reject(refreshErr);
       }
     }
 
-    // If maximum retries reached, clear tokens.
     if ((originalRequest._retryAttempt || 0) >= MAX_RETRIES) {
       clearTokens();
     }

@@ -43,8 +43,9 @@ const userSchema = new Schema(
     bio: { type: String, trim: true },
     username: { type: String, unique: true, required: true, trim: true },
     email: { type: String, unique: true, required: true, trim: true },
-    hashedPassword: { type: String, required: true },
-    salt: { type: String, required: true },
+    hashedPassword: { type: String, required: true, select: false },
+    salt: { type: String, required: true, select: false },
+
 
     avatar: { type: String, default: "/images/default-avatar.webp" },
 

@@ -33,6 +33,10 @@ class UserService {
   async getAuthUserByEmail(email: string): Promise<User | null> {
     return userRepository.findAuthUserByEmail(email);
   }
+  async getAuthUserById(userId: string): Promise<User | null> {
+    const userObjectId = toObjectId(userId);
+    return userRepository.findAuthUserById(userObjectId);
+  }
   async getUserByEmail(email: string): Promise<Partial<User> | null> {
     return userRepository.findByEmail(email);
   }
