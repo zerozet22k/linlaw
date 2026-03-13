@@ -1,32 +1,39 @@
-# Project Name
+# Lin Law
 
-A portfolio application built and maintained independently as part of my product and engineering work.
+A multilingual business platform built with Next.js and TypeScript for legal, corporate, tax, travel, and content management workflows.
 
 ## Overview
 
-This project was developed as a practical, real-world application with a focus on clean architecture, maintainability, and product-oriented implementation. It reflects my approach to building full-stack systems, reusable components, and production-style workflows.
+Lin Law is a full-stack web application developed independently as a real-world business platform. It combines a public-facing multilingual website with an internal dashboard for managing users, roles, files, newsletters, settings, inquiries, and structured page content.
+
+The project is built on top of a reusable boilerplate and extended into a company-ready system with custom business logic, CMS-style configuration, multilingual routing, and admin-oriented workflows.
 
 ## Features
 
-- modern frontend and backend architecture
-- reusable components and modular code structure
-- real-world business logic and workflows
-- scalable development patterns
-- portfolio-focused project presentation
+- multilingual public website with language-based routing
+- internal dashboard for operational management
+- newsletter publishing and management
+- file upload and signed URL workflows
+- user and role management
+- settings and page configuration system
+- inquiry and contact handling
+- reusable form-builder and CMS-style architecture
+- structured content management for pages, teams, and related businesses
 
 ## Tech Stack
 
-- Frontend: [Your frontend stack]
-- Backend: [Your backend stack]
-- Database: [Your database, if any]
-- Other Tools: [Any key tools/services]
+- Next.js
+- TypeScript
+- Tailwind CSS
+- PostCSS
+- App Router
+- custom config-driven CMS patterns
 
-## Notes
+## Project Structure
 
-- This repository is shared for portfolio and review purposes.
-- Some sensitive values, credentials, or deployment-specific details are intentionally excluded.
-- This project is not open source and is not licensed for reuse or redistribution.
-
-## License
-
-See the `LICENSE` file for details.
+```txt
+linlaw/
+├─ src/          # app routes, dashboard, api, components, services, models
+├─ public/       # static assets
+├─ uploader/     # utility scripts for storage/file handling
+└─ scripts/      # project helper scripts
