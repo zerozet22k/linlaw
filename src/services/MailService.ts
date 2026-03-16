@@ -6,8 +6,8 @@ import { SettingsInterface } from "@/config/CMS/settings/settingKeys";
 const settingService = new SettingService();
 
 export type BrevoAccount = {
-  apiKey: string;
   smtpKey: string;
+  smtpUser?: string;
   accountEmail: string;
 };
 
@@ -24,15 +24,17 @@ export default class MailService {
     try {
       const settings = (await settingService.getAllSettings()) as SettingsInterface;
       this.appEmail = settings[MAIL_SETTINGS_KEYS.APP_EMAIL];
-      this.brevoAccounts = settings[MAIL_SETTINGS_KEYS.BREVO] as BrevoAccount[];
+      this.brevoAccounts = (settings[MAIL_SETTINGS_KEYS.BREVO] as BrevoAccount[]) || [];
+
       if (!this.appEmail) {
-        console.error("❌ System email (APP_EMAIL) is not configured.");
+        console.error("APP_EMAIL is not configured.");
       }
-      if (!this.brevoAccounts || this.brevoAccounts.length === 0) {
-        console.error("❌ No Brevo account configured.");
+
+      if (this.brevoAccounts.length === 0) {
+        console.error("No Brevo account configured.");
       }
     } catch (error) {
-      console.error("❌ Error initializing mail service:", error);
+      console.error("Error initializing mail service:", error);
     }
   }
 
@@ -40,52 +42,44 @@ export default class MailService {
     await this.initialized;
   }
 
-  private async getBrevoRemainingLimit(account: BrevoAccount): Promise<number> {
-    try {
-      const response = await fetch("https://api.brevo.com/v3/account", {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          "api-key": account.apiKey,
-        },
-      });
-      const data = await response.json();
-      if (data.plan) {
-        const limit = data.plan.limit || 300;
-        const used = data.plan.emailsSentToday ?? data.plan.used ?? 0;
-        return limit - used;
-      }
-      return 0;
-    } catch (error) {
-      console.error("❌ Error fetching Brevo account usage:", error);
-      return 0;
-    }
-  }
-
-  private async selectBrevoAccount(): Promise<BrevoAccount | null> {
-    for (const account of this.brevoAccounts) {
-      const remaining = await this.getBrevoRemainingLimit(account);
-      if (remaining > 0) {
-        return account;
-      }
-    }
-    return null;
-  }
-
   private createTransporter(account: BrevoAccount): nodemailer.Transporter {
-    const smtpUser = "893d65001@smtp-brevo.com";
     return nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
       secure: false,
       auth: {
-        user: smtpUser,
+        user: account.smtpUser || "893d65001@smtp-brevo.com",
         pass: account.smtpKey,
       },
-      tls: {
-        rejectUnauthorized: false,
-      },
     });
+  }
+
+  private async sendWithFallback(
+    mailOptions: Omit<SendMailOptions, "from">
+  ) {
+    await this.ensureInitialized();
+
+    if (!this.brevoAccounts.length) {
+      throw new Error("No Brevo account configured.");
+    }
+
+    let lastError: unknown;
+
+    for (const account of this.brevoAccounts) {
+      try {
+        const transporter = this.createTransporter(account);
+
+        return await transporter.sendMail({
+          ...mailOptions,
+          from: account.accountEmail,
+        });
+      } catch (error) {
+        lastError = error;
+        console.error(`Brevo send failed for ${account.accountEmail}:`, error);
+      }
+    }
+
+    throw lastError || new Error("All Brevo accounts failed to send email.");
   }
 
   public async receiveMail(
@@ -93,29 +87,20 @@ export default class MailService {
     text: string,
     attachments?: SendMailOptions["attachments"]
   ) {
-    await this.ensureInitialized();
     if (!this.appEmail) {
-      throw new Error("❌ Email configuration is incomplete.");
+      await this.ensureInitialized();
     }
-    const account = await this.selectBrevoAccount();
-    if (!account) {
-      throw new Error("❌ No Brevo account has remaining quota.");
+
+    if (!this.appEmail) {
+      throw new Error("Email configuration is incomplete.");
     }
-    const transporter = this.createTransporter(account);
-    const mailOptions: SendMailOptions = {
-      from: account.accountEmail,
+
+    return this.sendWithFallback({
       to: this.appEmail,
       subject,
       text,
       attachments,
-    };
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      return info;
-    } catch (error) {
-      console.error("❌ Error sending email:", error);
-      throw error;
-    }
+    });
   }
 
   public async sendMail(
@@ -124,25 +109,11 @@ export default class MailService {
     text: string,
     attachments?: SendMailOptions["attachments"]
   ) {
-    await this.ensureInitialized();
-    const account = await this.selectBrevoAccount();
-    if (!account) {
-      throw new Error("❌ No Brevo account has remaining quota.");
-    }
-    const transporter = this.createTransporter(account);
-    const mailOptions: SendMailOptions = {
-      from: account.accountEmail,
+    return this.sendWithFallback({
       to,
       subject,
       text,
       attachments,
-    };
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      return info;
-    } catch (error) {
-      console.error("❌ Error sending email to", to, ":", error);
-      throw error;
-    }
+    });
   }
 }

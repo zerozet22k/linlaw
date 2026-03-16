@@ -163,7 +163,6 @@ export default function HeroSliderSection({
         {usableSlides.map((s) => (
           <SwiperSlide key={s.key}>
             <div className="heroSlide">
-              {/* ✅ media ALWAYS fills slide height */}
               <div className="heroMedia" aria-hidden="true">
                 <Image
                   src={s.src}
