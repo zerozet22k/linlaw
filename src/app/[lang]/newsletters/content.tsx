@@ -67,7 +67,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const fetchNewsletters = useCallback(
     async (opts?: { reset?: boolean; page?: number }) => {
       const reset = !!opts?.reset;
-      const currentPage = opts?.page ?? (reset ? 1 : page);
+      const currentPage = opts?.page ?? 1;
 
       const reqId = ++reqIdRef.current;
       if (reset) setLoading(true);
