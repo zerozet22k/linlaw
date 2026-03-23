@@ -55,6 +55,8 @@ const LanguageTextInput: React.FC<LanguageTextInputProps> = ({
               value={value[lang] || ""}
               onChange={(e) => handleChange(lang, e.target.value)}
               prefix={
+                // Flag icon is tiny/decorative; using img avoids next/image remote config overhead.
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={flagUrl}
                   alt={lang}

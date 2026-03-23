@@ -156,6 +156,8 @@ const SectionList: React.FC<SectionListProps> = ({
     return visible.map((it) => normalizeDomId(it.id)).filter(Boolean);
   }, [visible]);
 
+  const idListKey = useMemo(() => idList.join("|"), [idList]);
+
   // ✅ 1) On initial load with #hash, ensure we land on it (even if sections mount late)
   const didInitialHashScroll = useRef(false);
   useEffect(() => {
@@ -183,7 +185,7 @@ const SectionList: React.FC<SectionListProps> = ({
     });
 
     return () => cancelAnimationFrame(raf);
-  }, [idList.join("|")]);
+  }, [idListKey]);
 
   // ✅ 2) Scroll-spy: update URL hash when active section changes (NO jump)
   const lastHashRef = useRef<string>("");
@@ -248,7 +250,7 @@ const SectionList: React.FC<SectionListProps> = ({
       cancelAnimationFrame(raf);
       obs.disconnect();
     };
-  }, [idList.join("|"), scrollMarginTop, syncHashOnScroll]);
+  }, [idList, scrollMarginTop, syncHashOnScroll]);
 
   return (
     <>

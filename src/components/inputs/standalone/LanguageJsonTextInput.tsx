@@ -49,6 +49,8 @@ const LanguageJsonTextInput: React.FC<Props> = ({ value = {}, onChange }) => {
                         placeholder={`Enter ${nice} translation`}
                         onChange={(e) => handleChange(lang, e.target.value)}
                         prefix={
+                            // Flag icon is tiny/decorative; using img avoids next/image remote config overhead.
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={flagUrl}
                                 alt={lang}

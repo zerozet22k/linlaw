@@ -12,6 +12,8 @@ import { FileTypeWithEmpty } from "@/models/FileModel";
 const { Text } = Typography;
 
 const LazyImage = ({ src, alt }: { src: string; alt: string }) => (
+  // Thumbnails come from dynamic remote URLs; keep img for broad compatibility.
+  // eslint-disable-next-line @next/next/no-img-element
   <img
     src={src}
     alt={alt}

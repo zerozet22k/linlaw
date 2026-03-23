@@ -18,6 +18,8 @@ const FileThumbnail = ({ file }: { file: any }) => {
 
   if (file.type === FileType.IMAGE) {
     return (
+      // Admin thumbnail preview from dynamic URLs; keep img for compatibility.
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         alt={file.name}
         src={file.publicUrl}

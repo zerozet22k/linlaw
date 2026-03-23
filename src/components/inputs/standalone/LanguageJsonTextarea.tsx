@@ -52,6 +52,8 @@ const LanguageJsonTextarea: React.FC<Props> = ({ value = {}, onChange }) => {
                             width: "100%",
                         }}
                     >
+                        // Flag icon is tiny/decorative; using img avoids next/image remote config overhead.
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                             src={flagUrl}
                             alt={lang}

@@ -118,13 +118,20 @@ const PublicAPIDynamicMultiSelect = <T extends Record<string, any>>(
     fetchPersistedSelected();
   }, [initialValue, selectedValue, type]);
 
-  const handleSearch = useCallback(
-    debounce((searchValue: string) => {
-      setSearch(searchValue);
-      setPage(1);
-    }, 800),
+  const handleSearch = useMemo(
+    () =>
+      debounce((searchValue: string) => {
+        setSearch(searchValue);
+        setPage(1);
+      }, 800),
     []
   );
+
+  useEffect(() => {
+    return () => {
+      handleSearch.cancel();
+    };
+  }, [handleSearch]);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
