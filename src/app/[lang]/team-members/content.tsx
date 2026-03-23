@@ -151,6 +151,8 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
                             hoverable
                             cover={
                               <div style={{ position: "relative" }}>
+                                {/* Team card image uses dynamic remote URLs; keep img for broad compatibility. */}
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src={member.avatar || placeholder}
                                   alt={member.name || member.username}

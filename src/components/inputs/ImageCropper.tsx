@@ -147,6 +147,8 @@ const ImageCropper = forwardRef(
           minWidth={50}
           minHeight={50}
         >
+          {/* react-image-crop requires direct access to underlying HTMLImageElement */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             ref={imageRef}
             src={imageUrl}

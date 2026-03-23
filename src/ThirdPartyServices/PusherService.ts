@@ -35,7 +35,7 @@ class PusherService {
         pusherConfig.secret &&
         pusherConfig.cluster
       );
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }

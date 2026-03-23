@@ -65,9 +65,9 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   const tFailedToLoad = useMemo(() => t(language, "newsletter.failedToLoad"), [language]);
 
   const fetchNewsletters = useCallback(
-    async (opts?: { reset?: boolean }) => {
+    async (opts?: { reset?: boolean; page?: number }) => {
       const reset = !!opts?.reset;
-      const currentPage = reset ? 1 : page;
+      const currentPage = opts?.page ?? (reset ? 1 : page);
 
       const reqId = ++reqIdRef.current;
       if (reset) setLoading(true);
@@ -100,12 +100,12 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
         setLoadingMore(false);
       }
     },
-    [searchText, page, limit, tFailedToLoad]
+    [searchText, limit, tFailedToLoad]
   );  
 
   useEffect(() => {
     fetchNewsletters({ reset: true });
-  }, [searchText]);
+  }, [fetchNewsletters]);
 
   const countLabel = useMemo(() => {
     const n = newsletters.length;
@@ -275,7 +275,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
                 <Button
                   size="large"
                   type="primary"
-                  onClick={() => fetchNewsletters({ reset: false })}
+                  onClick={() => fetchNewsletters({ reset: false, page })}
                   loading={loadingMore}
                   disabled={loading}
                   style={{
