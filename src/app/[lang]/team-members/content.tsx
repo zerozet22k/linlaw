@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
 import { ROUTE_KEYS } from "@/config/navigations/routes";
+import { hrefLang } from "@/i18n/path";
 
 const { Title } = Typography;
 
@@ -86,7 +87,13 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
           color: token.colorTextBase,
         }}
       >
-        {loading && <Spin size="large" tip={tLoading} style={{ display: "block", margin: "40px auto" }} />}
+        {loading && (
+          <div style={{ display: "flex", justifyContent: "center", margin: "40px auto" }}>
+            <Spin size="large" tip={tLoading} fullscreen={false}>
+              <div style={{ width: 100, height: 48 }} />
+            </Spin>
+          </div>
+        )}
 
         {error && (
           <Alert title={tError} description={error} type="error" showIcon style={{ marginBottom: 40 }} />
@@ -126,7 +133,13 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
               <Row gutter={[gridGutter, gridGutter]} justify="center">
                 {block.members.map((member) => (
                   <Col xs={24} sm={12} md={8} lg={6} key={member._id}>
-                    <Link href={`/${ROUTE_KEYS.TEAM_MEMBERS}/${member._id}`} legacyBehavior>
+                    <Link
+                      href={hrefLang(
+                        `/${ROUTE_KEYS.TEAM_MEMBERS}/${encodeURIComponent(member.username || member._id)}`,
+                        language as any
+                      )}
+                      legacyBehavior
+                    >
                       <a style={{ textDecoration: "none" }}>
                         <motion.div
                           initial={variants.initial}

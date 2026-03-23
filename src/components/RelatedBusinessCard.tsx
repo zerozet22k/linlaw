@@ -8,6 +8,7 @@ import { GlobalOutlined, ArrowRightOutlined } from "@ant-design/icons";
 
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
+import { hrefLang } from "@/i18n/path";
 import { normalizeUrl } from "@/utils/urlUtils";
 import { RelatedBusinessAPI } from "@/models/RelatedBusinessModel";
 import "./RelatedBusinessCard.css";
@@ -25,7 +26,7 @@ const RelatedBusinessCard: React.FC<Props> = ({ item, variant = "directory" }) =
   const { token } = theme.useToken();
 
   const compact = variant === "widget";
-  const href = `/related-businesses/${item.slug}`;
+  const href = hrefLang(`/related-businesses/${item.slug}`, language as any);
 
   const tOpen = useMemo(() => t(language, "common.open"), [language]);
   const tWebsite = useMemo(() => t(language, "common.website"), [language]);

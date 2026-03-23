@@ -19,6 +19,7 @@ import type { LanguageJson } from "@/i18n/types";
 import { getFileExtension, humanizeExt } from "@/utils/filesUtil";
 import { formatDate } from "@/utils/timeUtil";
 import { isSameOriginReferrer } from "@/utils/urlUtils";
+import { hrefLang } from "@/i18n/path";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -89,8 +90,8 @@ const safeBack = useCallback(() => {
   } catch {
   
   }
-  router.push("/newsletters");
-}, [router]);
+  router.push(hrefLang("/newsletters", language as any));
+}, [router, language]);
 
 
   const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(null);
@@ -195,7 +196,7 @@ const safeBack = useCallback(() => {
     const desc = errorCode === "failedToLoad" ? tFailedToLoad : String(errorCode);
     return (
       <Alert
-        message={tError}
+        title={tError}
         description={desc}
         type="error"
         showIcon

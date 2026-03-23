@@ -30,6 +30,7 @@ import SubLoader from "@/components/loaders/SubLoader";
 import { RelatedBusinessAPI } from "@/models/RelatedBusinessModel";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
+import { hrefLang } from "@/i18n/path";
 import { normalizeUrl, isEmbeddableMapUrl, platformLabel } from "@/utils/urlUtils";
 
 const { Title, Text, Paragraph } = Typography;
@@ -169,7 +170,10 @@ const RelatedBusinessSlugContent: React.FC = () => {
             title={isNotFound ? tNotFound : tError}
             subTitle={error}
             extra={
-              <Button type="primary" onClick={() => router.push("/related-businesses")}>
+              <Button
+                type="primary"
+                onClick={() => router.push(hrefLang("/related-businesses", language as any))}
+              >
                 {tBackToDirectory}
               </Button>
             }
@@ -196,7 +200,10 @@ const RelatedBusinessSlugContent: React.FC = () => {
             title={tNotFound}
             subTitle={t(language, "relatedBusinesses.profileDoesNotExist")}
             extra={
-              <Button type="primary" onClick={() => router.push("/related-businesses")}>
+              <Button
+                type="primary"
+                onClick={() => router.push(hrefLang("/related-businesses", language as any))}
+              >
                 {tBackToDirectory}
               </Button>
             }
@@ -276,7 +283,7 @@ const RelatedBusinessSlugContent: React.FC = () => {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 20px 26px" }}>
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => router.push("/related-businesses")}
+            onClick={() => router.push(hrefLang("/related-businesses", language as any))}
             style={{ borderRadius: 999, marginBottom: 14 }}
           >
             {tBackToDirectory}

@@ -43,6 +43,7 @@ export const nav = {
     about: "关于",
     services: "服务",
     teamMembers: "团队成员",
+    teamMemberInfo: "团队成员",
     careers: "招聘",
     newsletters: "简报",
     newsletterInfo: "简报详情",

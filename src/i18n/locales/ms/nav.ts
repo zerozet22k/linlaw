@@ -43,6 +43,7 @@ export const nav = {
     about: "Perihal",
     services: "Perkhidmatan",
     teamMembers: "Ahli pasukan",
+    teamMemberInfo: "Maklumat ahli pasukan",
     careers: "Kerjaya",
     newsletters: "Surat berita",
     newsletterInfo: "Maklumat surat berita",

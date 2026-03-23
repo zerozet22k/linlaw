@@ -96,24 +96,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         const blocks: TeamBlock[] = await userService.getTeamMembersOrdered(sections);
 
-        const lastModById = new Map<string, Date>();
+        const lastModBySlug = new Map<string, Date>();
 
         for (const blk of blocks ?? []) {
           const members = Array.isArray((blk as any)?.members) ? (blk as any).members : [];
           for (const m of members) {
+            const username = String(m?.username || "").trim();
             const id = String(m?._id || "").trim();
-            if (!id) continue;
+            const slug = username || id;
+            if (!slug) continue;
 
             const lm = toDateOr(m?.updatedAt ?? m?.createdAt, now);
-            const prev = lastModById.get(id);
-            if (!prev || lm > prev) lastModById.set(id, lm);
+            const prev = lastModBySlug.get(slug);
+            if (!prev || lm > prev) lastModBySlug.set(slug, lm);
           }
         }
 
-        const ids = Array.from(lastModById.entries());
+        const slugs = Array.from(lastModBySlug.entries());
         return langs.flatMap((lang) =>
-          ids.map(([id, lastModified]) => ({
-            url: `${base}${pfx(lang, `/team-members/${encodeURIComponent(id)}`)}`,
+          slugs.map(([slug, lastModified]) => ({
+            url: `${base}${pfx(lang, `/team-members/${encodeURIComponent(slug)}`)}`,
             lastModified,
           }))
         );

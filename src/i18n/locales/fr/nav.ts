@@ -43,6 +43,7 @@ export const nav = {
     about: "À propos",
     services: "Services",
     teamMembers: "Membres de l’équipe",
+    teamMemberInfo: "Membre de l'équipe",
     careers: "Carrières",
     newsletters: "Bulletins",
     newsletterInfo: "Infos du bulletin",

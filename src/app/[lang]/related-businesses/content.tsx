@@ -110,7 +110,13 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
           color: token.colorTextBase,
         }}
       >
-        {loading && <Spin size="large" tip={tLoading} style={{ display: "block", margin: "40px auto" }} />}
+        {loading && (
+          <div style={{ display: "flex", justifyContent: "center", margin: "40px auto" }}>
+            <Spin size="large" tip={tLoading} fullscreen={false}>
+              <div style={{ width: 100, height: 48 }} />
+            </Spin>
+          </div>
+        )}
 
         {error && (
           <Alert title={tError} description={error} type="error" showIcon style={{ marginBottom: 40 }} />

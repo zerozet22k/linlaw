@@ -6,7 +6,7 @@ const userService = new UserService();
 
 async function handle(_req: Request, params: { id: string }) {
   try {
-    const user = await userService.getUserById(params.id);
+    const user = await userService.getUserByIdOrUsername(params.id);
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }

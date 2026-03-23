@@ -23,7 +23,7 @@ const TeamMemberClient: React.FC = () => {
 
   const [isPortrait, setIsPortrait] = useState(false);
 
-  const { id: userId } = useParams<{ id: string }>() ?? {};
+  const { username } = useParams<{ username: string }>() ?? {};
   const { token } = useToken();
 
   const { language } = useLanguage();
@@ -35,11 +35,11 @@ const TeamMemberClient: React.FC = () => {
   const tCoverAltSuffix = useMemo(() => t(language, "team.coverAltSuffix"), [language]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!username) return;
 
     (async () => {
       try {
-        const { data } = await apiClient.get<UserAPI>(`/team/${userId}`);
+        const { data } = await apiClient.get<UserAPI>(`/team/${encodeURIComponent(username)}`);
         setUser(data);
       } catch (e) {
         console.error(e);
@@ -48,14 +48,14 @@ const TeamMemberClient: React.FC = () => {
         setLoading(false);
       }
     })();
-  }, [userId, tFailedToLoad]);
+  }, [username, tFailedToLoad]);
 
   if (loading) return <Spin size="large" style={{ display: "block", margin: 40 }} />;
 
   if (error || !user)
     return (
       <Alert
-        message={tError}
+        title={tError}
         description={error ?? tNotFound}
         type="error"
         showIcon
@@ -89,11 +89,12 @@ const TeamMemberClient: React.FC = () => {
             fill
             priority
             sizes="(max-width: 768px) 100vw, 900px"
-            onLoadingComplete={(img) => {
+            onLoad={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
               const ratio = img.naturalHeight / Math.max(1, img.naturalWidth);
               setIsPortrait(ratio > 1.15);
             }}
-            style={{ objectPosition: "center" }}
+            style={{ objectPosition: "center", width: "100%", height: "100%" }}
           />
         </div>
 

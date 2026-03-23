@@ -99,12 +99,16 @@ const LanguageSelection: React.FC = () => {
         border: "1px solid rgba(255,255,255,0.25)",
         cursor: "pointer",
       }}
-      dropdownStyle={{
-        minWidth: 220,
-        padding: 6,
-        borderRadius: 12,
-        background: token.colorBgContainer,
-        zIndex: 3000,
+      styles={{
+        popup: {
+          root: {
+            minWidth: 220,
+            padding: 6,
+            borderRadius: 12,
+            background: token.colorBgContainer,
+            zIndex: 3000,
+          },
+        },
       }}
     />
   );

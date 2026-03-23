@@ -23,7 +23,7 @@ const SubLoader: React.FC<SubLoaderProps> = ({
         width: "100%", 
       }}
     >
-      <Spin size="large" tip={tip}>
+      <Spin size="large" tip={tip} fullscreen={false}>
         <div style={{ padding: '50px' }} />
       </Spin>
     </div>

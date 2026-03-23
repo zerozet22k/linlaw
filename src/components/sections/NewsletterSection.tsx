@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { Typography, Empty, Card, theme, Grid, Button } from "antd";
 import Link from "next/link";
+import { hrefLang } from "@/i18n/path";
 
 import type { INewsletterAPI } from "@/models/Newsletter";
 import { t } from "@/i18n";
@@ -208,7 +209,7 @@ const NewsletterSection: React.FC<Props> = ({ language, items }) => {
 
     return (
       <Link
-        href={`/newsletters/${id}`}
+        href={hrefLang(`/newsletters/${id}`, language as any)}
         style={{ textDecoration: "none", display: "block" }}
         aria-label={`${t(language, "common.open")} newsletter: ${title}`}
       >
@@ -279,7 +280,7 @@ const NewsletterSection: React.FC<Props> = ({ language, items }) => {
 
     return (
       <Link
-        href={`/newsletters/${id}`}
+        href={hrefLang(`/newsletters/${id}`, language as any)}
         style={{ textDecoration: "none", display: "block" }}
         aria-label={`${t(language, "common.open")} newsletter: ${title}`}
       >
@@ -317,10 +318,16 @@ const NewsletterSection: React.FC<Props> = ({ language, items }) => {
         {renderBigCard(bigRight)}
       </div>
 
-      <div style={gridBottomStyle}>{small.map((it) => renderSmallCard(it))}</div>
+      <div style={gridBottomStyle}>
+        {small.map((it, idx) => (
+          <React.Fragment key={`${String(it?._id || "newsletter")}-${idx}`}>
+            {renderSmallCard(it)}
+          </React.Fragment>
+        ))}
+      </div>
 
       <div style={{ marginTop: token.marginLG, display: "flex", justifyContent: "center" }}>
-        <Link href="/newsletters" style={{ textDecoration: "none" }}>
+        <Link href={hrefLang("/newsletters", language as any)} style={{ textDecoration: "none" }}>
           <Button
             size="large"
             type="primary"

@@ -112,6 +112,15 @@ class UserRepository {
       .populate("roles")
       .exec();
   }
+
+  async findByUsername(username: string): Promise<User | null> {
+    await dbConnect();
+    return this.userModel
+      .findOne({ username: String(username || "").trim() })
+      .populate("roles")
+      .exec();
+  }
+
   async create(userData: Partial<User>): Promise<User> {
     await dbConnect();
     const user = new this.userModel(userData);

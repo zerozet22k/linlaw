@@ -43,6 +43,7 @@ export const nav = {
     about: "เกี่ยวกับ",
     services: "บริการ",
     teamMembers: "สมาชิกทีม",
+    teamMemberInfo: "รายละเอียดสมาชิกทีม",
     careers: "ตำแหน่งงาน",
     newsletters: "จดหมายข่าว",
     newsletterInfo: "รายละเอียดจดหมายข่าว",

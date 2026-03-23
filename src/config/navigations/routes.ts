@@ -356,7 +356,7 @@
     // ✅ added public detail route
     [ROUTE_KEYS.TEAM_MEMBER_INFO]: {
       key: ROUTE_KEYS.TEAM_MEMBER_INFO,
-      path: "/team-members/:id",
+      path: "/team-members/:username",
       navKey: "nav.routes.teamMemberInfo",
       icon: "SolutionOutlined",
       loginRequired: false,

@@ -43,6 +43,7 @@ export const nav = {
     about: "소개",
     services: "서비스",
     teamMembers: "팀 멤버",
+    teamMemberInfo: "팀 멤버 상세",
     careers: "채용",
     newsletters: "뉴스레터",
     newsletterInfo: "뉴스레터 상세",

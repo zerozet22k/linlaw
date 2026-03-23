@@ -17,6 +17,7 @@ import {
 import { INewsletterAPI } from "@/models/Newsletter";
 import type { LanguageJson } from "@/i18n/types";
 import { formatDate } from "@/utils/timeUtil";
+import { hrefLang } from "@/i18n/path";
 
 const { Title, Text } = Typography;
 
@@ -200,7 +201,7 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
                 return (
                   <Link
                     key={n._id}
-                    href={`/newsletters/${n._id}`}  
+                    href={hrefLang(`/newsletters/${n._id}`, language as any)}
                     style={{ textDecoration: "none", display: "block" }}
                     aria-label={aria}
                   >

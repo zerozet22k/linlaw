@@ -15,6 +15,7 @@ import {
   TEAM_PAGE_SETTINGS_TYPES,
 } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 import { TeamBlock } from "@/models/TeamBlock";
+import { Types } from "mongoose";
 
 type TeamSectionsType =
   TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
@@ -56,6 +57,19 @@ class UserService {
     const userObjectId = toObjectId(userId);
     return userRepository.findById(userObjectId);
   }
+
+  async getUserByIdOrUsername(identity: string): Promise<User | null> {
+    const raw = String(identity || "").trim();
+    if (!raw) return null;
+
+    if (Types.ObjectId.isValid(raw) && raw.length === 24) {
+      const byId = await this.getUserById(raw);
+      if (byId) return byId;
+    }
+
+    return userRepository.findByUsername(raw);
+  }
+
   async getUsersByIds(userIds: string[]): Promise<User[]> {
     const objectIds = userIds.map((id) => toObjectId(id));
     return userRepository.findByIds(objectIds);
