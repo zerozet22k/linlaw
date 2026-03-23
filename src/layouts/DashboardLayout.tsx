@@ -77,7 +77,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
           styles={{ body: { padding: 0, background: colorBgContainer } }}
           onClose={handleDrawerToggle}
           open={drawerVisible}
-          width={mobileDrawerWidth}
+          size="default"
         >
           <div className="logo" style={{ display: "flex" }}>
             <Link href={homeHref} style={{ width: "100%" }}>

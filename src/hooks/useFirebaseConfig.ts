@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import apiClient from "@/utils/api/apiClient";
-import { FIREBASE_SETTINGS_KEYS } from "@/config/CMS/settings/keys/FIREBASE_SETTINGS_KEYS";
 import { useUser } from "@/hooks/useUser";
 
 export const useFirebaseConfig = () => {
@@ -8,41 +7,34 @@ export const useFirebaseConfig = () => {
   const [firebaseLoading, setFirebaseLoading] = useState(true);
   const [firebaseReady, setFirebaseReady] = useState(false);
 
-  const fetchFirebaseConfig = async () => {
-    
+  const fetchFirebaseConfig = useCallback(async () => {
     if (!user) {
       setFirebaseLoading(false);
       setFirebaseReady(false);
       return;
     }
+
     try {
       setFirebaseLoading(true);
-      const response = await apiClient.get(
-        `/settings/key/${FIREBASE_SETTINGS_KEYS.FIREBASE}`
-      );
-      if (response.data?.serviceAccount) {
-        setFirebaseReady(true);
-      } else {
-        throw new Error("Firebase settings are missing.");
-      }
+      const response = await apiClient.get("/firebase/status");
+      setFirebaseReady(!!response.data?.ready);
     } catch (error) {
       console.error("Error fetching Firebase settings:", error);
       setFirebaseReady(false);
     } finally {
       setFirebaseLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
-    
     if (!userInitialLoading) {
-      fetchFirebaseConfig();
+      void fetchFirebaseConfig();
     }
-  }, [user, userInitialLoading]);
+  }, [fetchFirebaseConfig, userInitialLoading]);
 
   const checkFirebaseConfig = useCallback(async () => {
     await fetchFirebaseConfig();
-  }, [user]);
+  }, [fetchFirebaseConfig]);
 
   return {
     firebaseLoading,

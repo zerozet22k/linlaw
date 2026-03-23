@@ -73,7 +73,7 @@ export default function LoginContent() {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", width: "100%" }}>
       <Card title="Login" style={{ width: "100%", maxWidth: "400px" }}>
-        {error && <Alert message="Login Error" description={error} type="error" showIcon closable style={{ marginBottom: 16 }} />}
+        {error && <Alert title="Login Error" description={error} type="error" showIcon closable style={{ marginBottom: 16 }} />}
 
         <Form layout="vertical" onFinish={onFinish}>
           <Form.Item name="email" label="Email" rules={[{ required: true, message: "Please input your email!" }]}>

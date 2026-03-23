@@ -49,7 +49,7 @@ export default function SignupContent() {
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", width: "100%", padding: 16 }}>
       <Card title="Sign Up" style={{ width: "100%", maxWidth: 400, borderRadius: 8 }}>
         {error && (
-          <Alert message="Signup Error" description={error} type="error" showIcon closable style={{ marginBottom: 16 }} />
+          <Alert title="Signup Error" description={error} type="error" showIcon closable style={{ marginBottom: 16 }} />
         )}
 
         <Form

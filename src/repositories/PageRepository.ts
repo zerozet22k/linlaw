@@ -95,6 +95,11 @@ class PageRepository {
 
     return this.findAllStructured();
   }
+
+  async deleteByKeys(keys: string[]): Promise<void> {
+    await dbConnect();
+    await this.pageModel.deleteMany({ key: { $in: keys } }).exec();
+  }
 }
 
 export default PageRepository;

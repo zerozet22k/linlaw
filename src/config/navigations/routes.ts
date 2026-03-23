@@ -9,6 +9,11 @@
       icon: "MailOutlined",
       navKey: "nav.parents.newsletters",
     },
+    CAREERS: {
+      key: "careers",
+      icon: "IdcardOutlined",
+      navKey: "nav.parents.careers",
+    },
     RELATED_BUSINESSES: {
       key: "related-businesses",
       icon: "ApartmentOutlined",
@@ -46,6 +51,9 @@
     NEWSLETTER_LIST: "newsletter-list",
     CREATE_NEWSLETTER: "create-newsletter",
     EDIT_NEWSLETTER: "edit-newsletter",
+    CAREER_LIST: "career-list",
+    CREATE_CAREER: "create-career",
+    EDIT_CAREER: "edit-career",
 
     NEWSLETTERS: "newsletters",
     NEWSLETTER_INFO: "newsletters-info", // ✅ public detail route
@@ -193,6 +201,36 @@
       exactMatch: true,
     },
 
+    [ROUTE_KEYS.CAREER_LIST]: {
+      key: ROUTE_KEYS.CAREER_LIST,
+      path: `${dashboardRoute}/careers`,
+      navKey: "nav.routes.careerList",
+      icon: "IdcardOutlined",
+      access: [APP_PERMISSIONS.VIEW_CAREER, APP_PERMISSIONS.ADMIN],
+      loginRequired: true,
+      IfNotLoggedInRedirectUrl: "/login?redirect=/dashboard/careers",
+    },
+
+    [ROUTE_KEYS.CREATE_CAREER]: {
+      key: ROUTE_KEYS.CREATE_CAREER,
+      path: `${dashboardRoute}/careers/create`,
+      navKey: "nav.routes.createCareer",
+      icon: "PlusOutlined",
+      access: [APP_PERMISSIONS.CREATE_CAREER, APP_PERMISSIONS.ADMIN],
+      loginRequired: true,
+    },
+
+    [ROUTE_KEYS.EDIT_CAREER]: {
+      key: ROUTE_KEYS.EDIT_CAREER,
+      path: `${dashboardRoute}/careers/:careerId`,
+      navKey: "nav.routes.editCareer",
+      icon: null,
+      access: [APP_PERMISSIONS.EDIT_CAREER, APP_PERMISSIONS.ADMIN],
+      loginRequired: true,
+      noAccessMessage: "You do not have permission to edit this career entry.",
+      exactMatch: true,
+    },
+
     [ROUTE_KEYS.RELATED_BUSINESSES_LIST]: {
       key: ROUTE_KEYS.RELATED_BUSINESSES_LIST,
       path: `${dashboardRoute}/related-businesses`,
@@ -206,7 +244,7 @@
       path: `${dashboardRoute}/related-businesses/create`,
       navKey: "nav.routes.createRelatedBusiness",
       icon: "PlusOutlined",
-      access: [APP_PERMISSIONS.ADMIN],
+      access: [APP_PERMISSIONS.CREATE_RELATED_BUSINESS, APP_PERMISSIONS.ADMIN],
       loginRequired: true,
     },
 
@@ -215,7 +253,7 @@
       path: `${dashboardRoute}/related-businesses/:id`,
       navKey: "nav.routes.editRelatedBusiness",
       icon: null,
-      access: [APP_PERMISSIONS.ADMIN],
+      access: [APP_PERMISSIONS.EDIT_RELATED_BUSINESS, APP_PERMISSIONS.ADMIN],
       loginRequired: true,
       exactMatch: true,
       noAccessMessage: "You do not have permission to edit this related business.",

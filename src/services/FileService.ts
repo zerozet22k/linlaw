@@ -10,7 +10,11 @@ import FirebaseService from "@/ThirdPartyServices/FirebaseService";
 import FileRepository from "@/repositories/FileRepository";
 import { FIREBASE_SETTINGS_KEYS } from "@/config/CMS/settings/keys/FIREBASE_SETTINGS_KEYS";
 import { toObjectId } from "@/repositories";
-import { getFileFolderWithType } from "@/utils/filesUtil";
+import {
+  getFileFolderWithType,
+  normalizeContentType,
+  sanitizeStorageFileName,
+} from "@/utils/filesUtil";
 
 class FileService {
   private fileRepository: FileRepository;
@@ -49,10 +53,11 @@ class FileService {
   async generateSignedUrl(fileName: string, contentType: string) {
     await this.firebaseService.initFirebase();
 
-    const rawFilePath = `${this.folderPath}/${Date.now()}_${fileName}`;
+    const safeFileName = sanitizeStorageFileName(fileName);
+    const rawFilePath = `${this.folderPath}/${Date.now()}_${safeFileName}`;
     const signedUrl = await this.firebaseService.generateSignedUrl(
       rawFilePath,
-      contentType
+      normalizeContentType(contentType)
     );
 
     return { uploadUrl: signedUrl, filePath: rawFilePath };
@@ -66,7 +71,7 @@ class FileService {
 
     const signedUrl = await this.firebaseService.generateSignedUrl(
       rawFilePath,
-      contentType
+      normalizeContentType(contentType)
     );
 
     return { uploadUrl: signedUrl, filePath: rawFilePath };
@@ -80,7 +85,7 @@ class FileService {
 
     const signedUrl = await this.firebaseService.generateSignedUrl(
       rawFilePath,
-      contentType
+      normalizeContentType(contentType)
     );
 
     return { uploadUrl: signedUrl, filePath: rawFilePath };

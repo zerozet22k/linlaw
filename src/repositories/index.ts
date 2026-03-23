@@ -6,6 +6,7 @@ import CacheRepository from "./CacheRepository";
 import { Types } from "mongoose";
 import InquiryRepository from "./InquiryRepository";
 import RelatedBusinessRepository from "./RelatedBusinessRepository";
+import CareerRepository from "./CareerRepository";
 export const userRepository = new UserRepository();
 export const settingRepository = new SettingRepository();
 export const imageRepository = new ImageRepository();
@@ -13,6 +14,7 @@ export const roleRepository = new RoleRepository();
 export const cacheRepository = new CacheRepository();
 export const inquiryRepository = new InquiryRepository();
 export const relatedBusinessRepository = new RelatedBusinessRepository();
+export const careerRepository = new CareerRepository();
 
 export const toObjectId = (id: string | null): Types.ObjectId => {
   try {

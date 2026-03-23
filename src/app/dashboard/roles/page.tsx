@@ -29,6 +29,7 @@ const RolesPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchText, setSearchText] = useState<string>("");
   const [deletingIds, setDeletingIds] = useState<string[]>([]);
+  const [syncingAdmin, setSyncingAdmin] = useState<boolean>(false);
   const router = useRouter();
 
   // Permission flags
@@ -69,6 +70,36 @@ const RolesPage: React.FC = () => {
     fetchRoles();
   }, [initialLoading, canView]);
 
+  const handleSyncSystemRoles = async () => {
+    setSyncingAdmin(true);
+    try {
+      const response = await apiClient.post("/roles/sync-system");
+      if (response.status === 200) {
+        message.success(
+          `${response.data.rolesCount} roles synced with ${response.data.permissionsCount} permissions`
+        );
+        // Refresh roles list
+        const rolesResponse = await apiClient.get("/roles");
+        if (rolesResponse.status === 200) {
+          setRoles(rolesResponse.data);
+        }
+      } else {
+        message.error("Failed to sync system roles");
+      }
+    } catch (error: any) {
+      console.error("Error syncing system roles:", error);
+      if (error?.response?.status === 403) {
+        message.warning("Only SYSTEM role accounts can sync all roles.");
+      } else {
+        message.error(
+          error?.response?.data?.error || "Failed to sync system roles"
+        );
+      }
+    } finally {
+      setSyncingAdmin(false);
+    }
+  };
+
   const handleDelete = async (roleId: string, roleType: RoleType) => {
     if (!canDelete) {
       message.warning("You do not have permission to delete roles.");
@@ -100,7 +131,7 @@ const RolesPage: React.FC = () => {
     }
   };
 
-  const filteredRoles = roles.filter((role) =>
+  const filteredRoles = roles.filter((role: RoleAPI) =>
     role.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
@@ -180,21 +211,30 @@ const RolesPage: React.FC = () => {
         subTitle="You do not have permission to view roles."
       />
     );
-    }
+  }
 
   return (
     <Card
       title="Roles Management"
       extra={
-        canCreate ? (
+        <Space>
           <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => router.push("/dashboard/roles/create")}
+            loading={syncingAdmin}
+            onClick={handleSyncSystemRoles}
+            title="Sync all system roles with available permissions (SYSTEM role only)"
           >
-            Create Role
+            Sync System
           </Button>
-        ) : null
+          {canCreate ? (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => router.push("/dashboard/roles/create")}
+            >
+              Create Role
+            </Button>
+          ) : null}
+        </Space>
       }
       style={{
         width: "100%",

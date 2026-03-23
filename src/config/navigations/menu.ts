@@ -93,6 +93,29 @@ export const dashboardMenu: NavigationMenuItem[] = [
   },
 
   {
+    key: PARENT_KEYS.CAREERS.key,
+    icon: PARENT_KEYS.CAREERS.icon!,
+    navKey: PARENT_KEYS.CAREERS.navKey,
+    access: [APP_PERMISSIONS.VIEW_CAREER, APP_PERMISSIONS.ADMIN],
+    children: [
+      {
+        key: ROUTE_KEYS.CREATE_CAREER,
+        navKey: ROUTES[ROUTE_KEYS.CREATE_CAREER].navKey,
+        link: ROUTES[ROUTE_KEYS.CREATE_CAREER].path,
+        icon: ROUTES[ROUTE_KEYS.CREATE_CAREER].icon!,
+        access: ROUTES[ROUTE_KEYS.CREATE_CAREER].access,
+      },
+      {
+        key: ROUTE_KEYS.CAREER_LIST,
+        navKey: ROUTES[ROUTE_KEYS.CAREER_LIST].navKey,
+        link: ROUTES[ROUTE_KEYS.CAREER_LIST].path,
+        icon: ROUTES[ROUTE_KEYS.CAREER_LIST].icon!,
+        access: ROUTES[ROUTE_KEYS.CAREER_LIST].access,
+      },
+    ],
+  },
+
+  {
     key: PARENT_KEYS.FILES.key,
     icon: PARENT_KEYS.FILES.icon!,
     navKey: PARENT_KEYS.FILES.navKey,

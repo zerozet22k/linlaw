@@ -113,6 +113,11 @@ class RoleRepository {
     await dbConnect();
     return this.roleModel.findOne({ type: roleType }).exec();
   }
+
+  async findByName(name: string): Promise<Role | null> {
+    await dbConnect();
+    return this.roleModel.findOne({ name }).exec();
+  }
 }
 
 export default RoleRepository;

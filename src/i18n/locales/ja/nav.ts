@@ -4,6 +4,7 @@ export const nav = {
     roles: "ロール",
     files: "ファイル",
     newsletters: "ニュースレター",
+    careers: "採用情報",
     relatedBusinesses: "関連企業",
   },
 
@@ -22,6 +23,9 @@ export const nav = {
     newsletterList: "ニュースレター",
     createNewsletter: "ニュースレター作成",
     editNewsletter: "ニュースレター編集",
+    careerList: "採用情報",
+    createCareer: "採用情報を作成",
+    editCareer: "採用情報を編集",
 
     relatedBusinessesList: "関連企業",
     createRelatedBusiness: "関連企業作成",

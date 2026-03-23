@@ -4,6 +4,7 @@ export const nav = {
         roles: "အခန်းကဏ္ဍများ",
         files: "ဖိုင်များ",
         newsletters: "သတင်းလွှာများ",
+        careers: "အလုပ်အကိုင်",
         relatedBusinesses: "ဆက်စပ်လုပ်ငန်းများ",
     },
 
@@ -22,6 +23,9 @@ export const nav = {
         newsletterList: "သတင်းလွှာများ",
         createNewsletter: "သတင်းလွှာဖန်တီးရန်",
         editNewsletter: "သတင်းလွှာပြင်ဆင်ရန်",
+        careerList: "အလုပ်အကိုင်",
+        createCareer: "အလုပ်အကိုင် ဖန်တီးရန်",
+        editCareer: "အလုပ်အကိုင် ပြင်ဆင်ရန်",
 
         relatedBusinessesList: "ဆက်စပ်လုပ်ငန်းများ",
         createRelatedBusiness: "ဆက်စပ်လုပ်ငန်းဖန်တီးရန်",

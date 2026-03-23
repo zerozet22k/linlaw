@@ -1,110 +1,153 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Card, Row, Col, Typography, Tag, Divider, theme, Empty, Button, Modal } from "antd";
+import { Button, Card, Col, Divider, Empty, Modal, Row, Tag, Typography, theme } from "antd";
 import {
   ApartmentOutlined,
-  EnvironmentOutlined,
-  IdcardOutlined,
-  DollarOutlined,
   CalendarOutlined,
   CloseOutlined,
+  DollarOutlined,
+  EnvironmentOutlined,
+  IdcardOutlined,
 } from "@ant-design/icons";
 import { motion, useReducedMotion } from "framer-motion";
 
 import PageWrapper from "@/components/ui/PageWrapper";
-import { CAREER_PAGE_SETTINGS_KEYS as K, CAREER_PAGE_SETTINGS_TYPES } from "@/config/CMS/pages/keys/CAREER_PAGE_SETTINGS";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
+import type { SharedPageContentType } from "@/config/CMS/pages/keys/shared/sharedPageTypes";
+import type { CareerAPI } from "@/models/CareerModel";
 import { formatYmd } from "@/utils/timeUtil";
 import { dedupStrings, normalizeKey, shortText } from "@/utils/textUtils";
 import { formatSalaryText, labelOfEmploymentType } from "@/utils/careerUtil";
 
 const { Title, Paragraph } = Typography;
 
-type Props = { data: CAREER_PAGE_SETTINGS_TYPES };
-type JobItem = CAREER_PAGE_SETTINGS_TYPES[typeof K.JOBS_SECTION]["items"][number];
+type Props = {
+  pageContent?: SharedPageContentType;
+  jobs: CareerAPI[];
+};
 
 const cardVariants = {
   initial: { opacity: 0, y: 10 },
   animate: { opacity: 1, y: 0 },
 };
 
-const text = (v: any, lang: string) => t(lang, v, "");
+const text = (value: any, lang: string) => t(lang, value, "");
 
-function jobKey(j: JobItem, idx: number): React.Key {
-  // If your schema has a stable id/slug, prefer it here.
-  return String((j as any).id ?? (j as any).jobId ?? (j as any).slug ?? idx);
+function jobKey(job: CareerAPI, index: number): React.Key {
+  return String(job._id || index);
 }
 
-function metaChips(j: JobItem, lang: string) {
+function metaChips(job: CareerAPI, lang: string) {
   const chips: Array<{ key: string; label: React.ReactNode }> = [];
 
-  if ((j as any).department) chips.push({ key: "dept", label: <Tag icon={<ApartmentOutlined />}>{(j as any).department}</Tag> });
-  if ((j as any).location) chips.push({ key: "loc", label: <Tag icon={<EnvironmentOutlined />}>{(j as any).location}</Tag> });
-
-  const et = labelOfEmploymentType((j as any).employmentType);
-  if (et) chips.push({ key: "type", label: <Tag icon={<IdcardOutlined />}>{et}</Tag> });
-
-  const sal = formatSalaryText((j as any).salary, lang);
-  if (sal) chips.push({ key: "sal", label: <Tag icon={<DollarOutlined />}>{sal}</Tag> });
-
-  const tPosted = t(lang, "career.posted");
-  const tCloses = t(lang, "career.closes");
-
-  if ((j as any).postedAt) {
+  if (job.department) {
     chips.push({
-      key: "posted",
+      key: "department",
+      label: <Tag icon={<ApartmentOutlined />}>{job.department}</Tag>,
+    });
+  }
+
+  if (job.location) {
+    chips.push({
+      key: "location",
+      label: <Tag icon={<EnvironmentOutlined />}>{job.location}</Tag>,
+    });
+  }
+
+  const employmentType = labelOfEmploymentType(job.employmentType);
+  if (employmentType) {
+    chips.push({
+      key: "employmentType",
+      label: <Tag icon={<IdcardOutlined />}>{employmentType}</Tag>,
+    });
+  }
+
+  const salary = formatSalaryText(job.salary, lang);
+  if (salary) {
+    chips.push({
+      key: "salary",
+      label: <Tag icon={<DollarOutlined />}>{salary}</Tag>,
+    });
+  }
+
+  const postedLabel = t(lang, "career.posted");
+  const closesLabel = t(lang, "career.closes");
+
+  if (job.postedAt) {
+    chips.push({
+      key: "postedAt",
       label: (
         <Tag icon={<CalendarOutlined />}>
-          {tPosted} {formatYmd((j as any).postedAt)}
+          {postedLabel} {formatYmd(job.postedAt)}
         </Tag>
       ),
     });
   }
 
-  if ((j as any).closingDate) {
+  if (job.closingDate) {
     chips.push({
-      key: "closes",
+      key: "closingDate",
       label: (
         <Tag icon={<CalendarOutlined />}>
-          {tCloses} {formatYmd((j as any).closingDate)}
+          {closesLabel} {formatYmd(job.closingDate)}
         </Tag>
       ),
     });
   }
 
   const hideSet = new Set(
-    [(j as any).department, (j as any).location, et].filter(Boolean).map((s) => normalizeKey(s))
+    [job.department, job.location, employmentType]
+      .filter(Boolean)
+      .map((value) => normalizeKey(value))
   );
 
-  const rawTags = (((j as any).tags ?? []) as Array<{ value?: string }>).map((tg) => tg?.value ?? "");
-  const extra = dedupStrings(rawTags).filter((v) => !hideSet.has(normalizeKey(v)));
+  const rawTags = (job.tags ?? []).map((tag) => tag?.value ?? "");
+  const extraTags = dedupStrings(rawTags).filter(
+    (value) => !hideSet.has(normalizeKey(value))
+  );
 
-  for (const v of extra) chips.push({ key: `tag-${normalizeKey(v)}`, label: <Tag>{v}</Tag> });
+  for (const tag of extraTags) {
+    chips.push({
+      key: `tag-${normalizeKey(tag)}`,
+      label: <Tag>{tag}</Tag>,
+    });
+  }
 
   return chips;
 }
 
-const CareersContent: React.FC<Props> = ({ data }) => {
-  const pageContent = data[K.PAGE_CONTENT];
-  const jobsSection = data[K.JOBS_SECTION];
+const CareersContent: React.FC<Props> = ({ pageContent, jobs }) => {
+  const items = useMemo(
+    () =>
+      Array.isArray(jobs)
+        ? [...jobs].sort((a, b) => {
+            const ao = typeof a.order === "number" ? a.order : 0;
+            const bo = typeof b.order === "number" ? b.order : 0;
+            if (ao !== bo) return ao - bo;
 
-  const items = useMemo(() => (Array.isArray(jobsSection?.items) ? (jobsSection.items as JobItem[]) : []), [jobsSection]);
+            const ad = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bd = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return bd - ad;
+          })
+        : [],
+    [jobs]
+  );
 
   const { token } = theme.useToken();
   const { language } = useLanguage();
   const reduceMotion = useReducedMotion();
 
-  const [active, setActive] = useState<JobItem | null>(null);
-  const open = !!active;
+  const [active, setActive] = useState<CareerAPI | null>(null);
+  const isOpen = !!active;
 
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
-  const openJob = useCallback((j: JobItem) => {
+  const openJob = useCallback((job: CareerAPI) => {
     restoreFocusRef.current = document.activeElement as HTMLElement | null;
-    setActive(j);
+    setActive(job);
   }, []);
 
   const closeJob = useCallback(() => {
@@ -112,60 +155,68 @@ const CareersContent: React.FC<Props> = ({ data }) => {
   }, []);
 
   useEffect(() => {
-    if (!open) return;
-    const id = window.setTimeout(() => closeBtnRef.current?.focus(), 0);
-    return () => window.clearTimeout(id);
-  }, [open]);
+    if (!isOpen) return;
+    const timeoutId = window.setTimeout(() => closeBtnRef.current?.focus(), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [isOpen]);
 
   useEffect(() => {
-    if (open) return;
+    if (isOpen) return;
     restoreFocusRef.current?.focus?.();
-  }, [open]);
+  }, [isOpen]);
 
-  const tNoData = t(language, "common.noData");
-  const tClose = t(language, "common.close");
-  const tPositionFallback = t(language, "career.position");
-  const tUntitledPosition = t(language, "career.untitledPosition");
-  const tResponsibilities = t(language, "career.responsibilities");
-  const tRequirements = t(language, "career.requirements");
-  const tBenefits = t(language, "career.benefits");
+  const emptyLabel = t(language, "common.noData");
+  const closeLabel = t(language, "common.close");
+  const positionFallback = t(language, "career.position");
+  const untitledPosition = t(language, "career.untitledPosition");
+  const responsibilitiesLabel = t(language, "career.responsibilities");
+  const requirementsLabel = t(language, "career.requirements");
+  const benefitsLabel = t(language, "career.benefits");
 
-  // Precompute chips once per language/items change (less work during rendering)
-  const chipLists = useMemo(() => items.map((j) => metaChips(j, language)), [items, language]);
-  const activeChips = useMemo(() => (active ? metaChips(active, language) : []), [active, language]);
+  const chipLists = useMemo(
+    () => items.map((job) => metaChips(job, language)),
+    [items, language]
+  );
+  const activeChips = useMemo(
+    () => (active ? metaChips(active, language) : []),
+    [active, language]
+  );
 
   return (
     <PageWrapper pageContent={pageContent}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
         {items.length === 0 ? (
           <Card style={{ borderRadius: 12 }}>
-            <Empty description={tNoData} />
+            <Empty description={emptyLabel} />
           </Card>
         ) : (
           <Row gutter={[24, 24]}>
-            {items.map((j, idx) => {
-              const chips = chipLists[idx] ?? [];
-              const title = text((j as any).title, language) || tUntitledPosition;
-              const summary = shortText(text((j as any).summary, language), 180);
+            {items.map((job, index) => {
+              const chips = chipLists[index] ?? [];
+              const title = text(job.title, language) || untitledPosition;
+              const summary = shortText(text(job.summary, language), 180);
 
               return (
-                <Col xs={24} sm={12} md={8} key={jobKey(j, idx)}>
+                <Col xs={24} sm={12} md={8} key={jobKey(job, index)}>
                   <motion.div
                     initial={reduceMotion ? false : "initial"}
                     animate="animate"
                     variants={cardVariants}
-                    transition={{ duration: reduceMotion ? 0 : 0.25, delay: reduceMotion ? 0 : idx * 0.04 }}
+                    transition={{
+                      duration: reduceMotion ? 0 : 0.25,
+                      delay: reduceMotion ? 0 : index * 0.04,
+                    }}
                   >
                     <Card
                       hoverable
                       role="button"
                       tabIndex={0}
-                      onClick={() => openJob(j)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") openJob(j);
-                        if (e.key === " ") {
-                          e.preventDefault(); // prevent page scroll
-                          openJob(j);
+                      onClick={() => openJob(job)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") openJob(job);
+                        if (event.key === " ") {
+                          event.preventDefault();
+                          openJob(job);
                         }
                       }}
                       style={{
@@ -189,12 +240,16 @@ const CareersContent: React.FC<Props> = ({ data }) => {
                       </Title>
 
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                        {chips.map((c) => (
-                          <span key={c.key}>{c.label}</span>
+                        {chips.map((chip) => (
+                          <span key={chip.key}>{chip.label}</span>
                         ))}
                       </div>
 
-                      {!!summary && <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>{summary}</Paragraph>}
+                      {!!summary && (
+                        <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
+                          {summary}
+                        </Paragraph>
+                      )}
                     </Card>
                   </motion.div>
                 </Col>
@@ -205,7 +260,7 @@ const CareersContent: React.FC<Props> = ({ data }) => {
       </div>
 
       <Modal
-        open={open}
+        open={isOpen}
         onCancel={closeJob}
         footer={null}
         closable={false}
@@ -215,8 +270,12 @@ const CareersContent: React.FC<Props> = ({ data }) => {
         style={{ top: 0, paddingBottom: 0, maxWidth: "100vw" }}
         mask={false}
         styles={{
-      
-          body: { height: "100vh", padding: 0, background: token.colorBgBase, overflow: "auto" },
+          body: {
+            height: "100vh",
+            padding: 0,
+            background: token.colorBgBase,
+            overflow: "auto",
+          },
         }}
       >
         {active && (
@@ -227,67 +286,84 @@ const CareersContent: React.FC<Props> = ({ data }) => {
               icon={<CloseOutlined />}
               onClick={closeJob}
               style={{ position: "fixed", top: 16, right: 16, zIndex: 10 }}
-              aria-label={tClose}
+              aria-label={closeLabel}
             />
 
-            <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 16px 56px", boxSizing: "border-box" }}>
+            <div
+              style={{
+                maxWidth: 960,
+                margin: "0 auto",
+                padding: "32px 16px 56px",
+                boxSizing: "border-box",
+              }}
+            >
               <Title level={2} style={{ marginTop: 8 }}>
-                {text((active as any).title, language) || tPositionFallback}
+                {text(active.title, language) || positionFallback}
               </Title>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
-                {activeChips.map((c) => (
-                  <span key={c.key}>{c.label}</span>
+                {activeChips.map((chip) => (
+                  <span key={chip.key}>{chip.label}</span>
                 ))}
               </div>
 
-              {(active as any).summary && (
-                <Paragraph style={{ fontSize: 16 }}>{text((active as any).summary, language)}</Paragraph>
+              {active.summary && (
+                <Paragraph style={{ fontSize: 16 }}>
+                  {text(active.summary, language)}
+                </Paragraph>
               )}
 
-              {(active as any).description && (
+              {active.description && (
                 <>
                   <Divider />
-                  <Paragraph style={{ whiteSpace: "pre-line" }}>{text((active as any).description, language)}</Paragraph>
+                  <Paragraph style={{ whiteSpace: "pre-line" }}>
+                    {text(active.description, language)}
+                  </Paragraph>
                 </>
               )}
 
-              {!!(active as any).responsibilities?.length && (
+              {!!active.responsibilities?.length && (
                 <>
                   <Divider />
-                  <Title level={4}>{tResponsibilities}</Title>
+                  <Title level={4}>{responsibilitiesLabel}</Title>
                   <ul style={{ paddingLeft: 18, marginTop: 6 }}>
-                    {(active as any).responsibilities.map((r: any, i: number) => (
-                      <li key={i}>
-                        <Paragraph style={{ marginBottom: 6 }}>{text(r?.text, language)}</Paragraph>
+                    {active.responsibilities.map((item, index) => (
+                      <li key={`${index}-${item.text?.en ?? "responsibility"}`}>
+                        <Paragraph style={{ marginBottom: 6 }}>
+                          {text(item?.text, language)}
+                        </Paragraph>
                       </li>
                     ))}
                   </ul>
                 </>
               )}
 
-              {!!(active as any).requirements?.length && (
+              {!!active.requirements?.length && (
                 <>
                   <Divider />
-                  <Title level={4}>{tRequirements}</Title>
+                  <Title level={4}>{requirementsLabel}</Title>
                   <ul style={{ paddingLeft: 18, marginTop: 6 }}>
-                    {(active as any).requirements.map((r: any, i: number) => (
-                      <li key={i}>
-                        <Paragraph style={{ marginBottom: 6 }}>{text(r?.text, language)}</Paragraph>
+                    {active.requirements.map((item, index) => (
+                      <li key={`${index}-${item.text?.en ?? "requirement"}`}>
+                        <Paragraph style={{ marginBottom: 6 }}>
+                          {text(item?.text, language)}
+                        </Paragraph>
                       </li>
                     ))}
                   </ul>
                 </>
               )}
 
-              {!!(active as any).benefits?.length && (
+              {!!active.benefits?.length && (
                 <>
                   <Divider />
-                  <Title level={4}>{tBenefits}</Title>
+                  <Title level={4}>{benefitsLabel}</Title>
                   <ul style={{ paddingLeft: 18, marginTop: 6 }}>
-                    {(active as any).benefits.map((b: any, i: number) => (
-                      <li key={i}>
-                        <Paragraph style={{ marginBottom: 6 }}>{text(b?.text, language)}</Paragraph>
+                    {active.benefits.map((item, index) => (
+                      <li key={`${index}-${item.text?.en ?? "benefit"}`}>
+                        <Paragraph style={{ marginBottom: 6 }}>
+                          {text(item?.text, language)}
+                        </Paragraph>
                       </li>
                     ))}
                   </ul>

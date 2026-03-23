@@ -4,6 +4,7 @@ export const nav = {
     roles: "角色",
     files: "文件",
     newsletters: "简报",
+    careers: "招聘",
     relatedBusinesses: "关联企业",
   },
 
@@ -22,6 +23,9 @@ export const nav = {
     newsletterList: "简报",
     createNewsletter: "创建简报",
     editNewsletter: "编辑简报",
+    careerList: "招聘",
+    createCareer: "创建招聘",
+    editCareer: "编辑招聘",
 
     relatedBusinessesList: "关联企业",
     createRelatedBusiness: "创建关联企业",

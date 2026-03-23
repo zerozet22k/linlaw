@@ -64,7 +64,7 @@ async function run() {
   if (!db) throw new Error("No db handle");
 
   // Safer: only scan the collections that actually contain URLs
-  const targetCollections = ["pages", "relatedbusinesses", "settings", "files", "newsletters"];
+  const targetCollections = ["pages", "relatedbusinesses", "settings", "files", "newsletters", "careers"];
 
   for (const name of targetCollections) {
     // skip missing collections

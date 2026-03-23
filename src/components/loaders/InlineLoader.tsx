@@ -34,7 +34,7 @@ const InlineLoader: React.FC<InlineLoaderProps> = ({
   if (error) {
     return (
       <div style={{ textAlign: "center", padding: "20px" }}>
-        <Alert message="Error" description={error} type="error" showIcon />
+        <Alert title="Error" description={error} type="error" showIcon />
       </div>
     );
   }

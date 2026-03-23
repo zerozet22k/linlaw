@@ -68,15 +68,15 @@ export default function DashboardPage() {
       : null;
 
   return (
-    <div style={{ padding: 24 }}>
+    <div>
       <Row justify="center">
         <Col xs={24} md={22} lg={18} xl={16} xxl={14}>
-          <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+          <Space orientation="vertical" size={12} style={{ width: "100%" }}>
             {/* Header */}
-            <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 20 } }}>
-              <Space size={14} align="start" style={{ width: "100%" }}>
+            <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 16 } }}>
+              <Space size={12} align="center" style={{ width: "100%" }}>
                 <Avatar
-                  size={56}
+                  size={48}
                   src={user.avatar}
                   style={{ flex: "0 0 auto" }}
                 >
@@ -84,16 +84,16 @@ export default function DashboardPage() {
                 </Avatar>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <Title level={4} style={{ margin: 0 }}>
-                    Welcome
+                  <Title level={5} style={{ margin: 0, lineHeight: 1.3 }}>
+                    Welcome, {derived.displayName}
                   </Title>
-                  <Text type="secondary">@{user.username}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>@{user.username}</Text>
 
-                  <div style={{ marginTop: 10 }}>
+                  <div style={{ marginTop: 6 }}>
                     {derived.roles?.length ? (
-                      <Space wrap size={[8, 8]}>
+                      <Space wrap size={[6, 6]}>
                         {derived.roles.map((r) => (
-                          <Tag key={r._id} color={r.color}>
+                          <Tag key={r._id} color={r.color} style={{ margin: 0 }}>
                             {r.name}
                           </Tag>
                         ))}
@@ -107,32 +107,32 @@ export default function DashboardPage() {
             </Card>
 
             {/* Stats */}
-            <Row gutter={[12, 12]}>
-              <Col xs={24} sm={8}>
-                <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 16 } }}>
-                  <Statistic title="Roles" value={derived.roles.length} />
+            <Row gutter={[8, 8]}>
+              <Col xs={8}>
+                <Card style={{ borderRadius: 14 }} styles={{ body: { padding: "12px 10px", textAlign: "center" } }}>
+                  <Statistic title="Roles" value={derived.roles.length} styles={{ content: { fontSize: 22 } }} />
                 </Card>
               </Col>
-              <Col xs={24} sm={8}>
-                <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 16 } }}>
-                  <Statistic title="Permissions" value={derived.permissionsCount} />
+              <Col xs={8}>
+                <Card style={{ borderRadius: 14 }} styles={{ body: { padding: "12px 10px", textAlign: "center" } }}>
+                  <Statistic title="Perms" value={derived.permissionsCount} styles={{ content: { fontSize: 22 } }} />
                 </Card>
               </Col>
-              <Col xs={24} sm={8}>
-                <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 16 } }}>
-                  <Statistic title="Devices" value={derived.devicesCount} />
+              <Col xs={8}>
+                <Card style={{ borderRadius: 14 }} styles={{ body: { padding: "12px 10px", textAlign: "center" } }}>
+                  <Statistic title="Devices" value={derived.devicesCount} styles={{ content: { fontSize: 22 } }} />
                 </Card>
               </Col>
             </Row>
 
             {/* Profile */}
-            <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 20 } }}>
-              <Divider titlePlacement="start">Profile</Divider>
+            <Card style={{ borderRadius: 14 }} styles={{ body: { padding: 16 } }}>
+              <Divider titlePlacement="start" style={{ marginTop: 0 }}>Profile</Divider>
 
               <Descriptions
-                size="middle"
+                size="small"
                 column={{ xs: 1, sm: 1, md: 2 }}
-                labelStyle={{ width: 140 }}
+                styles={{ label: { width: 90, fontWeight: 500 } }}
               >
                 <Descriptions.Item label="Name">
                   {user.name || <Text type="secondary">N/A</Text>}

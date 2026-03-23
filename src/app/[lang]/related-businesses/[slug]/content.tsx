@@ -246,7 +246,7 @@ const RelatedBusinessSlugContent: React.FC = () => {
       icon: <PhoneOutlined />,
       label: tPhoneLabel,
       value: (
-        <Space direction="vertical" size={4}>
+        <Space orientation="vertical" size={4}>
           {item.contacts.map((c, i) => {
             const name = String(c?.name || "").trim();
             const number = String(c?.number || "").trim().replace(/\s+/g, "");

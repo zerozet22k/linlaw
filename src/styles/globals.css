@@ -31,3 +31,28 @@ body.dark-theme .ant-modal-body::-webkit-scrollbar-track {
 html {
   scroll-behavior: smooth;
 }
+
+/* ── Sider collapse trigger ─────────────────────────────────────────── */
+/* Light theme: match sider's colorBgContainer (#fff) */
+body.light-theme .ant-layout-sider-trigger {
+  background: #ffffff;
+  color: rgba(0, 0, 0, 0.45);
+  border-top: 1px solid #f0f0f0;
+  transition: color 0.2s, background 0.2s;
+}
+body.light-theme .ant-layout-sider-trigger:hover {
+  color: rgba(0, 0, 0, 0.88);
+  background: #f5f5f5;
+}
+
+/* Dark theme: match sider's colorBgContainer (#141414) */
+body.dark-theme .ant-layout-sider-trigger {
+  background: #141414;
+  color: rgba(255, 255, 255, 0.45);
+  border-top: 1px solid #303030;
+  transition: color 0.2s, background 0.2s;
+}
+body.dark-theme .ant-layout-sider-trigger:hover {
+  color: rgba(255, 255, 255, 0.88);
+  background: #1f1f1f;
+}

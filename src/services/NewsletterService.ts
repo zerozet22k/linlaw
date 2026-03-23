@@ -2,7 +2,11 @@ import NewsletterRepository from "@/repositories/NewsletterRepository";
 import { INewsletter, INewsletterAttachmentBase } from "@/models/Newsletter";
 import FirebaseService from "@/ThirdPartyServices/FirebaseService";
 import { toObjectId } from "@/repositories";
-import { getFileFolderWithType } from "@/utils/filesUtil";
+import {
+  getFileFolderWithType,
+  normalizeContentType,
+  sanitizeStorageFileName,
+} from "@/utils/filesUtil";
 
 class NewsletterService {
   private newsletterRepo: NewsletterRepository;
@@ -48,7 +52,7 @@ class NewsletterService {
     const bucket = this.firebaseService.getBucket();
 
     for (const attachment of newsletter.fileAttachments) {
-      const fileRef = bucket.file(attachment.filePath);
+      const fileRef = bucket.file(attachment.rawFilePath);
       const [exists] = await fileRef.exists();
       if (exists) {
         await fileRef.delete();
@@ -87,10 +91,10 @@ class NewsletterService {
     }
     await this.firebaseService.initFirebase();
     const bucket = this.firebaseService.getBucket();
-    const fileRef = bucket.file(attachment.filePath);
-    const [exists] = await fileRef.exists();
+    const safeRef = bucket.file(attachment.rawFilePath);
+    const [exists] = await safeRef.exists();
     if (exists) {
-      await fileRef.delete();
+      await safeRef.delete();
     }
     return this.newsletterRepo.deleteAttachment(
       toObjectId(newsletterId),
@@ -121,10 +125,11 @@ class NewsletterService {
     contentType: string
   ): Promise<{ uploadUrl: string; filePath: string }> {
     await this.firebaseService.initFirebase();
-    const rawFilePath = `${this.folderPath}/${Date.now()}_${fileName}`;
+    const safeFileName = sanitizeStorageFileName(fileName);
+    const rawFilePath = `${this.folderPath}/${Date.now()}_${safeFileName}`;
     const signedUrl = await this.firebaseService.generateSignedUrl(
       rawFilePath,
-      contentType
+      normalizeContentType(contentType)
     );
     return { uploadUrl: signedUrl, filePath: rawFilePath };
   }

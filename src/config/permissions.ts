@@ -35,6 +35,10 @@ export const APP_PERMISSIONS = {
   UPLOAD_NEWSLETTER_ATTACHMENT: "upload_newsletter_attachment",
   DELETE_NEWSLETTER_ATTACHMENT: "delete_newsletter_attachment",
   EDIT_NEWSLETTER_ATTACHMENT: "edit_newsletter_attachment",
+  CREATE_CAREER: "create_career",
+  EDIT_CAREER: "edit_career",
+  DELETE_CAREER: "delete_career",
+  VIEW_CAREER: "view_career",
   SEND_EMAIL: "send_email",
   VIEW_RELATED_BUSINESSES: "view_related_businesses",
   CREATE_RELATED_BUSINESS: "create_related_business",
@@ -86,6 +90,12 @@ export const PERMISSION_GROUPS: Record<string, AppPermissionType[]> = {
     APP_PERMISSIONS.UPLOAD_NEWSLETTER_ATTACHMENT,
     APP_PERMISSIONS.DELETE_NEWSLETTER_ATTACHMENT,
     APP_PERMISSIONS.EDIT_NEWSLETTER_ATTACHMENT,
+  ],
+  MANAGE_CAREERS: [
+    APP_PERMISSIONS.CREATE_CAREER,
+    APP_PERMISSIONS.EDIT_CAREER,
+    APP_PERMISSIONS.DELETE_CAREER,
+    APP_PERMISSIONS.VIEW_CAREER,
   ],
 
   ACCESS: [
@@ -156,6 +166,10 @@ export const PERMISSION_GUIDE: Record<AppPermissionType, string> = {
     "Allows deleting newsletter attachments.",
   [APP_PERMISSIONS.EDIT_NEWSLETTER_ATTACHMENT]:
     "Allows editing newsletter attachment details.",
+  [APP_PERMISSIONS.CREATE_CAREER]: "Allows creating new career entries.",
+  [APP_PERMISSIONS.EDIT_CAREER]: "Allows editing career entries.",
+  [APP_PERMISSIONS.DELETE_CAREER]: "Allows deleting career entries.",
+  [APP_PERMISSIONS.VIEW_CAREER]: "Allows viewing career entries in the dashboard.",
   [APP_PERMISSIONS.SEND_EMAIL]: "Allows sending emails.",
   [APP_PERMISSIONS.VIEW_RELATED_BUSINESSES]: "Allows viewing related businesses.",
   [APP_PERMISSIONS.CREATE_RELATED_BUSINESS]:

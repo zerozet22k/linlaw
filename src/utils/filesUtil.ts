@@ -79,6 +79,41 @@ export const shortenFileName = (name: string, maxLength = 15) => {
   return `${baseName.slice(0, Math.max(1, maxLength - ext.length - 3))}...${ext}`;
 };
 
+export function sanitizeStorageFileName(
+  fileName: string,
+  fallback = "file"
+): string {
+  const raw = String(fileName ?? "")
+    .split(/[\\/]+/)
+    .pop()
+    ?.trim() ?? "";
+
+  const cleaned = raw
+    .replace(/[\u0000-\u001f<>:"/\\|?*]+/g, "-")
+    .replace(/\s+/g, " ")
+    .replace(/^\.+/, "")
+    .trim();
+
+  const safe = cleaned || fallback;
+  if (safe.length <= 180) return safe;
+
+  const dotIndex = safe.lastIndexOf(".");
+  if (dotIndex <= 0) {
+    return safe.slice(0, 180);
+  }
+
+  const ext = safe.slice(dotIndex);
+  const base = safe.slice(0, Math.max(1, 180 - ext.length));
+  return `${base}${ext}`;
+}
+
+export function normalizeContentType(contentType?: string): string {
+  const value = String(contentType ?? "").trim().toLowerCase();
+  return /^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/.test(value)
+    ? value
+    : "application/octet-stream";
+}
+
 export function getFileExtension(fileName?: string): string {
   if (!fileName) return "";
   const parts = fileName.split(".");

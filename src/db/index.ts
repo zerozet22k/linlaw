@@ -4,15 +4,11 @@ const MONGODB_URI = process.env.MONGODB_URI?.trim() as string;
 const MONGODB_NAME = process.env.MONGODB_NAME?.trim() as string;
 
 if (!MONGODB_URI) {
-  console.error(
-    "❌ MONGODB_URI is required and must be set in environment variables."
-  );
+  console.error("MONGODB_URI is required and must be set in environment variables.");
 }
 
 if (!MONGODB_NAME) {
-  console.error(
-    "❌ MONGODB_NAME is required and must be set in environment variables."
-  );
+  console.error("MONGODB_NAME is required and must be set in environment variables.");
 }
 
 interface MongooseCache {
@@ -32,9 +28,7 @@ async function dbConnect(): Promise<mongoose.Mongoose | null> {
   }
 
   if (!cached.promise) {
-    console.log(
-      `🔗 Connecting to MongoDB: ${MONGODB_URI} [Database: ${MONGODB_NAME}]`
-    );
+    console.log(`Connecting to MongoDB database "${MONGODB_NAME || "unknown"}"`);
 
     cached.promise = mongoose
       .connect(MONGODB_URI, {
@@ -42,11 +36,11 @@ async function dbConnect(): Promise<mongoose.Mongoose | null> {
         dbName: MONGODB_NAME,
       })
       .then((mongoose) => {
-        console.log("✅ MongoDB Connected Successfully");
+        console.log("MongoDB connected successfully");
         return mongoose;
       })
       .catch((error) => {
-        console.error("❌ MongoDB Connection Failed:", error.message || error);
+        console.error("MongoDB connection failed:", error.message || error);
         return null;
       });
   }

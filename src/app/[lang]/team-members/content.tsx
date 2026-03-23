@@ -89,7 +89,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
         {loading && <Spin size="large" tip={tLoading} style={{ display: "block", margin: "40px auto" }} />}
 
         {error && (
-          <Alert message={tError} description={error} type="error" showIcon style={{ marginBottom: 40 }} />
+          <Alert title={tError} description={error} type="error" showIcon style={{ marginBottom: 40 }} />
         )}
 
         {!loading && !error && blocks.length === 0 && (

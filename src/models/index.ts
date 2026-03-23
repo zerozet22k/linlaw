@@ -4,3 +4,4 @@ export const cacheModelName = "caches";
 export const settingModelName: string = "settings";
 export const fileModelName = "files";
 export const newsletterModelName = "newsletters";
+export const careerModelName = "careers";

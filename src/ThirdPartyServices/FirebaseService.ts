@@ -1,6 +1,5 @@
 import admin from "firebase-admin";
 import { getStorage, Storage } from "firebase-admin/storage";
-import { Storage as GoogleCloudStorage } from "@google-cloud/storage";
 import {
   FIREBASE_SETTINGS_KEYS,
   FIREBASE_SETTINGS_TYPES,
@@ -10,10 +9,11 @@ import SettingRepository from "@/repositories/SettingRepository";
 class FirebaseService {
   private static instance: FirebaseService;
   private settingRepository: SettingRepository;
+  private app: admin.app.App | null = null;
   private bucket: ReturnType<Storage["bucket"]> | null = null;
-  private googleStorage: GoogleCloudStorage | null = null;
-  private lastInitTime: number | null = null;
-  private static INIT_THRESHOLD = 5 * 60 * 1000; 
+  private activeSignature: string | null = null;
+  private initPromise: Promise<void> | null = null;
+  private static readonly APP_NAME = "linlaw-storage";
 
   private constructor() {
     this.settingRepository = new SettingRepository();
@@ -26,53 +26,104 @@ class FirebaseService {
     return FirebaseService.instance;
   }
 
+  private normalizeBucketName(bucket?: string) {
+    return String(bucket ?? "")
+      .trim()
+      .replace(/^gs:\/\//, "")
+      .replace(/\/+$/, "");
+  }
+
+  private normalizePrivateKey(privateKey?: string) {
+    return String(privateKey ?? "").replace(/\\n/g, "\n").trim();
+  }
+
+  private async getFirebaseConfig() {
+    const firebaseConfig = (await this.settingRepository.findByKey(
+      FIREBASE_SETTINGS_KEYS.FIREBASE
+    )) as FIREBASE_SETTINGS_TYPES[typeof FIREBASE_SETTINGS_KEYS.FIREBASE] | null;
+
+    const bucket = this.normalizeBucketName(firebaseConfig?.bucket);
+    const projectId = String(firebaseConfig?.serviceAccount?.project_id ?? "").trim();
+    const clientEmail = String(firebaseConfig?.serviceAccount?.client_email ?? "").trim();
+    const privateKey = this.normalizePrivateKey(
+      firebaseConfig?.serviceAccount?.private_key
+    );
+
+    if (!bucket || !projectId || !clientEmail || !privateKey) {
+      throw new Error("Firebase settings are incomplete.");
+    }
+
+    return {
+      bucket,
+      serviceAccount: {
+        projectId,
+        clientEmail,
+        privateKey,
+      } satisfies admin.ServiceAccount,
+      signature: JSON.stringify({
+        bucket,
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    };
+  }
+
   async isFirebaseAvailable(): Promise<boolean> {
     try {
-      const firebaseConfig = (await this.settingRepository.findByKey(
-        FIREBASE_SETTINGS_KEYS.FIREBASE
-      )) as FIREBASE_SETTINGS_TYPES[typeof FIREBASE_SETTINGS_KEYS.FIREBASE];
-
-      return !!(firebaseConfig && firebaseConfig.bucket);
+      await this.getFirebaseConfig();
+      return true;
     } catch {
       return false;
     }
   }
 
   async initFirebase() {
-    const currentTime = Date.now();
+    const firebaseConfig = await this.getFirebaseConfig();
     if (
       this.bucket &&
-      this.googleStorage &&
-      this.lastInitTime &&
-      currentTime - this.lastInitTime < FirebaseService.INIT_THRESHOLD
+      this.app &&
+      this.activeSignature === firebaseConfig.signature
     ) {
       return;
     }
 
-    const firebaseConfig = (await this.settingRepository.findByKey(
-      FIREBASE_SETTINGS_KEYS.FIREBASE
-    )) as FIREBASE_SETTINGS_TYPES[typeof FIREBASE_SETTINGS_KEYS.FIREBASE];
-
-    if (!firebaseConfig) {
-      throw new Error("Firebase settings not found.");
+    if (this.initPromise) {
+      await this.initPromise;
+      if (
+        this.bucket &&
+        this.app &&
+        this.activeSignature === firebaseConfig.signature
+      ) {
+        return;
+      }
     }
 
-    if (!admin.apps.length) {
-      const formattedServiceAccount: admin.ServiceAccount = {
-        projectId: firebaseConfig.serviceAccount.project_id,
-        clientEmail: firebaseConfig.serviceAccount.client_email,
-        privateKey: firebaseConfig.serviceAccount.private_key,
-      };
+    this.initPromise = (async () => {
+      const existingApp = admin.apps.find(
+        (app) => app != null && app.name === FirebaseService.APP_NAME
+      );
+      if (existingApp) {
+        await existingApp.delete();
+      }
 
-      admin.initializeApp({
-        credential: admin.credential.cert(formattedServiceAccount),
-        storageBucket: firebaseConfig.bucket,
-      });
+      this.app = admin.initializeApp(
+        {
+          credential: admin.credential.cert(firebaseConfig.serviceAccount),
+          storageBucket: firebaseConfig.bucket,
+        },
+        FirebaseService.APP_NAME
+      );
+
+      this.bucket = getStorage(this.app).bucket(firebaseConfig.bucket);
+      this.activeSignature = firebaseConfig.signature;
+    })();
+
+    try {
+      await this.initPromise;
+    } finally {
+      this.initPromise = null;
     }
-
-    this.bucket = getStorage().bucket();
-    this.googleStorage = new GoogleCloudStorage();
-    this.lastInitTime = currentTime;
   }
 
   getBucket(): ReturnType<Storage["bucket"]> {
@@ -86,7 +137,7 @@ class FirebaseService {
     filePath: string,
     contentType: string
   ): Promise<string> {
-    if (!this.googleStorage) {
+    if (!this.bucket) {
       await this.initFirebase();
     }
 
