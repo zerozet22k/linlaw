@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import TeamMemberContent from "./content";
 import { buildPageMetadataFromRequest } from "@/utils/server/metadata/buildPageMetadata";
 import { shortText } from "@/utils/textUtils";
-import { getRequestOrigin } from "@/utils/server/requestOrigin";
+import dbConnect from "@/db";
+import UserService from "@/services/UserService";
+
+const _userService = new UserService();
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +17,7 @@ export async function generateMetadata({
 }: {
   params: { lang: string; username: string };
 }): Promise<Metadata> {
-  const origin = await getRequestOrigin();
   const rawUsername = String(params?.username || "").trim();
-  const usernameForFetch = encodeURIComponent(rawUsername);
 
   let personName = "Team Member";
   let bio = "";
@@ -24,23 +25,20 @@ export async function generateMetadata({
   let canonicalSlug = rawUsername;
 
   try {
-    if (origin && rawUsername) {
-      const res = await fetch(`${origin}/api/team/${usernameForFetch}`, {
-        cache: "no-store",
-      });
+    if (rawUsername) {
+      await dbConnect();
+      const u = await _userService.getUserByIdOrUsername(rawUsername);
 
-      if (res.ok) {
-        const u: any = await res.json();
-
-        const uname = String(u?.username || "").trim();
+      if (u) {
+        const uname = String((u as any).username || "").trim();
         if (uname) canonicalSlug = uname;
 
-        const who = String(u?.name ?? u?.username ?? "").trim();
+        const who = String((u as any).name ?? (u as any).username ?? "").trim();
         if (who) personName = who;
 
-        bio = String(u?.bio ?? "").trim();
+        bio = String((u as any).bio ?? "").trim();
 
-        const img = String(u?.cover_image ?? u?.avatar ?? "").trim();
+        const img = String((u as any).cover_image ?? (u as any).avatar ?? "").trim();
         if (img) ogImageRaw = img;
       }
     }
@@ -65,16 +63,13 @@ export default async function Page({
   params: { lang: string; username: string };
 }) {
   const rawUsername = String(params?.username || "").trim();
-  const origin = await getRequestOrigin();
 
   try {
-    if (origin && rawUsername) {
-      const res = await fetch(`${origin}/api/team/${encodeURIComponent(rawUsername)}`, {
-        cache: "no-store",
-      });
-      if (res.ok) {
-        const u: any = await res.json();
-        const canonicalSlug = String(u?.username || "").trim();
+    if (rawUsername) {
+      await dbConnect();
+      const u = await _userService.getUserByIdOrUsername(rawUsername);
+      if (u) {
+        const canonicalSlug = String((u as any).username || "").trim();
         if (canonicalSlug && canonicalSlug !== rawUsername) {
           redirect(`/${params.lang}/team-members/${encodeURIComponent(canonicalSlug)}`);
         }
