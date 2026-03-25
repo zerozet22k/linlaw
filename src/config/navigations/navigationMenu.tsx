@@ -4,10 +4,11 @@ import React, { useMemo, useCallback } from "react";
 import Link from "next/link";
 import { Menu, MenuProps } from "antd";
 import { usePathname } from "next/navigation";
+import type { CSSProperties } from "react";
 
 import { useUser } from "@/hooks/useUser";
 import { UserAPI } from "@/models/UserModel";
-import { hasPermission } from "../permissions";
+import { APP_PERMISSIONS, hasPermission } from "../permissions";
 
 import {
   dashboardMenu,
@@ -79,6 +80,7 @@ interface AppMenuProps {
   isDashboard: boolean;
   isMobile: boolean;
   onMenuClick?: MenuProps["onClick"];
+  menuStyle?: CSSProperties;
 }
 
 const AppMenu: React.FC<AppMenuProps> = ({
@@ -86,6 +88,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
   isDashboard,
   isMobile,
   onMenuClick,
+  menuStyle,
 }) => {
   const { user, logout } = useUser();
   const pathname = usePathname();
@@ -126,6 +129,28 @@ const AppMenu: React.FC<AppMenuProps> = ({
     if (!isMobile) return base;
 
     if (user) {
+      if (hasPermission(user, [APP_PERMISSIONS.VIEW_DASHBOARD], true)) {
+        base.push({
+          key: "dashboard",
+          icon: DynamicIcon({ name: "DashboardOutlined" }),
+          label: (
+            <Link href={toHref("/dashboard")}>
+              {t(language, "nav.routes.dashboard", "Dashboard")}
+            </Link>
+          ),
+        });
+      }
+
+      base.push({
+        key: "profile",
+        icon: DynamicIcon({ name: "UserOutlined" }),
+        label: (
+          <Link href={toHref("/profile")}>
+            {t(language, "nav.routes.profile", "Profile")}
+          </Link>
+        ),
+      });
+
       base.push({
         key: "logout",
         icon: DynamicIcon({ name: "LogoutOutlined" }),
@@ -137,8 +162,18 @@ const AppMenu: React.FC<AppMenuProps> = ({
       });
     } else {
       base.push({
+        key: "profile",
+        icon: DynamicIcon({ name: "UserOutlined" }),
+        label: (
+          <Link href={toHref("/profile")}>
+            {t(language, "nav.routes.profile", "Profile")}
+          </Link>
+        ),
+      });
+
+      base.push({
         key: "login",
-        icon: DynamicIcon({ name: "LogoutOutlined" }),
+        icon: DynamicIcon({ name: "LoginOutlined" }),
         label: (
           <Link href={toHref("/login")}>
             {t(language, "nav.actions.login", "Login")}
@@ -161,6 +196,7 @@ const AppMenu: React.FC<AppMenuProps> = ({
       items={items}
       onClick={onMenuClick}
       selectedKeys={selectedKey ? [selectedKey] : []}
+      style={menuStyle}
     />
   );
 };

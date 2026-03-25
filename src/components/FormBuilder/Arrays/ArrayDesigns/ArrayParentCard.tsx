@@ -22,6 +22,7 @@ const ArrayParentCard: React.FC<ArrayParentCardProps> = ({
 
   return (
     <Card
+      className="formbuilder-responsive-card"
       title={label}
       extra={
         showAddButton && (

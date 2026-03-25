@@ -28,26 +28,48 @@ const ArrayFlatOutsideCard: React.FC<ArrayFlatOutsideCardProps> = ({
       }}
     >
       <div
+        className="formbuilder-flat-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          gap: 8,
           marginBottom: "8px",
         }}
       >
-        <Typography.Title level={5} style={{ margin: 0 }}>
+        <Typography.Title
+          level={5}
+          style={{
+            margin: 0,
+            minWidth: 0,
+            overflowWrap: "anywhere",
+            wordBreak: "break-word",
+          }}
+        >
           {label}
         </Typography.Title>
 
         {showAddButton && (
-          <Button
-            type="dashed"
-            icon={<PlusOutlined />}
-            onClick={onAdd}
-            size="small"
+          <div
+            className="formbuilder-flat-header-extra"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 8,
+              minWidth: 0,
+            }}
           >
-            Add New Block
-          </Button>
+            <Button
+              type="dashed"
+              icon={<PlusOutlined />}
+              onClick={onAdd}
+              size="small"
+            >
+              Add New Block
+            </Button>
+          </div>
         )}
       </div>
 

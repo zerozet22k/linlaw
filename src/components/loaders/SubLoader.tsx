@@ -1,32 +1,32 @@
+"use client";
+
 import React from "react";
-import { Spin } from "antd";
+
+import LoaderShell, { type LoaderVariant } from "./LoaderShell";
 
 interface SubLoaderProps {
   tip?: string;
   minHeight?: string | number;
   backgroundColor?: string;
+  size?: "small" | "default" | "large";
+  variant?: LoaderVariant;
 }
 
 const SubLoader: React.FC<SubLoaderProps> = ({
   tip = "Loading...",
   minHeight = "80vh",
   backgroundColor = "transparent",
+  size = "large",
+  variant = "section",
 }) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: minHeight,
-        backgroundColor: backgroundColor,
-        width: "100%", 
-      }}
-    >
-      <Spin size="large" tip={tip} fullscreen={false}>
-        <div style={{ padding: '50px' }} />
-      </Spin>
-    </div>
+    <LoaderShell
+      message={tip}
+      minHeight={minHeight}
+      backgroundColor={backgroundColor}
+      size={size}
+      variant={variant}
+    />
   );
 };
 

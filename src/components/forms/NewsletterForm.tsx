@@ -6,6 +6,8 @@ import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import apiClient from "@/utils/api/apiClient";
 import { INewsletterAPI } from "@/models/Newsletter";
 import LanguageTextInput from "../inputs/LanguageTextInput";
+import { applyServerFieldErrors } from "@/utils/forms/applyServerFieldErrors";
+import { hasMeaningfulLanguageValue } from "@/utils/validation/formValidation";
 
 
 interface NewsletterFormProps {
@@ -71,7 +73,11 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
       }
     } catch (error: any) {
       console.error("Error submitting newsletter form:", error);
-      message.error("An error occurred while submitting the form.");
+      const handled = applyServerFieldErrors(form, error.response?.data?.fieldErrors);
+      message.error(
+        error.response?.data?.message ||
+          (handled ? "Please correct the highlighted fields." : "An error occurred while submitting the form.")
+      );
     } finally {
       setSubmitting(false);
     }
@@ -188,7 +194,12 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ newsletter }) => {
           label="Title"
           name="title"
           rules={[
-            { required: true, message: "Please enter the newsletter title" },
+            {
+              validator: async (_, value) => {
+                if (hasMeaningfulLanguageValue(value)) return;
+                throw new Error("Please enter the newsletter title");
+              },
+            },
           ]}
         >
           <LanguageTextInput />

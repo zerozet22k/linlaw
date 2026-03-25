@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Spin, Alert, Typography } from "antd";
+import { Alert, Typography } from "antd";
 import Image from "next/image";
 import apiClient from "@/utils/api/apiClient";
+import SubLoader from "@/components/loaders/SubLoader";
 import CustomCarousel from "@/components/sections/CustomCarousel";
 import {
   TEAM_PAGE_SETTINGS_KEYS,
@@ -66,9 +67,7 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: 60 }}>
-        <Spin size="large" tip="Loading team members..." />
-      </div>
+      <SubLoader tip="Loading team members..." minHeight={220} backgroundColor="transparent" />
     );
   }
 

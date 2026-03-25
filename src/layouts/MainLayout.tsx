@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Layout, Drawer, Space, Typography, Button, theme } from "antd";
+import { Layout, Drawer, Typography, Button, theme } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import Image from "next/image";
@@ -38,7 +38,7 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
   const { language } = useLanguage(); // ✅
   const homeHref = `/${language || DEFAULT_LANG}`; // ✅
 
-  const { showGoTop, scrollToTop, isMobile } = useLayout();
+  const { showGoTop, scrollToTop, isMobile, shouldCollapsePublicNav } = useLayout();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const siteDefaults: SiteSettings = {
@@ -75,6 +75,8 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
 
   const logoSrc = (s.siteLogo || "").trim();
   const logoAlt = s.siteName || "Logo";
+  const showInlinePublicMenu = !shouldCollapsePublicNav;
+  const showPublicDrawer = !showInlinePublicMenu;
 
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -86,16 +88,26 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
           top: 0,
           zIndex: 999,
           height: 90,
-          padding: 10,
+          padding: isMobile ? "10px 12px" : "10px 20px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          gap: isMobile ? 12 : 24,
+          minWidth: 0,
           background: colorBgContainer,
           transition: "background 0.3s ease",
         }}
       >
         {/* ✅ was href="/" */}
-        <Link href={homeHref} style={{ display: "flex", alignItems: "center", height: 80 }}>
+        <Link
+          href={homeHref}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: 80,
+            flexShrink: 0,
+          }}
+        >
           {logoSrc ? (
             <div style={{ position: "relative", height: 80, width: 80 }}>
               <Image
@@ -112,16 +124,35 @@ const MainLayout: React.FC<Props> = ({ children, routeConfig }) => {
           )}
         </Link>
 
-        <Space>
-          {!isMobile && (
-            <AppMenu menuMode="horizontal" isDashboard={false} isMobile={false} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: isMobile ? 12 : 20,
+            flex: "1 1 auto",
+            minWidth: 0,
+          }}
+        >
+          {showInlinePublicMenu && (
+            <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+              <AppMenu
+                menuMode="horizontal"
+                isDashboard={false}
+                isMobile={false}
+                menuStyle={{ minWidth: 0, justifyContent: "flex-end" }}
+              />
+            </div>
           )}
-          <UserAvatar isMobile={isMobile} toggleDrawer={toggleDrawer} />
-        </Space>
+
+          <div style={{ flexShrink: 0 }}>
+            <UserAvatar isMobile={showPublicDrawer} toggleDrawer={toggleDrawer} />
+          </div>
+        </div>
       </Header>
 
       <Content style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-        {isMobile && (
+        {showPublicDrawer && (
           <Drawer
             title="Menu"
             placement="right"

@@ -1,29 +1,15 @@
 "use client";
 
 import React, { FC } from "react";
-import { Spin, theme } from "antd";
+
+import LoaderShell from "./LoaderShell";
 
 interface LoadingSpinProps {
   message?: string;
 }
 
-const LoadingSpin: FC<LoadingSpinProps> = ({ }) => {
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        background: colorBgContainer,
-      }}
-    >
-      <Spin size="large" />
-    </div>
-  );
+const LoadingSpin: FC<LoadingSpinProps> = ({ message }) => {
+  return <LoaderShell message={message} variant="page" size="large" minHeight="100dvh" />;
 };
 
 export default LoadingSpin;

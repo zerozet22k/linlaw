@@ -20,6 +20,7 @@ const ArrayChildCardDesign: React.FC<ArrayChildCardDesignProps> = ({
 }) => {
   return (
     <Card
+      className="formbuilder-responsive-card"
       title={label}
       extra={
         <Button

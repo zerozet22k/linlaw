@@ -1,5 +1,7 @@
 import React from "react";
-import { Spin, Empty, Alert } from "antd";
+import { Empty, Alert } from "antd";
+
+import LoaderShell from "./LoaderShell";
 
 interface InlineLoaderProps {
   loading: boolean;
@@ -18,22 +20,15 @@ const InlineLoader: React.FC<InlineLoaderProps> = ({
 }) => {
   if (loading) {
     return (
-      <div
-        style={{
-          textAlign: "center",
-          padding: "20px",
-          flexDirection: "column",
-        }}
-      >
-        <Spin size="small" />
-        <div style={{ marginTop: "10px", color: "#555" }}>{loadingMessage}</div>
+      <div style={{ width: "100%", maxWidth: 560, margin: "0 auto" }}>
+        <LoaderShell message={loadingMessage} size="small" variant="inline" minHeight={96} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ textAlign: "center", padding: "20px" }}>
+      <div style={{ width: "100%", maxWidth: 560, margin: "0 auto", padding: "20px 0" }}>
         <Alert title="Error" description={error} type="error" showIcon />
       </div>
     );
@@ -41,7 +36,7 @@ const InlineLoader: React.FC<InlineLoaderProps> = ({
 
   if (data.length === 0) {
     return (
-      <div style={{ textAlign: "center", padding: "20px" }}>
+      <div style={{ width: "100%", maxWidth: 560, margin: "0 auto", padding: "20px 0", textAlign: "center" }}>
         <Empty description={emptyMessage} />
       </div>
     );

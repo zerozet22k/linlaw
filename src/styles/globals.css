@@ -56,3 +56,60 @@ body.dark-theme .ant-layout-sider-trigger:hover {
   color: rgba(255, 255, 255, 0.88);
   background: #1f1f1f;
 }
+
+.formbuilder-responsive-card {
+  width: 100%;
+  min-width: 0;
+}
+
+.formbuilder-responsive-card .ant-card-head-wrapper {
+  align-items: flex-start;
+  column-gap: 12px;
+  row-gap: 8px;
+  flex-wrap: wrap;
+}
+
+.formbuilder-responsive-card .ant-card-head-title,
+.formbuilder-responsive-card .ant-card-extra,
+.formbuilder-flat-header > *,
+.formbuilder-flat-header-extra,
+.formbuilder-header-actions,
+.formbuilder-field-title {
+  min-width: 0;
+}
+
+.formbuilder-responsive-card .ant-card-head-title,
+.formbuilder-responsive-card .ant-card-head-title .ant-typography,
+.formbuilder-flat-header .ant-typography {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.formbuilder-flat-header {
+  width: 100%;
+}
+
+.formbuilder-flat-header-extra,
+.formbuilder-header-actions {
+  max-width: 100%;
+}
+
+.formbuilder-flat-header-extra > *,
+.formbuilder-header-actions > * {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .formbuilder-responsive-card .ant-card-extra,
+  .formbuilder-flat-header-extra,
+  .formbuilder-header-actions {
+    width: 100%;
+  }
+
+  .formbuilder-responsive-card .ant-card-extra > *,
+  .formbuilder-flat-header-extra > *,
+  .formbuilder-header-actions > * {
+    width: 100%;
+  }
+}

@@ -20,6 +20,7 @@ const FieldDefaultCard: React.FC<FieldDefaultCardProps> = ({
 }) => {
   return (
     <Card
+      className="formbuilder-responsive-card"
       title={<FieldTitle label={label} guide={guide} level={5} />}
       extra={extra}
       style={{

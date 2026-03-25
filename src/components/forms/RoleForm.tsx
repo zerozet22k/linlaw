@@ -26,6 +26,7 @@ import {
 } from "@/config/permissions";
 import { useUser } from "@/hooks/useUser";
 import { getHighestRoleWithPermission } from "@/utils/roleUtils";
+import { applyServerFieldErrors } from "@/utils/forms/applyServerFieldErrors";
 
 interface RoleFormProps {
   role?: RoleAPI;
@@ -37,6 +38,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
   const [selectedPermissions, setSelectedPermissions] = useState<
     AppPermissionType[]
   >(role?.permissions || []);
+  const [permissionsError, setPermissionsError] = useState<string>("");
   const router = useRouter();
   const isSystemRole = role?.type === RoleType.SYSTEM;
 
@@ -74,6 +76,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
 
   const onFinish = async (values: any) => {
     setLoading(true);
+    setPermissionsError("");
 
     values.permissions = ensureFreePerms(selectedPermissions);
 
@@ -87,6 +90,12 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
       message.error(
         `Role level must be strictly less than ${highestEditableRole.level}.`
       );
+      setLoading(false);
+      return;
+    }
+
+    if (!values.permissions.length) {
+      setPermissionsError("Select at least one permission.");
       setLoading(false);
       return;
     }
@@ -116,7 +125,17 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
       router.push("/dashboard/roles");
     } catch (error: any) {
       console.error("Error submitting form:", error);
-      message.error(error.response?.data?.message || "Failed to submit the form.");
+      const serverFieldErrors = error.response?.data?.fieldErrors;
+      if (serverFieldErrors?.permissions) {
+        setPermissionsError(serverFieldErrors.permissions);
+      }
+      const handled = applyServerFieldErrors(form, serverFieldErrors);
+      message.error(
+        error.response?.data?.message ||
+          (handled || serverFieldErrors?.permissions
+            ? "Please correct the highlighted fields."
+            : "Failed to submit the form.")
+      );
     } finally {
       setLoading(false);
     }
@@ -134,6 +153,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
       } else {
         perms.forEach((perm) => newSet.delete(perm));
       }
+      setPermissionsError("");
       return Array.from(newSet);
     });
   };
@@ -150,6 +170,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
           newSet.delete(perm);
         }
       }
+      setPermissionsError("");
       return Array.from(newSet);
     });
   };
@@ -236,7 +257,12 @@ const RoleForm: React.FC<RoleFormProps> = ({ role }) => {
                 </Col>
 
                 <Col xs={24}>
-                  <Form.Item label="Permissions">
+                  <Form.Item
+                    label="Permissions"
+                    required
+                    validateStatus={permissionsError ? "error" : undefined}
+                    help={permissionsError || undefined}
+                  >
                     <div
                       style={{
                         position: "relative",

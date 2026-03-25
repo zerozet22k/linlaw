@@ -30,6 +30,7 @@ const JsonParentCard: React.FC<JsonParentCardProps> = ({
 
   return (
     <Card
+      className="formbuilder-responsive-card"
       title={<FieldTitle label={label} guide={guide} />}
       extra={extra}
       styles={{

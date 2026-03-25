@@ -19,6 +19,7 @@ import DateTimeInput from "./Inputs/DateTimeInput";
 import TimeInput from "./Inputs/TimeInput";
 import { FileType } from "@/models/FileModel";
 import SwitchInput from "./Inputs/SwitchInput";
+import LinkAssistanceInput from "./Inputs/LinkAssistanceInput";
 
 type FieldRendererProps = {
   config: ChildFieldInfo;
@@ -35,6 +36,7 @@ const renderFormField = (
   value: any,
   onChange: (val: any) => void,
   options?: { label: string; value: string | number }[],
+  linkAssistanceMode?: "mixed" | "external",
   inputStyle?: CSSProperties,
   zIndex?: number,
 ) => {
@@ -133,6 +135,26 @@ const renderFormField = (
         />
       );
 
+    case FormType.URL:
+      return (
+        <LinkAssistanceInput
+          value={value}
+          onChange={onChange}
+          style={commonStyle}
+          mode="external"
+        />
+      );
+
+    case FormType.LINK_ASSISTANCE:
+      return (
+        <LinkAssistanceInput
+          value={value}
+          onChange={onChange}
+          style={commonStyle}
+          mode={linkAssistanceMode ?? "mixed"}
+        />
+      );
+
     default:
       return (
         <GeneralInput
@@ -164,6 +186,7 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
     value,
     onChange,
     config.options,
+    config.linkAssistanceMode,
     inputStyle,
     zIndex,
   );

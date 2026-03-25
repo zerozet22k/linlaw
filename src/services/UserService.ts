@@ -41,6 +41,9 @@ class UserService {
   async getUserByEmail(email: string): Promise<Partial<User> | null> {
     return userRepository.findByEmail(email);
   }
+  async getUserByUsername(username: string): Promise<User | null> {
+    return userRepository.findByUsername(username);
+  }
   async updateUserAvatar(
     userId: string,
     avatarUrl: string

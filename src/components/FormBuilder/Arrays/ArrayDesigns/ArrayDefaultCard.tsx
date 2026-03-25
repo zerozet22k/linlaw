@@ -20,6 +20,7 @@ const ArrayDefaultCard: React.FC<ArrayDefaultCardProps> = ({
 }) => {
   return (
     <Card
+      className="formbuilder-responsive-card"
       title={label}
       extra={
         showAddButton && (

@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Tabs, Button, message, Space, Spin } from "antd";
+import { Tabs, Button, message, Space } from "antd";
 import apiClient from "@/utils/api/apiClient";
 import CombinedField from "@/components/FormBuilder/CombinedField";
+import SubLoader from "@/components/loaders/SubLoader";
 import { useLanguageContext } from "@/contexts/LanguageContext";
 import {
   PAGE_SETTINGS_GUIDE,
@@ -115,11 +116,7 @@ const PagesContent: React.FC = () => {
   }, [pages]);
 
   if (loading) {
-    return (
-      <div style={{ textAlign: "center", marginTop: 50, height: "100vh" }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <SubLoader tip="Loading pages..." minHeight="60vh" />;
   }
 
   return (

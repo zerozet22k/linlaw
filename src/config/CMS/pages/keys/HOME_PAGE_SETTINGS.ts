@@ -172,7 +172,7 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
           link: {
             label: "Button Link",
             guide: "Where the button takes the user (URL or page path).",
-            formType: FormType.TEXT,
+            formType: FormType.LINK_ASSISTANCE,
           },
           buttonText: {
             label: "Button Label",
@@ -298,7 +298,11 @@ export const HOME_PAGE_SETTINGS: GeneralConfig<typeof HOME_PAGE_SETTINGS_KEYS> =
           [ModalBehaviorType.ITEM_MODAL]: true,
         },
         fields: {
-          ctaHref: { label: "Link", guide: 'Example: "/contact"', formType: FormType.TEXT },
+          ctaHref: {
+            label: "Link",
+            guide: 'Choose an in-app path or enter an external URL.',
+            formType: FormType.LINK_ASSISTANCE,
+          },
           ctaText: { label: "Text", formType: FormType.LANGUAGE_JSON_TEXT },
           ctaVariant: {
             label: "Variant",

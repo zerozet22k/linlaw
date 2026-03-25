@@ -5,6 +5,12 @@ import RelatedBusinessService from "@/services/RelatedBusinessService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import { APP_PERMISSIONS, checkPermission } from "@/config/permissions";
 import type { User } from "@/models/UserModel";
+import {
+  FieldErrors,
+  generateSlug,
+  hasMeaningfulLanguageValue,
+  isValidSlug,
+} from "@/utils/validation/formValidation";
 
 const toPlain = (value: unknown) => JSON.parse(JSON.stringify(value));
 
@@ -73,20 +79,37 @@ async function handleCreate(req: Request) {
   const service = new RelatedBusinessService();
   const body = await req.json();
 
-  if (!body?.slug || !body?.title) {
+  const fieldErrors: FieldErrors = {};
+  const title = body?.title;
+  const titleEn = String(body?.title?.en || "").trim();
+  const slug = String(body?.slug || "").trim() || generateSlug(titleEn);
+
+  if (!hasMeaningfulLanguageValue(title)) {
+    fieldErrors.title = "Title is required.";
+  }
+  if (!slug) {
+    fieldErrors.slug = "Slug is required.";
+  } else if (!isValidSlug(slug)) {
+    fieldErrors.slug = "Use kebab-case only (a-z, 0-9, hyphens).";
+  }
+
+  if (Object.keys(fieldErrors).length) {
     return NextResponse.json(
-      { message: "slug and title are required" },
+      { message: "Please correct the highlighted fields.", fieldErrors },
       { status: 400 }
     );
   }
 
   try {
-    const created = await service.createBusiness(body);
+    const created = await service.createBusiness({ ...body, slug });
     return NextResponse.json(toPlain(created), { status: 201 });
   } catch (error: any) {
     if (error?.code === 11000) {
       return NextResponse.json(
-        { message: "Slug already exists" },
+        {
+          message: "Slug already exists.",
+          fieldErrors: { slug: "Slug already exists." },
+        },
         { status: 409 }
       );
     }

@@ -31,15 +31,37 @@ const JsonFlatOutsideCard: React.FC<JsonFlatOutsideCardProps> = ({
     <div style={{ marginBottom: "16px", padding: "12px" }}>
       {showHeader && (
         <div
+          className="formbuilder-flat-header"
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: 8,
             marginBottom: showBody ? "8px" : 0,
           }}
         >
-          {label && <FieldTitle label={label} guide={guide} />}
-          {extra && <div>{extra}</div>}
+          {(label || guide) && (
+            <FieldTitle
+              label={label}
+              guide={guide}
+              style={{ flex: "1 1 240px", minWidth: 0 }}
+            />
+          )}
+          {extra && (
+            <div
+              className="formbuilder-flat-header-extra"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 8,
+                minWidth: 0,
+              }}
+            >
+              {extra}
+            </div>
+          )}
         </div>
       )}
 

@@ -7,6 +7,7 @@ import {
   FREE_PERMISSIONS,
 } from "@/config/permissions";
 import { getHighestRoleWithPermission } from "@/utils/roleUtils";
+import { FieldErrors } from "@/utils/validation/formValidation";
 
 const roleService = new RoleService();
 
@@ -27,9 +28,20 @@ async function handleCreateRoleRequest(request: Request, user: any) {
   try {
     const body = await request.json();
     const { name, type, permissions, level } = body;
-    if (!name || !type || !permissions || level === undefined) {
+    const fieldErrors: FieldErrors = {};
+
+    if (!String(name || "").trim()) fieldErrors.name = "Role name is required.";
+    if (!type) fieldErrors.type = "Role type is required.";
+    if (!Array.isArray(permissions) || permissions.length === 0) {
+      fieldErrors.permissions = "Select at least one permission.";
+    }
+    if (level === undefined || level === null || String(level).trim?.() === "") {
+      fieldErrors.level = "Role level is required.";
+    }
+
+    if (Object.keys(fieldErrors).length) {
       return NextResponse.json(
-        { error: "Missing required fields (name, type, permissions, level)" },
+        { message: "Please correct the highlighted fields.", fieldErrors },
         { status: 400 }
       );
     }
@@ -39,14 +51,17 @@ async function handleCreateRoleRequest(request: Request, user: any) {
     );
     if (!highestEditableRole) {
       return NextResponse.json(
-        { error: "Insufficient permissions" },
+        { message: "Insufficient permissions" },
         { status: 403 }
       );
     }
     if (level >= highestEditableRole.level) {
       return NextResponse.json(
         {
-          error: `Role level must be strictly less than ${highestEditableRole.level}`,
+          message: `Role level must be strictly less than ${highestEditableRole.level}`,
+          fieldErrors: {
+            level: `Role level must be strictly less than ${highestEditableRole.level}`,
+          },
         },
         { status: 400 }
       );
@@ -61,19 +76,31 @@ async function handleCreateRoleRequest(request: Request, user: any) {
     if (invalidPerms.length > 0) {
       return NextResponse.json(
         {
-          error: `You cannot delegate permission(s): ${invalidPerms.join(
+          message: `You cannot delegate permission(s): ${invalidPerms.join(
             ", "
           )}`,
+          fieldErrors: {
+            permissions: `You cannot delegate permission(s): ${invalidPerms.join(", ")}`,
+          },
         },
         { status: 400 }
       );
     }
     const newRole = await roleService.createRole(body);
     return NextResponse.json(newRole, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === 11000) {
+      return NextResponse.json(
+        {
+          message: "Role name already exists.",
+          fieldErrors: { name: "Role name already exists." },
+        },
+        { status: 409 }
+      );
+    }
     console.error("Error creating role:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { message: "Internal Server Error" },
       { status: 500 }
     );
   }

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Typography } from "antd";
 
@@ -48,14 +48,6 @@ const LayoutRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return hasPermission(user, routeConfig.access || [], true);
   }, [user, routeConfig]);
 
-  
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 120);
-    return () => clearTimeout(timer);
-  }, [pathname]);
-
   useEffect(() => {
     const siteName =
       settings[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteName?.trim() ||
@@ -83,7 +75,7 @@ const LayoutRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   }, [initialLoading, user, routeConfig, pathname, router]);
 
-  if (initialLoading || loading) return <LoadingSpin message="Building Theme..." />;
+  if (initialLoading) return <LoadingSpin />;
 
   const content =
     user && routeConfig?.access && !hasAccess ? (

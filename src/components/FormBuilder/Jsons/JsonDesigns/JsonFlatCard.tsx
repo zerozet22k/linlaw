@@ -43,14 +43,34 @@ const JsonFlatCard: React.FC<JsonFlatCardProps> = ({
     >
       {showHeader && (
         <div
+          className="formbuilder-flat-header"
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
+            flexWrap: "wrap",
+            gap: 8,
           }}
         >
-          <FieldTitle label={label} guide={guide} />
-          {extra && <div>{extra}</div>}
+          <FieldTitle
+            label={label}
+            guide={guide}
+            style={{ flex: "1 1 240px", minWidth: 0 }}
+          />
+          {extra && (
+            <div
+              className="formbuilder-flat-header-extra"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 8,
+                minWidth: 0,
+              }}
+            >
+              {extra}
+            </div>
+          )}
         </div>
       )}
 

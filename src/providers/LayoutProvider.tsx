@@ -18,6 +18,7 @@ export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
   const [showGoTop, setShowGoTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const shouldCollapsePublicNav = useMediaQuery({ maxWidth: 1180 });
 
   useEffect(() => {
     function handleScroll() {
@@ -52,8 +53,9 @@ export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
       scrollProgress,
       scrollToTop,
       isMobile,
+      shouldCollapsePublicNav,
     }),
-    [showGoTop, scrollProgress, scrollToTop, isMobile]
+    [showGoTop, scrollProgress, scrollToTop, isMobile, shouldCollapsePublicNav]
   );
 
   return (

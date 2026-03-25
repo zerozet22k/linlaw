@@ -16,11 +16,29 @@ const FieldTitle: React.FC<FieldTitleProps> = ({
   level = 4,
 }) => {
   return (
-    <div style={{ display: "flex", alignItems: "center", ...style }}>
+    <div
+      className="formbuilder-field-title"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        columnGap: 10,
+        rowGap: 4,
+        minWidth: 0,
+        ...style,
+      }}
+    >
       {label && (
         <Typography.Title
           level={level}
-          style={{ fontWeight: 500, marginTop: 0 }}
+          style={{
+            fontWeight: 500,
+            marginTop: 0,
+            marginBottom: 0,
+            minWidth: 0,
+            overflowWrap: "anywhere",
+            wordBreak: "break-word",
+          }}
         >
           {label}
         </Typography.Title>
@@ -29,9 +47,10 @@ const FieldTitle: React.FC<FieldTitleProps> = ({
         <Tooltip title={guide}>
           <Typography.Text
             style={{
-              marginLeft: 10,
+              marginLeft: 0,
               cursor: "pointer",
               fontWeight: 600,
+              flex: "0 0 auto",
             }}
           >
             ℹ️

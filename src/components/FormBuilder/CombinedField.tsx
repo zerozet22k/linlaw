@@ -31,42 +31,54 @@ const CombinedField: React.FC<CombinedFieldProps> = ({
   zIndex = 1000,
   surface = "body",
 }) => {
+  const wrapperStyle: React.CSSProperties =
+    surface === "header"
+      ? { minWidth: 0, maxWidth: "100%", flex: "0 1 auto" }
+      : { width: "100%", minWidth: 0 };
+
   if ("fields" in config) {
     if (config.type === NestedFieldType.ARRAY) {
       return (
-        <ArrayFieldRenderer
-          config={config}
-          value={values || []}
-          onChange={(value) => onChange(keyPrefix, value, "array")}
-          zIndex={zIndex + 1}
-      
-        />
+        <div style={wrapperStyle}>
+          <ArrayFieldRenderer
+            config={config}
+            value={values || []}
+            onChange={(value) => onChange(keyPrefix, value, "array")}
+            style={surface === "header" ? { minWidth: 0 } : wrapperStyle}
+            zIndex={zIndex + 1}
+          />
+        </div>
       );
     }
 
     if (config.type === NestedFieldType.JSON) {
       return (
-        <JsonFieldRenderer
-          config={config as any}
-          value={values || {}}
-          onChange={(value) => onChange(keyPrefix, value, "json")}
-          zIndex={zIndex + 1}
-          surface={surface}
-        />
+        <div style={wrapperStyle}>
+          <JsonFieldRenderer
+            config={config as any}
+            value={values || {}}
+            onChange={(value) => onChange(keyPrefix, value, "json")}
+            style={surface === "header" ? { minWidth: 0 } : wrapperStyle}
+            zIndex={zIndex + 1}
+            surface={surface}
+          />
+        </div>
       );
     }
   }
 
   if (isFieldInfo(config)) {
     return (
-      <FieldRenderer
-        config={config}
-        value={values}
-        onChange={(value) => onChange(keyPrefix, value, config.formType)}
-        style={{ position: "relative" }}
-        zIndex={zIndex + 1}
-        surface={surface}  
-      />
+      <div style={wrapperStyle}>
+        <FieldRenderer
+          config={config}
+          value={values}
+          onChange={(value) => onChange(keyPrefix, value, config.formType)}
+          style={{ position: "relative", minWidth: 0 }}
+          zIndex={zIndex + 1}
+          surface={surface}
+        />
+      </div>
     );
   }
 

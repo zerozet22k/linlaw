@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Typography, Spin, Alert, theme } from "antd";
+import { Typography, Alert, theme } from "antd";
 
 import apiClient from "@/utils/api/apiClient";
+import SubLoader from "@/components/loaders/SubLoader";
 import PageWrapper from "@/components/ui/PageWrapper";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
@@ -111,11 +112,7 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
         }}
       >
         {loading && (
-          <div style={{ display: "flex", justifyContent: "center", margin: "40px auto" }}>
-            <Spin size="large" tip={tLoading} fullscreen={false}>
-              <div style={{ width: 100, height: 48 }} />
-            </Spin>
-          </div>
+          <SubLoader tip={tLoading} minHeight={220} />
         )}
 
         {error && (

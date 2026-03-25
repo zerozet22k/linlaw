@@ -28,6 +28,7 @@ const JsonDefaultCard: React.FC<JsonDefaultCardProps> = ({
 
   return (
     <Card
+      className="formbuilder-responsive-card"
       title={<FieldTitle label={label} guide={guide} />}
       extra={extra}
       styles={{

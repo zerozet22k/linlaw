@@ -24,6 +24,11 @@ import LanguageJsonTextInput from "@/components/inputs/standalone/LanguageJsonTe
 import LanguageJsonTextarea from "@/components/inputs/standalone/LanguageJsonTextarea";
 import type { CareerAPI } from "@/models/CareerModel";
 import { EMP_TYPE_LABEL } from "@/utils/careerUtil";
+import { applyServerFieldErrors } from "@/utils/forms/applyServerFieldErrors";
+import {
+  hasMeaningfulLanguageValue,
+  isValidYmd,
+} from "@/utils/validation/formValidation";
 
 type Props = {
   career?: CareerAPI;
@@ -171,7 +176,11 @@ const CareerForm: React.FC<Props> = ({ career }) => {
       router.push("/dashboard/careers");
     } catch (error: any) {
       console.error("Career submit error:", error);
-      message.error(error?.response?.data?.message || "Failed to save career.");
+      const handled = applyServerFieldErrors(form, error?.response?.data?.fieldErrors);
+      message.error(
+        error?.response?.data?.message ||
+          (handled ? "Please correct the highlighted fields." : "Failed to save career.")
+      );
     } finally {
       setLoading(false);
     }
@@ -197,7 +206,14 @@ const CareerForm: React.FC<Props> = ({ career }) => {
                   <Form.Item
                     label="Title"
                     name="title"
-                    rules={[{ required: true, message: "Please enter a title." }]}
+                    rules={[
+                      {
+                        validator: async (_, value) => {
+                          if (hasMeaningfulLanguageValue(value)) return;
+                          throw new Error("Please enter a title.");
+                        },
+                      },
+                    ]}
                   >
                     <LanguageJsonTextInput />
                   </Form.Item>
@@ -232,13 +248,35 @@ const CareerForm: React.FC<Props> = ({ career }) => {
                 </Col>
 
                 <Col xs={24} md={6}>
-                  <Form.Item label="Posted At" name="postedAt" rules={[ymdRule]}>
+                  <Form.Item
+                    label="Posted At"
+                    name="postedAt"
+                    rules={[
+                      {
+                        validator: async (_, value) => {
+                          if (!value || isValidYmd(value)) return;
+                          throw new Error(ymdRule.message);
+                        },
+                      },
+                    ]}
+                  >
                     <Input placeholder="YYYY-MM-DD" />
                   </Form.Item>
                 </Col>
 
                 <Col xs={24} md={6}>
-                  <Form.Item label="Closing Date" name="closingDate" rules={[ymdRule]}>
+                  <Form.Item
+                    label="Closing Date"
+                    name="closingDate"
+                    rules={[
+                      {
+                        validator: async (_, value) => {
+                          if (!value || isValidYmd(value)) return;
+                          throw new Error(ymdRule.message);
+                        },
+                      },
+                    ]}
+                  >
                     <Input placeholder="YYYY-MM-DD" />
                   </Form.Item>
                 </Col>

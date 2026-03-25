@@ -5,6 +5,11 @@ import CareerService from "@/services/CareerService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import { APP_PERMISSIONS, checkPermission } from "@/config/permissions";
 import type { User } from "@/models/UserModel";
+import {
+  FieldErrors,
+  hasMeaningfulLanguageValue,
+  isValidYmd,
+} from "@/utils/validation/formValidation";
 
 const service = new CareerService();
 const toPlain = (value: unknown) => JSON.parse(JSON.stringify(value));
@@ -66,9 +71,21 @@ async function handleGet(request: Request, user: User | null) {
 async function handleCreate(request: Request) {
   const body = await request.json();
 
-  if (!body?.title) {
+  const fieldErrors: FieldErrors = {};
+
+  if (!hasMeaningfulLanguageValue(body?.title)) {
+    fieldErrors.title = "Please enter a title.";
+  }
+  if (body?.postedAt && !isValidYmd(body.postedAt)) {
+    fieldErrors.postedAt = "Use YYYY-MM-DD format.";
+  }
+  if (body?.closingDate && !isValidYmd(body.closingDate)) {
+    fieldErrors.closingDate = "Use YYYY-MM-DD format.";
+  }
+
+  if (Object.keys(fieldErrors).length) {
     return NextResponse.json(
-      { message: "title is required" },
+      { message: "Please correct the highlighted fields.", fieldErrors },
       { status: 400 }
     );
   }

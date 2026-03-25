@@ -71,7 +71,16 @@ const JsonDesignRenderer: React.FC<JsonDesignRendererProps> = ({
     if (isHeader) {
       return (
         <>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div
+            className="formbuilder-header-actions"
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              flexWrap: "wrap",
+              minWidth: 0,
+            }}
+          >
             {editButtonHeader}
             {extra}
           </div>
@@ -91,13 +100,20 @@ const JsonDesignRenderer: React.FC<JsonDesignRendererProps> = ({
 
 
     if (placement === "header") {
-      const extraWithEdit = extra ? (
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      const extraWithEdit = (
+        <div
+          className="formbuilder-header-actions"
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            flexWrap: "wrap",
+            minWidth: 0,
+          }}
+        >
           {extra}
           {editButtonHeader}
         </div>
-      ) : (
-        editButtonHeader
       );
 
       const shell =

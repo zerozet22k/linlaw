@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import NewsletterService from "@/services/NewsletterService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import { APP_PERMISSIONS } from "@/config/permissions";
+import {
+  FieldErrors,
+  hasMeaningfulLanguageValue,
+} from "@/utils/validation/formValidation";
 
 const newsletterService = new NewsletterService();
 
@@ -34,9 +38,14 @@ export const POST = async (request: Request) =>
     async (req, _user) => {
       try {
         const data = await req.json();
-        if (!data.title) {
+        const fieldErrors: FieldErrors = {};
+        if (!hasMeaningfulLanguageValue(data?.title)) {
+          fieldErrors.title = "Please enter the newsletter title.";
+        }
+
+        if (Object.keys(fieldErrors).length) {
           return NextResponse.json(
-            { error: "Title is required." },
+            { message: "Please correct the highlighted fields.", fieldErrors },
             { status: 400 }
           );
         }
@@ -48,7 +57,7 @@ export const POST = async (request: Request) =>
       } catch (error) {
         console.error("Error creating newsletter:", error);
         return NextResponse.json(
-          { error: "Failed to create newsletter." },
+          { message: "Failed to create newsletter." },
           { status: 500 }
         );
       }

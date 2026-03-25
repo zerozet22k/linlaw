@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Spin, Alert, Typography, theme } from "antd";
+import { Alert, Typography, theme } from "antd";
 import { useParams } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
 import { rgba } from "polished";
 import Image from "next/image";
 
+import SubLoader from "@/components/loaders/SubLoader";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
 
@@ -29,6 +30,7 @@ const TeamMemberClient: React.FC = () => {
   const { language } = useLanguage();
 
   const tError = useMemo(() => t(language, "common.error"), [language]);
+  const tLoading = useMemo(() => t(language, "common.loading"), [language]);
   const tFailedToLoad = useMemo(() => t(language, "team.failedToLoadUser"), [language]);
   const tNotFound = useMemo(() => t(language, "team.userNotFound"), [language]);
   const tNoBio = useMemo(() => t(language, "team.noBiography"), [language]);
@@ -50,7 +52,7 @@ const TeamMemberClient: React.FC = () => {
     })();
   }, [username, tFailedToLoad]);
 
-  if (loading) return <Spin size="large" style={{ display: "block", margin: 40 }} />;
+  if (loading) return <SubLoader tip={tLoading} minHeight={240} />;
 
   if (error || !user)
     return (

@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Tabs, Button, message, Space, Spin } from "antd";
+import { Tabs, Button, message, Space } from "antd";
 import apiClient from "@/utils/api/apiClient";
 import CombinedField from "@/components/FormBuilder/CombinedField";
+import SubLoader from "@/components/loaders/SubLoader";
 import {
   settingGroupedKeys,
   SETTINGS_GUIDE,
@@ -129,11 +130,7 @@ const SettingsPage: React.FC = () => {
   }, [settings]);
 
   if (loading) {
-    return (
-      <div style={{ textAlign: "center", marginTop: 50, height: "100vh" }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <SubLoader tip="Loading settings..." minHeight="60vh" />;
   }
 
   return (

@@ -4,6 +4,7 @@ export enum FormType {
   BOOLEAN = "boolean",
   SWITCH = "switch",
   URL = "url",
+  LINK_ASSISTANCE = "link-assistance",
   FILE = "file",
   SELECT = "select",
   EMAIL = "email",
@@ -339,14 +340,18 @@ export const BOX_SIDES_FIELD = {
   formType: FormType.BOX_SIDES,
 } as const;
 
+export type LinkAssistanceMode = "mixed" | "external";
+
 interface BaseChildField {
   label?: string;
   guide?: string;
+  linkAssistanceMode?: LinkAssistanceMode;
 }
 
 export interface FieldInfo extends BaseParentField {
   formType: FormType;
   parentDesign?: FieldDesign;
+  linkAssistanceMode?: LinkAssistanceMode;
 }
 
 export interface NestedJsonField extends BaseParentField {

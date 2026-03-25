@@ -7,6 +7,7 @@ interface LayoutContextProps {
   scrollProgress: number;
   scrollToTop: () => void;
   isMobile: boolean;
+  shouldCollapsePublicNav: boolean;
 }
 
 export const LayoutContext = createContext<LayoutContextProps | undefined>(

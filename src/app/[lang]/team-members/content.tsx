@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, Row, Col, Spin, Alert, theme, Typography } from "antd";
+import { Card, Row, Col, Alert, theme, Typography } from "antd";
 import Link from "next/link";
 import apiClient from "@/utils/api/apiClient";
 import PageWrapper from "@/components/ui/PageWrapper";
+import SubLoader from "@/components/loaders/SubLoader";
 import { TEAM_PAGE_SETTINGS_KEYS, TEAM_PAGE_SETTINGS_TYPES } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
 import { TeamBlockAPI } from "@/models/TeamBlock";
 import { motion } from "framer-motion";
@@ -88,11 +89,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
         }}
       >
         {loading && (
-          <div style={{ display: "flex", justifyContent: "center", margin: "40px auto" }}>
-            <Spin size="large" tip={tLoading} fullscreen={false}>
-              <div style={{ width: 100, height: 48 }} />
-            </Spin>
-          </div>
+          <SubLoader tip={tLoading} minHeight={220} />
         )}
 
         {error && (

@@ -22,6 +22,8 @@ import apiClient from "@/utils/api/apiClient";
 import LanguageJsonTextInput from "../inputs/standalone/LanguageJsonTextInput";
 import LanguageJsonTextarea from "../inputs/standalone/LanguageJsonTextarea";
 import ImageSelection from "@/components/inputs/standalone/ImageSelection";
+import { applyServerFieldErrors } from "@/utils/forms/applyServerFieldErrors";
+import { generateSlug, sanitizeSlug } from "@/utils/validation/formValidation";
 
 const DAY_OPTIONS = [
     "Monday",
@@ -41,14 +43,6 @@ const PLATFORM_OPTIONS = [
 ];
 
 const TIME_24H = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-const slugify = (s: string) =>
-    (s || "")
-        .toLowerCase()
-        .trim()
-        .replace(/['"]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
 
 const isValidUrl = (s?: string) => {
     if (!s) return true;
@@ -136,7 +130,7 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
             return;
         }
         slugTouchedRef.current = false;
-        setSlugProgrammatically(slugify(en));
+        setSlugProgrammatically(generateSlug(en));
     };
 
     const onValuesChange = (changed: any, all: any) => {
@@ -159,7 +153,7 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
             const en = getEn(all.title);
             if (!en) return;
 
-            setSlugProgrammatically(slugify(en));
+            setSlugProgrammatically(generateSlug(en));
         }
     };
 
@@ -173,7 +167,7 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
         setLoading(true);
         try {
             const payload = {
-                slug: values.slug,
+                slug: sanitizeSlug(values.slug),
                 isActive: values.isActive ?? true,
                 order: values.order ?? 0,
                 title: values.title ?? {},
@@ -201,7 +195,11 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
             router.push("/dashboard/related-businesses");
         } catch (e: any) {
             console.error("RelatedBusiness submit error:", e);
-            message.error(e?.response?.data?.message || "Failed to submit form.");
+            const handled = applyServerFieldErrors(form, e?.response?.data?.fieldErrors);
+            message.error(
+                e?.response?.data?.message ||
+                    (handled ? "Please correct the highlighted fields." : "Failed to submit form.")
+            );
         } finally {
             setLoading(false);
         }
@@ -247,7 +245,7 @@ const RelatedBusinessForm: React.FC<Props> = ({ business }) => {
                                             </Space>
                                         }
                                         name="slug"
-                                        normalize={(v) => slugify(v)}
+                                        normalize={(v) => sanitizeSlug(v)}
                                         rules={[
                                             { required: true, message: "Please enter a slug" },
                                             {

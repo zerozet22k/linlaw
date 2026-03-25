@@ -1,39 +1,602 @@
-# Lin Law
 
-A multilingual business platform built with Next.js and TypeScript for legal, corporate, tax, travel, and content management workflows.
+```
+linlaw
+├─ .eslintrc.json
+├─ .VSCodeCounter
+│  └─ 2026-03-23_18-13-28
+│     ├─ details.md
+│     ├─ diff-details.md
+│     ├─ diff.csv
+│     ├─ diff.md
+│     ├─ diff.txt
+│     ├─ results.csv
+│     ├─ results.json
+│     ├─ results.md
+│     └─ results.txt
+├─ cors.json
+├─ LICENSE
+├─ next.config.mjs
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.mjs
+├─ public
+│  ├─ googlec6edda4dd1f1d963.html
+│  ├─ images
+│  │  ├─ default-avatar.webp
+│  │  ├─ favicon.ico
+│  │  ├─ logo.png
+│  │  ├─ logo.svg
+│  │  └─ product-logo.webp
+│  └─ site.webmanifest
+├─ push_all.bat
+├─ README2.md
+├─ src
+│  ├─ app
+│  │  ├─ api
+│  │  │  ├─ auth
+│  │  │  │  ├─ login
+│  │  │  │  │  └─ route.tsx
+│  │  │  │  ├─ refresh
+│  │  │  │  │  └─ route.tsx
+│  │  │  │  └─ signup
+│  │  │  │     └─ route.tsx
+│  │  │  ├─ careers
+│  │  │  │  ├─ route.ts
+│  │  │  │  └─ [careerId]
+│  │  │  │     └─ route.ts
+│  │  │  ├─ contact-us
+│  │  │  │  └─ route.ts
+│  │  │  ├─ data
+│  │  │  │  └─ route.ts
+│  │  │  ├─ files
+│  │  │  │  ├─ route.ts
+│  │  │  │  ├─ signedUrl
+│  │  │  │  │  └─ route.ts
+│  │  │  │  ├─ sync
+│  │  │  │  │  └─ route.ts
+│  │  │  │  └─ [id]
+│  │  │  │     └─ route.ts
+│  │  │  ├─ firebase
+│  │  │  │  ├─ set-cors
+│  │  │  │  │  └─ route.ts
+│  │  │  │  └─ status
+│  │  │  │     └─ route.ts
+│  │  │  ├─ inquiry
+│  │  │  │  ├─ route.ts
+│  │  │  │  └─ [id]
+│  │  │  │     ├─ reply
+│  │  │  │     │  ├─ index.ts
+│  │  │  │     │  └─ [replyId].ts
+│  │  │  │     └─ route.ts
+│  │  │  ├─ me
+│  │  │  │  ├─ getSignedUrl
+│  │  │  │  │  └─ route.ts
+│  │  │  │  └─ route.ts
+│  │  │  ├─ newsletters
+│  │  │  │  ├─ route.ts
+│  │  │  │  └─ [newsletterId]
+│  │  │  │     ├─ attachment
+│  │  │  │     │  ├─ route.ts
+│  │  │  │     │  ├─ signurl
+│  │  │  │     │  │  └─ route.ts
+│  │  │  │     │  └─ [attachmentId]
+│  │  │  │     │     └─ route.ts
+│  │  │  │     └─ route.ts
+│  │  │  ├─ pages
+│  │  │  │  └─ route.ts
+│  │  │  ├─ related-businesses
+│  │  │  │  ├─ id
+│  │  │  │  │  └─ [id]
+│  │  │  │  │     └─ route.ts
+│  │  │  │  ├─ route.ts
+│  │  │  │  └─ slug
+│  │  │  │     └─ [slug]
+│  │  │  │        └─ route.ts
+│  │  │  ├─ roles
+│  │  │  │  ├─ route.ts
+│  │  │  │  ├─ sync-admin
+│  │  │  │  │  └─ route.ts
+│  │  │  │  ├─ sync-system
+│  │  │  │  │  └─ route.ts
+│  │  │  │  └─ [id]
+│  │  │  │     └─ route.ts
+│  │  │  ├─ send-emails
+│  │  │  │  └─ route.ts
+│  │  │  ├─ settings
+│  │  │  │  ├─ key
+│  │  │  │  │  └─ [key]
+│  │  │  │  │     └─ route.ts
+│  │  │  │  ├─ public
+│  │  │  │  │  └─ route.ts
+│  │  │  │  └─ route.ts
+│  │  │  ├─ setup
+│  │  │  │  └─ route.ts
+│  │  │  ├─ team
+│  │  │  │  ├─ route.ts
+│  │  │  │  └─ [id]
+│  │  │  │     └─ route.ts
+│  │  │  └─ users
+│  │  │     ├─ route.ts
+│  │  │     └─ [id]
+│  │  │        ├─ getSignedUrl
+│  │  │        │  └─ route.ts
+│  │  │        └─ route.ts
+│  │  ├─ dashboard
+│  │  │  ├─ careers
+│  │  │  │  ├─ create
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  ├─ page.tsx
+│  │  │  │  └─ [careerId]
+│  │  │  │     └─ page.tsx
+│  │  │  ├─ files
+│  │  │  │  ├─ page.tsx
+│  │  │  │  └─ upload
+│  │  │  │     └─ page.tsx
+│  │  │  ├─ newsletters
+│  │  │  │  ├─ create
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  ├─ page.tsx
+│  │  │  │  └─ [newsletterId]
+│  │  │  │     └─ page.tsx
+│  │  │  ├─ page.tsx
+│  │  │  ├─ pages
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ related-businesses
+│  │  │  │  ├─ create
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  ├─ page.tsx
+│  │  │  │  └─ [id]
+│  │  │  │     └─ page.tsx
+│  │  │  ├─ roles
+│  │  │  │  ├─ create
+│  │  │  │  │  └─ page.tsx
+│  │  │  │  ├─ page.tsx
+│  │  │  │  └─ [id]
+│  │  │  │     └─ page.tsx
+│  │  │  ├─ send-emails
+│  │  │  │  └─ page.tsx
+│  │  │  ├─ settings
+│  │  │  │  └─ page.tsx
+│  │  │  └─ users
+│  │  │     ├─ create
+│  │  │     │  └─ page.tsx
+│  │  │     ├─ page.tsx
+│  │  │     └─ [id]
+│  │  │        └─ page.tsx
+│  │  ├─ layout-content.tsx
+│  │  ├─ layout.tsx
+│  │  ├─ robots.ts
+│  │  ├─ sitemap.ts
+│  │  └─ [lang]
+│  │     ├─ careers
+│  │     │  ├─ content.tsx
+│  │     │  └─ page.tsx
+│  │     ├─ content.tsx
+│  │     ├─ layout.tsx
+│  │     ├─ login
+│  │     │  ├─ content.tsx
+│  │     │  └─ page.tsx
+│  │     ├─ newsletters
+│  │     │  ├─ content.tsx
+│  │     │  ├─ page.tsx
+│  │     │  └─ [id]
+│  │     │     ├─ content.tsx
+│  │     │     └─ page.tsx
+│  │     ├─ page.tsx
+│  │     ├─ profile
+│  │     │  ├─ content.tsx
+│  │     │  └─ page.tsx
+│  │     ├─ related-businesses
+│  │     │  ├─ content.tsx
+│  │     │  ├─ page.tsx
+│  │     │  └─ [slug]
+│  │     │     ├─ content.tsx
+│  │     │     └─ page.tsx
+│  │     ├─ signup
+│  │     │  ├─ content.tsx
+│  │     │  └─ page.tsx
+│  │     └─ team-members
+│  │        ├─ content.tsx
+│  │        ├─ page.tsx
+│  │        └─ [username]
+│  │           ├─ content.css
+│  │           ├─ content.tsx
+│  │           └─ page.tsx
+│  ├─ components
+│  │  ├─ FileUploader
+│  │  │  ├─ FileUploader.tsx
+│  │  │  └─ UploadProgressList.tsx
+│  │  ├─ FormBuilder
+│  │  │  ├─ Arrays
+│  │  │  │  ├─ ArrayChildDesignRenderer.tsx
+│  │  │  │  ├─ ArrayChildDesigns
+│  │  │  │  │  ├─ ArrayChildCardDesign.tsx
+│  │  │  │  │  ├─ ArrayChildListDesign.tsx
+│  │  │  │  │  ├─ ArrayChildNoneDesign.tsx
+│  │  │  │  │  └─ ArrayChildTableDesign.tsx
+│  │  │  │  ├─ ArrayDesignRenderer.tsx
+│  │  │  │  ├─ ArrayDesigns
+│  │  │  │  │  ├─ ArrayDefaultCard.tsx
+│  │  │  │  │  ├─ ArrayFlatCard.tsx
+│  │  │  │  │  ├─ ArrayFlatOutsideCard.tsx
+│  │  │  │  │  ├─ ArrayNoneCard.tsx
+│  │  │  │  │  └─ ArrayParentCard.tsx
+│  │  │  │  └─ ArrayFieldRenderer.tsx
+│  │  │  ├─ CombinedField.tsx
+│  │  │  ├─ CustomModal.tsx
+│  │  │  ├─ Fields
+│  │  │  │  ├─ extra
+│  │  │  │  │  └─ FieldTitle.tsx
+│  │  │  │  ├─ FieldDesignRenderer.tsx
+│  │  │  │  ├─ FieldDesigns
+│  │  │  │  │  ├─ FieldDefaultCard.tsx
+│  │  │  │  │  ├─ FieldParentCard.tsx
+│  │  │  │  │  └─ FieldRow.tsx
+│  │  │  │  ├─ FieldRenderer.tsx
+│  │  │  │  └─ Inputs
+│  │  │  │     ├─ BoxSidesInput.tsx
+│  │  │  │     ├─ DateInput.tsx
+│  │  │  │     ├─ DateTimeInput.tsx
+│  │  │  │     ├─ GeneralInput.tsx
+│  │  │  │     ├─ IconSelector.tsx
+│  │  │  │     ├─ LanguageJsonTextarea.tsx
+│  │  │  │     ├─ LanguageJsonTextInput.tsx
+│  │  │  │     ├─ MediaSelector.tsx
+│  │  │  │     ├─ ResponsiveImagesInput.tsx
+│  │  │  │     ├─ RoleSelector.tsx
+│  │  │  │     ├─ SizeInput.tsx
+│  │  │  │     ├─ sortable
+│  │  │  │     │  └─ SortableTag.tsx
+│  │  │  │     ├─ SupportedLanguageSelector.module.css
+│  │  │  │     ├─ SupportedLanguageSelector.tsx
+│  │  │  │     ├─ SwitchInput.tsx
+│  │  │  │     ├─ TimeInput.tsx
+│  │  │  │     ├─ UserSelector.tsx
+│  │  │  │     └─ UsersSelector.tsx
+│  │  │  ├─ InputStyle.ts
+│  │  │  ├─ Jsons
+│  │  │  │  ├─ JsonChildDesignRenderer.tsx
+│  │  │  │  ├─ JsonDesignRenderer.tsx
+│  │  │  │  ├─ JsonDesigns
+│  │  │  │  │  ├─ JsonDefaultCard.tsx
+│  │  │  │  │  ├─ JsonFlatCard.tsx
+│  │  │  │  │  ├─ JsonFlatOutsideCard.tsx
+│  │  │  │  │  ├─ JsonNone.tsx
+│  │  │  │  │  └─ JsonParentCard.tsx
+│  │  │  │  └─ JsonFieldRenderer.tsx
+│  │  │  └─ SortableItem.tsx
+│  │  ├─ forms
+│  │  │  ├─ CareerForm.tsx
+│  │  │  ├─ NewsletterForm.tsx
+│  │  │  ├─ ProfileUpdateForm.tsx
+│  │  │  ├─ RelatedBusinessForm.tsx
+│  │  │  ├─ RoleForm.tsx
+│  │  │  ├─ SetupForm.tsx
+│  │  │  └─ UserForm.tsx
+│  │  ├─ inputs
+│  │  │  ├─ ImageCropper.tsx
+│  │  │  ├─ LanguageTextInput.tsx
+│  │  │  ├─ ProfileAvatar.tsx
+│  │  │  ├─ PublicAPIDynamicDropdown.tsx
+│  │  │  ├─ PublicAPIDynamicMultiSelect.tsx
+│  │  │  ├─ RichTextEditor.css
+│  │  │  ├─ RichTextEditor.tsx
+│  │  │  └─ standalone
+│  │  │     ├─ ImageSelection.tsx
+│  │  │     ├─ LanguageJsonTextarea.tsx
+│  │  │     ├─ LanguageJsonTextInput.tsx
+│  │  │     ├─ LanguageSelection.tsx
+│  │  │     ├─ RoleSelection.tsx
+│  │  │     └─ UserSelection.tsx
+│  │  ├─ loaders
+│  │  │  ├─ InlineLoader.tsx
+│  │  │  ├─ LoadingSpin.tsx
+│  │  │  ├─ LoadingSpinner.tsx
+│  │  │  ├─ ProtectedPage.tsx
+│  │  │  └─ SubLoader.tsx
+│  │  ├─ modals
+│  │  │  └─ FileSelectionModal.tsx
+│  │  ├─ RelatedBusinessCard.css
+│  │  ├─ RelatedBusinessCard.tsx
+│  │  ├─ sections
+│  │  │  ├─ AboutUsSection.tsx
+│  │  │  ├─ ClickToAction.tsx
+│  │  │  ├─ CustomCarousel.tsx
+│  │  │  ├─ FAQSection.tsx
+│  │  │  ├─ HeroSliderSection.css
+│  │  │  ├─ HeroSliderSection.tsx
+│  │  │  ├─ NewsletterSection.tsx
+│  │  │  ├─ PromoShowcaseSection.tsx
+│  │  │  ├─ RelatedBusinessesSection.tsx
+│  │  │  ├─ ServicesSection.tsx
+│  │  │  ├─ TeamSection.tsx
+│  │  │  └─ TestimonialsSection.tsx
+│  │  └─ ui
+│  │     ├─ FileThumbnail.tsx
+│  │     ├─ PageWrapper.tsx
+│  │     ├─ SocialLink.tsx
+│  │     ├─ SocialLinks.tsx
+│  │     └─ UserAvatar.tsx
+│  ├─ config
+│  │  ├─ CMS
+│  │  │  ├─ fields
+│  │  │  │  └─ SECTION_SETTINGS.tsx
+│  │  │  ├─ pages
+│  │  │  │  ├─ keys
+│  │  │  │  │  ├─ CAREER_PAGE_SETTINGS.ts
+│  │  │  │  │  ├─ HOME_PAGE_SETTINGS.ts
+│  │  │  │  │  ├─ NEWSLETTER_PAGE_SETTINGS.tsx
+│  │  │  │  │  ├─ RELATED_BUSINESSES_PAGE_SETTINGS.ts
+│  │  │  │  │  ├─ shared
+│  │  │  │  │  │  ├─ sharedPageConfig.ts
+│  │  │  │  │  │  └─ sharedPageTypes.ts
+│  │  │  │  │  └─ TEAM_PAGE_SETTINGS.tsx
+│  │  │  │  └─ pageKeys.ts
+│  │  │  └─ settings
+│  │  │     ├─ index.ts
+│  │  │     ├─ keys
+│  │  │     │  ├─ DESIGN_SCHEMA_KEYS.ts
+│  │  │     │  ├─ FIREBASE_SETTINGS_KEYS.ts
+│  │  │     │  ├─ GLOBAL_SETTINGS_KEYS.ts
+│  │  │     │  ├─ LANGUAGE_SETTINGS_KEYS.ts
+│  │  │     │  ├─ MAIL_KEYS.ts
+│  │  │     │  ├─ MESSAGING_SERVICE_KEYS.ts
+│  │  │     │  ├─ PUSHER_SETTINGS_KEYS.ts
+│  │  │     │  ├─ SEO_SETTINGS_KEYS.ts
+│  │  │     │  └─ SOCIAL_MEDIA_KEYS.ts
+│  │  │     └─ settingKeys.ts
+│  │  ├─ navigations
+│  │  │  ├─ IconMapper.tsx
+│  │  │  ├─ menu.ts
+│  │  │  ├─ navigationMenu.tsx
+│  │  │  └─ routes.ts
+│  │  └─ permissions.ts
+│  ├─ contexts
+│  │  ├─ FileContext.tsx
+│  │  ├─ LanguageContext.tsx
+│  │  ├─ LayoutContext.tsx
+│  │  ├─ SettingsContext.tsx
+│  │  └─ UserContext.tsx
+│  ├─ db
+│  │  └─ index.ts
+│  ├─ hooks
+│  │  ├─ useFetchFiles.ts
+│  │  ├─ useFile.ts
+│  │  ├─ useFileModal.ts
+│  │  ├─ useFileUpload.ts
+│  │  ├─ useFirebaseConfig.ts
+│  │  ├─ useHash.ts
+│  │  ├─ useLanguage.tsx
+│  │  ├─ useLayout.ts
+│  │  ├─ useSettings.ts
+│  │  └─ useUser.ts
+│  ├─ i18n
+│  │  ├─ getTranslatedText.ts
+│  │  ├─ index.ts
+│  │  ├─ lang.server.ts
+│  │  ├─ languages.ts
+│  │  ├─ locales
+│  │  │  ├─ de
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ en
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ es
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ fr
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ ja
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ ko
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ ms
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ my
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  ├─ th
+│  │  │  │  ├─ aboutUs.ts
+│  │  │  │  ├─ career.ts
+│  │  │  │  ├─ common.ts
+│  │  │  │  ├─ contact.ts
+│  │  │  │  ├─ faq.ts
+│  │  │  │  ├─ index.ts
+│  │  │  │  ├─ nav.ts
+│  │  │  │  ├─ newsletter.ts
+│  │  │  │  ├─ relatedBusinesses.ts
+│  │  │  │  ├─ team.ts
+│  │  │  │  └─ title.ts
+│  │  │  └─ zh
+│  │  │     ├─ aboutUs.ts
+│  │  │     ├─ career.ts
+│  │  │     ├─ common.ts
+│  │  │     ├─ contact.ts
+│  │  │     ├─ faq.ts
+│  │  │     ├─ index.ts
+│  │  │     ├─ nav.ts
+│  │  │     ├─ newsletter.ts
+│  │  │     ├─ relatedBusinesses.ts
+│  │  │     ├─ team.ts
+│  │  │     └─ title.ts
+│  │  ├─ path.ts
+│  │  └─ types.ts
+│  ├─ layouts
+│  │  ├─ DashboardLayout.tsx
+│  │  ├─ MainLayout.tsx
+│  │  └─ OverlayBar.tsx
+│  ├─ middleware.ts
+│  ├─ middlewares
+│  │  ├─ authMiddleware.ts
+│  │  ├─ langMiddleware.ts
+│  │  └─ verifyServerAuth.ts
+│  ├─ models
+│  │  ├─ CacheModel.ts
+│  │  ├─ CareerModel.ts
+│  │  ├─ constants.ts
+│  │  ├─ FileModel.ts
+│  │  ├─ index.ts
+│  │  ├─ InquiryModel.ts
+│  │  ├─ Newsletter.ts
+│  │  ├─ PageModel.ts
+│  │  ├─ RelatedBusinessModel.ts
+│  │  ├─ RoleModel.ts
+│  │  ├─ SettingModel.ts
+│  │  ├─ TeamBlock.ts
+│  │  ├─ UserModel.ts
+│  │  └─ Users
+│  │     └─ DeviceToken.ts
+│  ├─ providers
+│  │  ├─ AppProvider.tsx
+│  │  ├─ CustomConfigProvider.tsx
+│  │  ├─ FileProvider.tsx
+│  │  ├─ LanguageProvider.tsx
+│  │  ├─ LayoutProvider.tsx
+│  │  ├─ PusherProvider.tsx
+│  │  ├─ SettingsProvider.tsx
+│  │  └─ UserProvider.tsx
+│  ├─ repositories
+│  │  ├─ CacheRepository.ts
+│  │  ├─ CareerRepository.ts
+│  │  ├─ FileRepository.ts
+│  │  ├─ index.ts
+│  │  ├─ InquiryRepository.ts
+│  │  ├─ NewsletterRepository.ts
+│  │  ├─ PageRepository.ts
+│  │  ├─ RelatedBusinessRepository.ts
+│  │  ├─ RoleRepository.ts
+│  │  ├─ SettingRepository.ts
+│  │  └─ UserRepository.ts
+│  ├─ router
+│  │  ├─ LayoutRouter.tsx
+│  │  └─ routeMatch.ts
+│  ├─ services
+│  │  ├─ CareerService.ts
+│  │  ├─ FileService.ts
+│  │  ├─ InquiryService.ts
+│  │  ├─ MailService.ts
+│  │  ├─ NewsletterService.ts
+│  │  ├─ PageService.ts
+│  │  ├─ RelatedBusinessService.ts
+│  │  ├─ RoleService.ts
+│  │  ├─ SettingService.ts
+│  │  └─ UserService.ts
+│  ├─ styles
+│  │  ├─ carousel.css
+│  │  └─ globals.css
+│  ├─ ThirdPartyServices
+│  │  ├─ FirebaseService.ts
+│  │  └─ PusherService.ts
+│  ├─ types
+│  │  └─ types.d.ts
+│  └─ utils
+│     ├─ api
+│     │  └─ apiClient.ts
+│     ├─ careerUtil.ts
+│     ├─ components
+│     │  ├─ cssMaps.ts
+│     │  ├─ cssUrl.ts
+│     │  └─ hasRenderableChildren.ts
+│     ├─ filesUtil.ts
+│     ├─ firebaseClient.ts
+│     ├─ mime.json
+│     ├─ pageid.tsx
+│     ├─ roleUtils.ts
+│     ├─ server
+│     │  ├─ metadata
+│     │  ├─ pageSettings.ts
+│     │  ├─ publicCareers.ts
+│     │  ├─ publicNewsletters.ts
+│     │  ├─ publicRelatedBusinesses.ts
+│     │  ├─ publicSiteSettings.ts
+│     │  ├─ requestOrigin.ts
+│     │  └─ sendPaymentEmail.ts
+│     ├─ textUtils.ts
+│     ├─ timeUtil.ts
+│     ├─ typed.ts
+│     └─ urlUtils.ts
+├─ tailwind.config.ts
+├─ tsconfig.json
+└─ uploader
+   ├─ package-lock.json
+   ├─ package.json
+   └─ rewrite-storage-urls.ts
 
-## Overview
-
-Lin Law is a full-stack web application developed independently as a real-world business platform. It combines a public-facing multilingual website with an internal dashboard for managing users, roles, files, newsletters, settings, inquiries, and structured page content.
-
-The project is built on top of a reusable boilerplate and extended into a company-ready system with custom business logic, CMS-style configuration, multilingual routing, and admin-oriented workflows.
-
-## Features
-
-- multilingual public website with language-based routing
-- internal dashboard for operational management
-- newsletter publishing and management
-- file upload and signed URL workflows
-- user and role management
-- settings and page configuration system
-- inquiry and contact handling
-- reusable form-builder and CMS-style architecture
-- structured content management for pages, teams, and related businesses
-
-## Tech Stack
-
-- Next.js
-- TypeScript
-- Tailwind CSS
-- PostCSS
-- App Router
-- custom config-driven CMS patterns
-
-## Project Structure
-
-```txt
-linlaw/
-├─ src/          # app routes, dashboard, api, components, services, models
-├─ public/       # static assets
-├─ uploader/     # utility scripts for storage/file handling
-└─ scripts/      # project helper scripts
+```
