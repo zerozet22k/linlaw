@@ -63,6 +63,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const enabled = langsFromSettings(settings);
   const langs = enabled.length ? enabled : ([DEFAULT_LANG] as SupportedLanguage[]);
+  const buildAlternates = (
+    path: string
+  ): NonNullable<MetadataRoute.Sitemap[number]["alternates"]> => ({
+    languages: {
+      ...Object.fromEntries(langs.map((lang) => [lang, `${base}${pfx(lang, path)}`])),
+      "x-default": `${base}${pfx(DEFAULT_LANG, path)}`,
+    },
+  });
+  const buildEntries = (path: string, lastModified: Date): MetadataRoute.Sitemap =>
+    langs.map((lang) => ({
+      url: `${base}${pfx(lang, path)}`,
+      lastModified,
+      alternates: buildAlternates(path),
+    }));
 
   const staticPaths = UNIQUE(
     Object.values(ROUTES)
@@ -71,12 +85,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((p) => !NOINDEX_PATHS.has(p))
   );
 
-  const staticEntries: MetadataRoute.Sitemap = langs.flatMap((lang) =>
-    staticPaths.map((p) => ({
-      url: `${base}${pfx(lang, p)}`,
-      lastModified: now,
-    }))
-  );
+  const staticEntries: MetadataRoute.Sitemap = staticPaths.flatMap((p) => buildEntries(p, now));
 
   const userService = new UserService();
   const pageService = new PageService();
@@ -113,11 +122,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
 
         const slugs = Array.from(lastModBySlug.entries());
-        return langs.flatMap((lang) =>
-          slugs.map(([slug, lastModified]) => ({
-            url: `${base}${pfx(lang, `/team-members/${encodeURIComponent(slug)}`)}`,
-            lastModified,
-          }))
+        return slugs.flatMap(([slug, lastModified]) =>
+          buildEntries(`/team-members/${encodeURIComponent(slug)}`, lastModified)
         );
       })(),
 
@@ -137,12 +143,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             if (!id) continue;
 
             const lastModified = toDateOr(n?.updatedAt ?? n?.createdAt, now);
-            for (const lang of langs) {
-              out.push({
-                url: `${base}${pfx(lang, `/newsletters/${encodeURIComponent(id)}`)}`,
-                lastModified,
-              });
-            }
+            out.push(...buildEntries(`/newsletters/${encodeURIComponent(id)}`, lastModified));
           }
 
           if (!hasMore || list.length === 0) break;
@@ -170,12 +171,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             if (!slug) continue;
 
             const lastModified = toDateOr(b?.updatedAt ?? b?.createdAt, now);
-            for (const lang of langs) {
-              out.push({
-                url: `${base}${pfx(lang, `/related-businesses/${encodeURIComponent(slug)}`)}`,
-                lastModified,
-              });
-            }
+            out.push(...buildEntries(`/related-businesses/${encodeURIComponent(slug)}`, lastModified));
           }
 
           if (!hasMore || list.length === 0) break;
@@ -186,13 +182,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })(),
     ]);
 
-  const byUrl = new Map<string, { url: string; lastModified: Date }>();
+  const byUrl = new Map<
+    string,
+    {
+      url: string;
+      lastModified: Date;
+      alternates?: MetadataRoute.Sitemap[number]["alternates"];
+    }
+  >();
 
   const push = (items: MetadataRoute.Sitemap) => {
     for (const it of items) {
       const lm = toDateOr((it as any)?.lastModified, now);
       const prev = byUrl.get(it.url);
-      if (!prev || lm > prev.lastModified) byUrl.set(it.url, { url: it.url, lastModified: lm });
+      if (!prev || lm > prev.lastModified) {
+        byUrl.set(it.url, { url: it.url, lastModified: lm, alternates: it.alternates });
+      }
     }
   };
 
@@ -203,5 +208,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return Array.from(byUrl.values())
     .sort((a, b) => a.url.localeCompare(b.url))
-    .map((x) => ({ url: x.url, lastModified: x.lastModified }));
+    .map((x) => ({ url: x.url, lastModified: x.lastModified, alternates: x.alternates }));
 }

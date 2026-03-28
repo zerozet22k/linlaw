@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { DynamicIcon } from "@/config/navigations/IconMapper";
 import { useLanguage } from "@/hooks/useLanguage";
 import { t } from "@/i18n";
+import { hrefLang } from "@/i18n/path";
 
 import {
   HOME_PAGE_SETTINGS_KEYS as K,
@@ -224,12 +225,13 @@ export default function AboutUsSection({ data, language: propLanguage }: Props) 
                   if (!href || !text) return null;
 
                   const variant = c.ctaVariant === "primary" ? "primary" : "default";
+                  const localizedHref = hrefLang(href, language as any);
 
                   return (
                     <Button
                       key={(c as any)._id || (c as any).id || `cta-${i}`}
                       type={variant === "primary" ? "primary" : "default"}
-                      href={href}
+                      href={localizedHref}
                       style={{ height: 40, paddingInline: 16, borderRadius: 10, fontWeight: 800 }}
                     >
                       {text}

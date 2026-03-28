@@ -7,6 +7,7 @@ import { Button, theme, Grid } from "antd";
 import type { ButtonProps } from "antd";
 import { motion, useReducedMotion } from "framer-motion";
 import { t } from "@/i18n";
+import { hrefLang } from "@/i18n/path";
 import {
   HOME_PAGE_SETTINGS_KEYS as K,
   HOME_PAGE_SETTINGS_TYPES,
@@ -111,6 +112,7 @@ const PromoShowcaseSection: React.FC<PromoShowcaseSectionProps> = ({ data, langu
           const panelTitle = tt(language, row.panelTitle, "");
           const panelText = tt(language, row.panelText, "");
           const buttonText = tt(language, row.buttonText, "View");
+          const localizedHref = hrefLang(String(row.link || "").trim(), language as any);
 
           const cardRowStyle: React.CSSProperties = {
             borderTop: i === 0 ? "none" : `1px solid ${token.colorBorderSecondary}`,
@@ -275,18 +277,18 @@ const PromoShowcaseSection: React.FC<PromoShowcaseSectionProps> = ({ data, langu
                   </div>
                 ) : null}
 
-                {row.link ? (
+                {localizedHref ? (
                   <div style={{ marginTop: 18, display: "flex", justifyContent: ctaJustify }}>
                     {(() => {
                       const variant = (row.buttonVariant || "primary") as ButtonProps["type"];
                       const target = row.linkTarget || "same_tab";
                       const openNewTab = target === "new_tab";
 
-                      if (isExternalHref(row.link)) {
+                      if (isExternalHref(localizedHref)) {
                         return (
                           <Button
                             type={variant}
-                            href={row.link}
+                            href={localizedHref}
                             target={openNewTab ? "_blank" : undefined}
                             rel={openNewTab ? "noreferrer" : undefined}
                             style={{ height: 42, paddingInline: 18, borderRadius: 12, fontWeight: 800 }}
@@ -298,7 +300,7 @@ const PromoShowcaseSection: React.FC<PromoShowcaseSectionProps> = ({ data, langu
 
                       if (openNewTab) {
                         return (
-                          <Link href={row.link} target="_blank" rel="noreferrer">
+                          <Link href={localizedHref} target="_blank" rel="noreferrer">
                             <Button
                               type={variant}
                               style={{ height: 42, paddingInline: 18, borderRadius: 12, fontWeight: 800 }}
@@ -310,7 +312,7 @@ const PromoShowcaseSection: React.FC<PromoShowcaseSectionProps> = ({ data, langu
                       }
 
                       return (
-                        <Link href={row.link}>
+                        <Link href={localizedHref}>
                           <Button
                             type={variant}
                             style={{ height: 42, paddingInline: 18, borderRadius: 12, fontWeight: 800 }}

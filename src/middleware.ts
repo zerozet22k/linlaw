@@ -27,8 +27,6 @@
     p === "/sitemap.xml" ||
     PUBLIC_FILE.test(p);
 
-  const cookieRead = (req: NextRequest, k: string) => (req.cookies.get(k)?.value || "").trim();
-
   const setLangCookie = (res: NextResponse, lang: SupportedLanguage) => {
     res.cookies.set("language", lang, {
       path: "/",
@@ -40,12 +38,6 @@
   const getPathLang = (pathname: string): SupportedLanguage | null => {
     const seg = (pathname.split("/")[1] || "").trim();
     return seg && isSupportedLanguageLocal(seg) ? (seg as SupportedLanguage) : null;
-  };
-
-  const pickLang = (req: NextRequest): SupportedLanguage => {
-    const c = cookieRead(req, "language");
-    if (c && isSupportedLanguageLocal(c)) return c as SupportedLanguage;
-    return DEFAULT_LANG; // "en"
   };
 
   export function middleware(req: NextRequest) {
@@ -84,24 +76,20 @@
       return res;
     }
 
-    // No lang segment: decide by cookie, fallback DEFAULT_LANG
-    const lang = pickLang(req);
+    // No lang segment: always normalize to the stable default locale for SEO.
+    const lang = DEFAULT_LANG;
 
     const alias = ANCHOR_ALIASES[basePath];
     if (alias) {
       const u = url.clone();
       u.pathname = `/${lang}`;
       u.hash = alias;
-      const res = NextResponse.redirect(u, 308);
-      setLangCookie(res, lang);
-      return res;
+      return NextResponse.redirect(u, 308);
     }
 
     const u = url.clone();
     u.pathname = ensureLangPrefix(basePath, lang);
-    const res = NextResponse.redirect(u, 308);
-    setLangCookie(res, lang);
-    return res;
+    return NextResponse.redirect(u, 308);
   }
 
   export const config = {

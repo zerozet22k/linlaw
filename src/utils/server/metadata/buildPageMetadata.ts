@@ -18,6 +18,7 @@ import {
   getSiteUrl,
   toAbsoluteUrl,
 } from "@/utils/server/publicSiteSettings";
+import { langsFromSettings } from "@/middlewares/langMiddleware";
 
 type SharedPageContentLike = { title?: any; description?: any };
 
@@ -142,26 +143,12 @@ export async function buildPageMetadata(opts: BuildPageMetadataOpts): Promise<Me
 
   const pageTitle: Metadata["title"] = path === "/" ? { absolute: titleText } : titleText;
 
-
-  const supported =
-    Array.isArray((settings as any)?.["supportedLanguages"])
-      ? ((settings as any).supportedLanguages as string[])
-      : null;
-
-  const supportedLangs =
-    supported?.map((x) => String(x).trim()).filter(Boolean).filter(isSupportedLanguageLocal) as
-    | SupportedLanguage[]
-    | undefined;
-
-  const languages =
-    supportedLangs && supportedLangs.length
-      ? Object.fromEntries(
-        supportedLangs.map((l) => [
-          l,
-          `${siteUrl}${prefixPath(path, l)}`,
-        ])
-      )
-      : undefined;
+  const enabledLangs = langsFromSettings(settings as any);
+  const defaultAlternate = `${siteUrl}${prefixPath(path, DEFAULT_LANG)}`;
+  const languages = Object.fromEntries(
+    enabledLangs.map((l) => [l, `${siteUrl}${prefixPath(path, l)}`])
+  ) as Record<string, string>;
+  languages["x-default"] = defaultAlternate;
 
   return {
     title: pageTitle,
@@ -170,7 +157,7 @@ export async function buildPageMetadata(opts: BuildPageMetadataOpts): Promise<Me
 
     alternates: {
       canonical,
-      ...(languages ? { languages } : {}),
+      languages,
     },
 
     robots: opts.noindex ? robotsNoindex() : undefined,
