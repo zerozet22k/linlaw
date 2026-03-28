@@ -127,6 +127,108 @@ class UserRepository {
     return user.save();
   }
 
+  async countAll(): Promise<number> {
+    await dbConnect();
+    return this.userModel.countDocuments({});
+  }
+
+  async countByRoleId(roleId: Types.ObjectId): Promise<number> {
+    await dbConnect();
+    return this.userModel.countDocuments({ role_ids: { $in: [roleId] } });
+  }
+
+  async countCreatedSince(date: Date): Promise<number> {
+    await dbConnect();
+    return this.userModel.countDocuments({
+      $or: [{ createdAt: { $gte: date } }, { created_at: { $gte: date } }],
+    } as any);
+  }
+
+  async getDeviceSummary(): Promise<{
+    storedDevices: number;
+    usersWithDevices: number;
+  }> {
+    await dbConnect();
+
+    const [summary] = await this.userModel
+      .aggregate([
+        {
+          $project: {
+            deviceCount: { $size: { $ifNull: ["$devices", []] } },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            storedDevices: { $sum: "$deviceCount" },
+            usersWithDevices: {
+              $sum: {
+                $cond: [{ $gt: ["$deviceCount", 0] }, 1, 0],
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+
+    return {
+      storedDevices: summary?.storedDevices ?? 0,
+      usersWithDevices: summary?.usersWithDevices ?? 0,
+    };
+  }
+
+  async getSignupTrendSince(date: Date): Promise<
+    {
+      date: string;
+      users: number;
+    }[]
+  > {
+    await dbConnect();
+
+    const rows = await this.userModel
+      .aggregate([
+        {
+          $addFields: {
+            analyticsCreatedAt: { $ifNull: ["$createdAt", "$created_at"] },
+          },
+        },
+        {
+          $match: {
+            analyticsCreatedAt: { $gte: date },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$analyticsCreatedAt",
+                timezone: "UTC",
+              },
+            },
+            users: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ])
+      .exec();
+
+    return rows.map((row) => ({
+      date: String(row._id),
+      users: Number(row.users ?? 0),
+    }));
+  }
+
+  async getRecentUsers(limit = 5): Promise<User[]> {
+    await dbConnect();
+    return this.userModel
+      .find({})
+      .sort({ createdAt: -1, created_at: -1 } as any)
+      .limit(limit)
+      .populate("roles")
+      .exec();
+  }
+
   async update(
     id: Types.ObjectId,
     updateData: Partial<User>

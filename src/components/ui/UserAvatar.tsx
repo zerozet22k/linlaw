@@ -21,6 +21,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ isMobile, toggleDrawer }) => {
 
   const tGuest = t(language, "nav.actions.guest", "Guest");
   const tDashboard = t(language, "nav.routes.dashboard", "Dashboard");
+  const tAnalytics = t(language, "nav.routes.analytics", "Analytics");
   const tProfile = t(language, "nav.routes.profile", "Profile");
   const tLogout = t(language, "nav.actions.logout", "Logout");
   const tLogin = t(language, "nav.actions.login", "Login");
@@ -39,6 +40,10 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ isMobile, toggleDrawer }) => {
             key: "dashboard",
             label: <Link href="/dashboard">{tDashboard}</Link>,
           },
+          {
+            key: "analytics",
+            label: <Link href="/dashboard/analytics">{tAnalytics}</Link>,
+          },
         ]
         : []),
       {
@@ -55,7 +60,16 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ isMobile, toggleDrawer }) => {
           label: <Link href="/login">{tLogin}</Link>,
         },
     ],
-    [canSeeDashboard, tDashboard, tProfile, user, logout, tLogout, tLogin]
+    [
+      canSeeDashboard,
+      tDashboard,
+      tAnalytics,
+      tProfile,
+      user,
+      logout,
+      tLogout,
+      tLogin,
+    ]
   );
 
   if (initialLoading) return <Spin size="small" />;

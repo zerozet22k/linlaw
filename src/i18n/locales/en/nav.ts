@@ -9,6 +9,7 @@ export const nav = {
   },
 
   routes: {
+    analytics: "Analytics",
     dashboard: "Dashboard",
     profile: "Profile",
 

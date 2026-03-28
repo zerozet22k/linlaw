@@ -139,6 +139,16 @@ const AppMenu: React.FC<AppMenuProps> = ({
             </Link>
           ),
         });
+
+        base.push({
+          key: "analytics",
+          icon: DynamicIcon({ name: "AreaChartOutlined" }),
+          label: (
+            <Link href={toHref("/dashboard/analytics")}>
+              {t(language, "nav.routes.analytics", "Analytics")}
+            </Link>
+          ),
+        });
       }
 
       base.push({

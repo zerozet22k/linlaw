@@ -23,6 +23,7 @@
 
   export const ROUTE_KEYS = {
     DASHBOARD: "dashboard",
+    ANALYTICS: "analytics",
     USER_LIST: "user-list",
     CREATE_USER: "create-user",
     EDIT_USER: "edit-user",
@@ -97,6 +98,16 @@
       access: [APP_PERMISSIONS.VIEW_DASHBOARD],
       loginRequired: true,
       IfNotLoggedInRedirectUrl: "/login?redirect=/dashboard",
+    },
+
+    [ROUTE_KEYS.ANALYTICS]: {
+      key: ROUTE_KEYS.ANALYTICS,
+      path: `${dashboardRoute}/analytics`,
+      navKey: "nav.routes.analytics",
+      icon: "AreaChartOutlined",
+      access: [APP_PERMISSIONS.VIEW_DASHBOARD],
+      loginRequired: true,
+      IfNotLoggedInRedirectUrl: "/login?redirect=/dashboard/analytics",
     },
 
     [ROUTE_KEYS.PROFILE]: {

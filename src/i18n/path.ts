@@ -4,7 +4,12 @@ import { isSupportedLanguageLocal, type SupportedLanguage } from "@/i18n/languag
 const EXT = /^([a-z][a-z0-9+.-]*:)?\/\//i;
 const isExternal = (href: string) =>
   EXT.test(href) || href.startsWith("mailto:") || href.startsWith("tel:");
-const UNLOCALIZED_EXACT_PATHS = new Set(["/favicon.ico", "/robots.txt", "/sitemap.xml"]);
+const UNLOCALIZED_EXACT_PATHS = new Set([
+  "/analytics",
+  "/favicon.ico",
+  "/robots.txt",
+  "/sitemap.xml",
+]);
 const UNLOCALIZED_PREFIXES = ["/api", "/dashboard", "/_next"];
 
 const shouldKeepUnprefixed = (pathname: string) => {

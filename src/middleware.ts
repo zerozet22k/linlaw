@@ -22,6 +22,7 @@
     p.startsWith("/api") ||
     p.startsWith("/_next") ||
     p.startsWith("/dashboard") ||
+    p === "/analytics" ||
     p === "/favicon.ico" ||
     p === "/robots.txt" ||
     p === "/sitemap.xml" ||

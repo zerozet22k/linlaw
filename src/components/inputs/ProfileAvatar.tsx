@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { message, Button, Modal, Spin } from "antd";
+import { message, Button, Modal, Spin, Card, Grid, Typography, theme } from "antd";
 import { CameraOutlined } from "@ant-design/icons";
 import Image from "next/image";
 
@@ -9,26 +9,45 @@ import ImageCropper from "./ImageCropper";
 import apiClient from "@/utils/api/apiClient";
 import { UserAPI } from "@/models/UserModel";
 
+const { Text, Title } = Typography;
+
 interface ProfileAvatarProps {
   user?: UserAPI;
   onAvatarChange?: (avatarUrl: string) => void;
   onCoverChange?: (coverUrl: string) => void;
 }
 
+const getInitials = (user?: UserAPI) => {
+  const base = String(user?.name || user?.username || "").trim();
+  if (!base) return "U";
+  return base
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("") || "U";
+};
+
 const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   user,
   onAvatarChange,
   onCoverChange,
 }) => {
+  const { token } = theme.useToken();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
+
   const defaultAvatar = "/images/default-avatar.webp";
-  const defaultCover = "/images/default-cover.jpg";
+  const fallbackInitials = getInitials(user);
 
   const [avatarUrl, setAvatarUrl] = useState<string>(
     user?.avatar || defaultAvatar
   );
   const [coverUrl, setCoverUrl] = useState<string>(
-    user?.cover_image || defaultCover
+    user?.cover_image || ""
   );
+  const [avatarBroken, setAvatarBroken] = useState(false);
+  const [coverBroken, setCoverBroken] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -41,7 +60,9 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   const uploadingForRef = useRef<"avatar" | "cover">("avatar");
   useEffect(() => {
     setAvatarUrl(user?.avatar || defaultAvatar);
-    setCoverUrl(user?.cover_image || defaultCover);
+    setCoverUrl(user?.cover_image || "");
+    setAvatarBroken(false);
+    setCoverBroken(false);
   }, [user?.avatar, user?.cover_image]);
   useEffect(() => {
     return () => {
@@ -124,6 +145,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
       await updateUserImage(publicUrl, type);
 
       setModalVisible(false);
+      setPreviewUrl(null);
     } catch (error) {
       console.error(error);
       message.error("Upload error. Please try again.");
@@ -140,9 +162,11 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
       await apiClient.put(`/users/${user._id}`, { [fieldKey]: newImageUrl });
 
       if (type === "avatar") {
+        setAvatarBroken(false);
         setAvatarUrl(newImageUrl);
         onAvatarChange?.(newImageUrl);
       } else {
+        setCoverBroken(false);
         setCoverUrl(newImageUrl);
         onCoverChange?.(newImageUrl);
       }
@@ -154,88 +178,300 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
     }
   };
 
+  const closeCropModal = () => {
+    setModalVisible(false);
+    setPreviewUrl(null);
+  };
+
+  const displayName = String(user?.name || user?.username || "User").trim();
+  const username = String(user?.username || "").trim();
+  const email = String(user?.email || "").trim();
+  const position = String(user?.position || "").trim();
+  const avatarSrc = avatarBroken ? defaultAvatar : avatarUrl || defaultAvatar;
+  const showCoverImage = !!coverUrl && !coverBroken;
+  const mediaHint =
+    "Use a square avatar and a wide cover image for the cleanest profile layout.";
+  const avatarSize = isMobile ? 92 : 110;
+  const coverHeight = isMobile ? 280 : 360;
+  const detailChips = [position, email].filter(Boolean);
+  const coverAccent =
+    "linear-gradient(135deg, rgba(13,27,62,0.96) 0%, rgba(18,86,121,0.82) 48%, rgba(228,176,74,0.72) 100%)";
+  const coverOverlay =
+    "linear-gradient(180deg, rgba(6,12,22,0.12) 0%, rgba(6,12,22,0.35) 45%, rgba(6,12,22,0.88) 100%)";
+
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: 400,
-        borderRadius: 8,
-        backgroundColor: "#f0f0f0",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-        marginBottom: 60,
-        overflow: "hidden",
-      }}
-    >
-      {/* Cover image uses next/image for LCP-friendly optimization */}
-      <Image
-        src={coverUrl}
-        alt="Cover"
-        fill
-        priority
-        sizes="100vw"
-        style={{ objectFit: "cover" }}
-        onError={() => setCoverUrl(defaultCover)}
-      />
-
-      <div
+    <>
+      <Card
+        bordered
         style={{
-          position: "absolute",
-          top: 10,
-          right: 10,
-          background: "rgba(0, 0, 0, 0.5)",
-          borderRadius: "50%",
-          padding: 8,
-          cursor: "pointer",
-          zIndex: 2,
-        }}
-        onClick={() => openFilePicker("cover")}
-      >
-        <CameraOutlined style={{ color: "#fff", fontSize: 18 }} />
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          bottom: 0,
-          transform: "translate(-50%, 50%)",
-          width: 120,
-          height: 120,
-          borderRadius: "50%",
-          border: "4px solid white",
+          borderRadius: 24,
           overflow: "hidden",
-          backgroundColor: "#fff",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          cursor: "pointer",
-          zIndex: 2,
+          boxShadow: "0 18px 45px rgba(15, 23, 42, 0.08)",
         }}
-        onClick={() => openFilePicker("avatar")}
+        styles={{ body: { padding: 0 } }}
       >
-        <div style={{ position: "relative", width: "100%", height: "100%" }}>
-          <Image
-            src={avatarUrl}
-            alt="Avatar"
-            fill
-            sizes="120px"
-            style={{ objectFit: "cover" }}
-            onError={() => setAvatarUrl(defaultAvatar)}
+        <div
+          style={{
+            position: "relative",
+            minHeight: coverHeight,
+            background: coverAccent,
+          }}
+        >
+          {showCoverImage ? (
+            <Image
+              src={coverUrl}
+              alt="Profile cover"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 33vw"
+              style={{ objectFit: "cover" }}
+              onError={() => setCoverBroken(true)}
+            />
+          ) : (
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: isMobile ? 42 : 56,
+                fontWeight: 800,
+                letterSpacing: 2,
+                color: "rgba(255,255,255,0.24)",
+                textTransform: "uppercase",
+              }}
+            >
+              {fallbackInitials}
+            </div>
+          )}
+
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: coverOverlay,
+            }}
           />
+
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: isMobile ? 18 : 22,
+              zIndex: 1,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: 12,
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 12px",
+                  borderRadius: 999,
+                  background: "rgba(255,255,255,0.14)",
+                  backdropFilter: "blur(10px)",
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  textTransform: "uppercase",
+                }}
+              >
+                Profile Media
+              </div>
+
+              <Button
+                htmlType="button"
+                icon={<CameraOutlined />}
+                onClick={() => openFilePicker("cover")}
+                style={{
+                  borderRadius: 999,
+                  borderColor: "rgba(255,255,255,0.28)",
+                  background: "rgba(9, 18, 35, 0.34)",
+                  color: "#fff",
+                  boxShadow: "none",
+                }}
+              >
+                {showCoverImage ? "Change Cover" : "Add Cover"}
+              </Button>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: isMobile ? "flex-start" : "flex-end",
+                gap: 16,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => openFilePicker("avatar")}
+                style={{
+                  appearance: "none",
+                  border: "none",
+                  padding: 0,
+                  background: "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    position: "relative",
+                    width: avatarSize,
+                    height: avatarSize,
+                    borderRadius: "50%",
+                    border: "4px solid rgba(255,255,255,0.95)",
+                    overflow: "hidden",
+                    background: "#fff",
+                    boxShadow: "0 14px 34px rgba(15, 23, 42, 0.28)",
+                  }}
+                >
+                  <Image
+                    src={avatarSrc}
+                    alt="Avatar"
+                    fill
+                    sizes={`${avatarSize}px`}
+                    style={{ objectFit: "cover" }}
+                    onError={() => setAvatarBroken(true)}
+                  />
+
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: 6,
+                      bottom: 6,
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "rgba(7, 15, 28, 0.72)",
+                      color: "#fff",
+                      boxShadow: "0 8px 20px rgba(15, 23, 42, 0.25)",
+                    }}
+                  >
+                    <CameraOutlined />
+                  </div>
+                </div>
+              </button>
+
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <Title
+                  level={isMobile ? 4 : 3}
+                  style={{
+                    margin: 0,
+                    color: "#fff",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {displayName}
+                </Title>
+
+                {username && (
+                  <Text
+                    style={{
+                      display: "block",
+                      marginTop: 6,
+                      color: "rgba(255,255,255,0.78)",
+                      fontSize: 15,
+                    }}
+                  >
+                    @{username}
+                  </Text>
+                )}
+
+                {detailChips.length > 0 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 8,
+                      marginTop: 12,
+                    }}
+                  >
+                    {detailChips.map((chip) => (
+                      <span
+                        key={chip}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          maxWidth: "100%",
+                          padding: "7px 11px",
+                          borderRadius: 999,
+                          background: "rgba(255,255,255,0.14)",
+                          color: "rgba(255,255,255,0.92)",
+                          fontSize: 12.5,
+                          lineHeight: 1.2,
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {chip}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
           style={{
-            position: "absolute",
-            bottom: 0,
-            width: "100%",
-            background: "rgba(0,0,0,0.5)",
-            textAlign: "center",
-            padding: "4px 0",
+            padding: isMobile ? 18 : 22,
+            background: token.colorBgContainer,
           }}
         >
-          <CameraOutlined style={{ color: "#fff", fontSize: 16 }} />
+          <Text
+            style={{
+              display: "block",
+              color: token.colorTextSecondary,
+              lineHeight: 1.6,
+            }}
+          >
+            {mediaHint}
+          </Text>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 10,
+              marginTop: 16,
+            }}
+          >
+            <Button htmlType="button" icon={<CameraOutlined />} onClick={() => openFilePicker("avatar")}>
+              Change Avatar
+            </Button>
+            <Button htmlType="button" icon={<CameraOutlined />} onClick={() => openFilePicker("cover")}>
+              Change Cover
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       <input
         type="file"
@@ -247,17 +483,17 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
 
       <Modal
         open={modalVisible}
-        title={`Crop Your ${uploadingFor === "avatar" ? "Avatar" : "Cover (Portrait)"}`}
-        onCancel={() => setModalVisible(false)}
-        width="90vw"
+        title={uploadingFor === "avatar" ? "Crop Avatar" : "Crop Cover Image"}
+        onCancel={closeCropModal}
+        width={isMobile ? "96vw" : 1080}
         style={{ top: 20 }}
         styles={{
           body: {
-            height: "80vh",
+            minHeight: "min(80vh, 720px)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            padding: 0,
+            padding: 16,
           },
         }}
         maskClosable={false}
@@ -265,7 +501,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
         footer={[
           <Button
             key="cancel"
-            onClick={() => setModalVisible(false)}
+            onClick={closeCropModal}
             disabled={uploading}
           >
             Cancel
@@ -289,11 +525,11 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
             ref={cropRef}
             imageUrl={previewUrl}
             imageRef={imageRef}
-            aspectRatio={uploadingFor === "avatar" ? 1 : 3 / 4}
+            aspectRatio={uploadingFor === "avatar" ? 1 : 16 / 9}
           />
         )}
       </Modal>
-    </div>
+    </>
   );
 };
 

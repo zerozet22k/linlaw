@@ -24,6 +24,14 @@ export const dashboardMenu: NavigationMenuItem[] = [
   },
 
   {
+    key: ROUTE_KEYS.ANALYTICS,
+    icon: ROUTES[ROUTE_KEYS.ANALYTICS].icon!,
+    navKey: ROUTES[ROUTE_KEYS.ANALYTICS].navKey,
+    link: ROUTES[ROUTE_KEYS.ANALYTICS].path,
+    access: ROUTES[ROUTE_KEYS.ANALYTICS].access,
+  },
+
+  {
     key: PARENT_KEYS.USERS.key,
     icon: PARENT_KEYS.USERS.icon!,
     navKey: PARENT_KEYS.USERS.navKey,
