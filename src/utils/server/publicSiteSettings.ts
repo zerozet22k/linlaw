@@ -43,6 +43,14 @@ export function getSiteUrl(settings: PublicSettings) {
   return u.replace(/\/+$/, "");
 }
 
+export function getSiteFavicon(settings: PublicSettings) {
+  return (
+    settings?.[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteFavicon?.trim() ||
+    settings?.[GLOBAL_SETTINGS_KEYS.SITE_SETTINGS]?.siteLogo?.trim() ||
+    "/images/logo.svg"
+  );
+}
+
 export function getSeo(settings: PublicSettings) {
   const description =
     settings?.[SEO_SETTINGS_KEYS.SEO_SETTINGS]?.metaDescription?.trim() ||

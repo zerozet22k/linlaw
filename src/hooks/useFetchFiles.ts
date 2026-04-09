@@ -84,15 +84,13 @@ export const useFetchFiles = () => {
     if (userInitialLoading) return;
 
     if (!user || !canViewFiles) {
+      debouncedFetchPage1.cancel();
+      reqSeqRef.current += 1;
       setFiles([]);
       setHasMore(false);
-      return;
+      setLoading(false);
     }
-
-    // initial load (page 1) debounced
-    fetchFiles({ ...searchState, page: 1 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, userInitialLoading, canViewFiles]);
+  }, [user, userInitialLoading, canViewFiles, debouncedFetchPage1]);
 
   const fetchFiles = useCallback(
     (searchStateData: SearchState) => {

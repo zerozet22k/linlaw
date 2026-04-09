@@ -24,6 +24,9 @@ import { hrefLang } from "@/i18n/path";
 const { Title, Text, Paragraph } = Typography;
 
 type Attachment = NonNullable<INewsletterAPI["fileAttachments"]>[number];
+type NewsletterDetailContentProps = {
+  initialNewsletter?: INewsletterAPI | null;
+};
 
 type AttachmentPreviewProps = {
   lang: string;
@@ -70,7 +73,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({ lang, attachment,
   );
 };
 
-const NewsletterDetailContent: React.FC = () => {
+const NewsletterDetailContent: React.FC<NewsletterDetailContentProps> = ({ initialNewsletter }) => {
   const router = useRouter();
   const params = useParams<{ id: string | string[] }>();
 
@@ -94,10 +97,12 @@ const safeBack = useCallback(() => {
 }, [router, language]);
 
 
-  const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(null);
-  const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(null);
+  const [newsletter, setNewsletter] = useState<INewsletterAPI | null>(initialNewsletter ?? null);
+  const [selectedAttachment, setSelectedAttachment] = useState<Attachment | null>(
+    Array.isArray(initialNewsletter?.fileAttachments) ? initialNewsletter.fileAttachments[0] ?? null : null
+  );
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialNewsletter === undefined);
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -115,7 +120,20 @@ const safeBack = useCallback(() => {
   const tFailedToLoad = useMemo(() => t(language, "newsletter.failedToLoad", "Failed to load."), [language]);
   const tUntitled = useMemo(() => t(language, "newsletter.untitled", "Untitled"), [language]);
 
+  useEffect(() => {
+    if (initialNewsletter === undefined) return;
+    setNewsletter(initialNewsletter);
+    setSelectedAttachment(
+      Array.isArray(initialNewsletter?.fileAttachments)
+        ? initialNewsletter.fileAttachments[0] ?? null
+        : null
+    );
+    setLoading(false);
+    setErrorCode(null);
+  }, [initialNewsletter]);
+
   const fetchNewsletter = useCallback(async () => {
+    if (initialNewsletter !== undefined) return;
     if (!id) return;
 
     const reqId = ++reqIdRef.current;
@@ -143,7 +161,7 @@ const safeBack = useCallback(() => {
       if (reqId !== reqIdRef.current) return;
       setLoading(false);
     }
-  }, [id]);
+  }, [id, initialNewsletter]);
 
   useEffect(() => {
     fetchNewsletter();

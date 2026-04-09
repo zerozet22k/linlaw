@@ -32,6 +32,11 @@
         siteName: { label: "Site Name", formType: FormType.TEXT },
         siteUrl: { label: "Site URL", formType: FormType.URL },
         siteLogo: { label: "Site Logo", formType: FormType.IMAGE_SELECTOR },
+        siteFavicon: {
+          label: "Site Favicon",
+          guide: "Small icon used in browser tabs and bookmarks.",
+          formType: FormType.IMAGE_SELECTOR,
+        },
         siteBanner: { label: "Banner", formType: FormType.IMAGE_SELECTOR },
       },
     },
@@ -71,6 +76,7 @@
       siteName: string;
       siteUrl: string;
       siteLogo?: string;
+      siteFavicon?: string;
       siteBanner?: string;
     };
 

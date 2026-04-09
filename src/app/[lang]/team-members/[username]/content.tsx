@@ -17,9 +17,13 @@ import "./content.css";
 const { Title, Paragraph } = Typography;
 const { useToken } = theme;
 
-const TeamMemberClient: React.FC = () => {
-  const [user, setUser] = useState<UserAPI | null>(null);
-  const [loading, setLoading] = useState(true);
+type TeamMemberClientProps = {
+  initialUser?: UserAPI | null;
+};
+
+const TeamMemberClient: React.FC<TeamMemberClientProps> = ({ initialUser }) => {
+  const [user, setUser] = useState<UserAPI | null>(initialUser ?? null);
+  const [loading, setLoading] = useState(initialUser === undefined);
   const [error, setError] = useState<string | null>(null);
 
   const [isPortrait, setIsPortrait] = useState(false);
@@ -37,6 +41,15 @@ const TeamMemberClient: React.FC = () => {
   const tCoverAltSuffix = useMemo(() => t(language, "team.coverAltSuffix"), [language]);
 
   useEffect(() => {
+    if (initialUser !== undefined) {
+      setUser(initialUser);
+      setLoading(false);
+      setError(null);
+    }
+  }, [initialUser]);
+
+  useEffect(() => {
+    if (initialUser !== undefined) return;
     if (!username) return;
 
     (async () => {
@@ -50,7 +63,7 @@ const TeamMemberClient: React.FC = () => {
         setLoading(false);
       }
     })();
-  }, [username, tFailedToLoad]);
+  }, [initialUser, username, tFailedToLoad]);
 
   if (loading) return <SubLoader tip={tLoading} minHeight={240} />;
 

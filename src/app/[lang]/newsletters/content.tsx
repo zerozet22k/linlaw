@@ -23,22 +23,28 @@ const { Title, Text } = Typography;
 
 type NewsletterContentProps = {
   data: NEWSLETTER_PAGE_SETTINGS_TYPES;
+  initialNewsletters?: INewsletterAPI[];
+  initialHasMore?: boolean;
 };
 
-const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
+const NewsletterContent: React.FC<NewsletterContentProps> = ({
+  data,
+  initialNewsletters,
+  initialHasMore,
+}) => {
   const { language } = useLanguage();
   const { token } = theme.useToken();
   const pageContent = data[NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT];
   const newsletterSection = data[NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS];
   const limit = newsletterSection?.maxNewslettersCount || 6;
 
-  const [newsletters, setNewsletters] = useState<INewsletterAPI[]>([]);
+  const [newsletters, setNewsletters] = useState<INewsletterAPI[]>(() => initialNewsletters ?? []);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(() => (initialHasMore ? 2 : 1));
+  const [hasMore, setHasMore] = useState(!!initialHasMore);
 
   const [queryDraft, setQueryDraft] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -104,8 +110,18 @@ const NewsletterContent: React.FC<NewsletterContentProps> = ({ data }) => {
   );  
 
   useEffect(() => {
+    if (searchText === "" && initialNewsletters !== undefined) {
+      setNewsletters(initialNewsletters);
+      setHasMore(!!initialHasMore);
+      setPage(initialHasMore ? 2 : 1);
+      setLoading(false);
+      setLoadingMore(false);
+      setError(null);
+      return;
+    }
+
     fetchNewsletters({ reset: true });
-  }, [fetchNewsletters]);
+  }, [fetchNewsletters, initialHasMore, initialNewsletters, searchText]);
 
   const countLabel = useMemo(() => {
     const n = newsletters.length;

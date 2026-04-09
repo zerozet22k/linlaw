@@ -5,6 +5,28 @@ import { message } from "antd";
 import apiClient, { saveTokens, clearTokens } from "@/utils/api/apiClient";
 import UserContext from "@/contexts/UserContext";
 import { UserAPI } from "@/models/UserModel";
+import {
+  SESSION_HINT_COOKIE,
+  SESSION_HINT_COOKIE_VALUE,
+} from "@/utils/auth/sessionHint";
+
+const getAccessTokenExpiry = () => {
+  const raw = localStorage.getItem("accessTokenExpiry");
+  const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN;
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const hasValidAccessToken = () => {
+  const accessToken = localStorage.getItem("accessToken");
+  const expiry = getAccessTokenExpiry();
+  return !!accessToken && !!expiry && expiry > Date.now();
+};
+
+const hasSessionHintCookie = () =>
+  document.cookie
+    .split(";")
+    .map((cookie) => cookie.trim())
+    .some((cookie) => cookie === `${SESSION_HINT_COOKIE}=${SESSION_HINT_COOKIE_VALUE}`);
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserAPI | null>(null);
@@ -58,8 +80,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     (async () => {
       try {
-        const hasAccessToken = !!localStorage.getItem("accessToken");
-        if (hasAccessToken) return;
+        if (hasValidAccessToken()) return;
+
+        if (!hasSessionHintCookie()) {
+          clearTokens();
+          return;
+        }
 
         let deviceName = localStorage.getItem("deviceName");
         if (!deviceName) deviceName = getBrowserName();
@@ -85,15 +111,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
   const swrKey = useMemo(() => {
     if (!authBooted) return null;
-    return localStorage.getItem("accessToken") ? ["/me", tokenVersion] : null;
+    return hasValidAccessToken() ? ["/me", tokenVersion] : null;
   }, [authBooted, tokenVersion]);
 
   const { data, mutate, isValidating } = useSWR<UserAPI>(swrKey, ([url]) => fetcher(url), {
-    
     refreshInterval: 0,
-    revalidateOnFocus: true,
+    revalidateOnFocus: false,
     shouldRetryOnError: false,
-    dedupingInterval: 5000,
+    dedupingInterval: 30000,
   });
 
   

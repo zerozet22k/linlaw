@@ -19,9 +19,10 @@ import {
 
 type Props = {
   data: RELATED_BUSINESSES_PAGE_SETTINGS_TYPES;
+  initialItems?: RelatedBusinessAPI[];
 };
 
-const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
+const RelatedBusinessesContent: React.FC<Props> = ({ data, initialItems }) => {
   const { language } = useLanguage();
   const { token } = theme.useToken();
 
@@ -36,11 +37,19 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
   const limit = Math.max(1, Number(sections?.maxBusinessesCount ?? 50));
   const includeInactive = Number(sections?.includeInactive ?? 0) === 1;
 
-  const [items, setItems] = useState<RelatedBusinessAPI[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<RelatedBusinessAPI[]>(() => initialItems ?? []);
+  const [loading, setLoading] = useState(initialItems === undefined);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialItems === undefined) return;
+    setItems(initialItems);
+    setLoading(false);
+    setError(null);
+  }, [initialItems]);
+
+  useEffect(() => {
+    if (initialItems !== undefined) return;
     let mounted = true;
 
     const fetchAll = async () => {
@@ -74,7 +83,7 @@ const RelatedBusinessesContent: React.FC<Props> = ({ data }) => {
     return () => {
       mounted = false;
     };
-  }, [limit, includeInactive, tFailedToLoad]);
+  }, [initialItems, limit, includeInactive, tFailedToLoad]);
 
   const sorted = useMemo(() => {
     const arr = Array.isArray(items) ? [...items] : [];

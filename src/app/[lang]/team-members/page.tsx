@@ -13,6 +13,8 @@ import {
 import { getPageSettings } from "@/utils/server/pageSettings";
 import { valuesOf } from "@/utils/typed";
 import { buildPageMetadataFromRequest } from "@/utils/server/metadata/buildPageMetadata";
+import UserService from "@/services/UserService";
+import type { TeamBlockAPI } from "@/models/TeamBlock";
 
 const defaults: TEAM_PAGE_SETTINGS_TYPES = {
   [TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: undefined,
@@ -23,10 +25,20 @@ const defaults: TEAM_PAGE_SETTINGS_TYPES = {
 };
 
 async function loadData() {
-  return getPageSettings({
+  const data = await getPageSettings({
     keys: valuesOf(TEAM_PAGE_SETTINGS_KEYS),
     defaults,
   });
+
+  const userService = new UserService();
+  const blocks = await userService.getTeamMembersOrdered(
+    data[TEAM_PAGE_SETTINGS_KEYS.SECTIONS]
+  );
+
+  return {
+    data,
+    blocks: JSON.parse(JSON.stringify(blocks)) as TeamBlockAPI[],
+  };
 }
 
 export async function generateMetadata({
@@ -34,7 +46,7 @@ export async function generateMetadata({
 }: {
   params: { lang: string };
 }): Promise<Metadata> {
-  const data = await loadData();
+  const { data } = await loadData();
 
   return buildPageMetadataFromRequest({
     params,
@@ -44,8 +56,8 @@ export async function generateMetadata({
 }
 
 const TeamMembersPage = async () => {
-  const data = await loadData();
-  return <TeamContent data={data} />;
+  const { data, blocks } = await loadData();
+  return <TeamContent data={data} initialBlocks={blocks} />;
 };
 
 export default TeamMembersPage;

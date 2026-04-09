@@ -12,6 +12,7 @@ import { shortText } from "@/utils/textUtils";
 import { getRequestOrigin } from "@/utils/server/requestOrigin";
 import { tL } from "@/i18n";
 import type { INewsletterAPI } from "@/models/Newsletter";
+import NewsletterService from "@/services/NewsletterService";
 
 function pickOgImageFromNewsletter(n?: INewsletterAPI | null): string | undefined {
   if (!n) return undefined;
@@ -100,6 +101,21 @@ export async function generateMetadata({
   });
 }
 
-export default function Page() {
-  return <NewsletterDetailContent />;
+export default async function Page({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const rawId = String(params?.id || "").trim();
+  let initialNewsletter: INewsletterAPI | null = null;
+
+  if (rawId) {
+    const newsletterService = new NewsletterService();
+    const item = await newsletterService.getNewsletterById(rawId).catch(() => null);
+    if (item) {
+      initialNewsletter = JSON.parse(JSON.stringify(item)) as INewsletterAPI;
+    }
+  }
+
+  return <NewsletterDetailContent initialNewsletter={initialNewsletter} />;
 }

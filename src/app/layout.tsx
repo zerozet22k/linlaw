@@ -1,17 +1,25 @@
 // src/app/layout.tsx
 export const dynamic = "force-dynamic";
 
-import "antd/dist/antd.css";
 import React from "react";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { headers, cookies } from "next/headers";
+import "@/styles/globals.css";
 
 import { SettingsProvider } from "@/providers/SettingsProvider";
 import LayoutContent from "./layout-content";
 
-import { getPublicSettings, getSiteName, getSiteUrl } from "@/utils/server/publicSiteSettings";
+import {
+  getPublicSettings,
+  getSeo,
+  getSiteFavicon,
+  getSiteName,
+  getSiteUrl,
+  toAbsoluteUrl,
+} from "@/utils/server/publicSiteSettings";
 import type { SettingsInterface } from "@/config/CMS/settings/settingKeys";
 
 import { DEFAULT_LANG } from "@/i18n/languages";
@@ -21,10 +29,37 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
   const siteName = getSiteName(settings);
   const siteUrl = getSiteUrl(settings).replace(/\/$/, "");
+  const siteFavicon = getSiteFavicon(settings);
+  const faviconUrl = toAbsoluteUrl(siteFavicon, siteUrl);
+  const { description, keywords, ogImageRaw } = getSeo(settings);
+  const metaTitle =
+    settings?.seoSettings?.metaTitle?.trim() || siteName;
+  const ogImage = ogImageRaw ? toAbsoluteUrl(ogImageRaw, siteUrl) : undefined;
 
-  return {  
+  return {
     metadataBase: new URL(siteUrl),
-    title: { default: siteName, template: `%s | ${siteName}` },
+    applicationName: siteName,
+    title: { default: metaTitle, template: `%s | ${siteName}` },
+    description,
+    keywords,
+    icons: {
+      icon: [{ url: faviconUrl }],
+      shortcut: [{ url: faviconUrl }],
+    },
+    openGraph: {
+      title: metaTitle,
+      description,
+      url: siteUrl,
+      siteName,
+      type: "website",
+      images: ogImage ? [{ url: ogImage }] : undefined,
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: metaTitle,
+      description,
+      images: ogImage ? [ogImage] : undefined,
+    },
   };
 }
 
@@ -64,9 +99,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </head>
 
       <body style={{ margin: 0, padding: 0, width: "100%", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-        <SettingsProvider settings={settings}>
-          <LayoutContent>{children}</LayoutContent>
-        </SettingsProvider>
+        <AntdRegistry>
+          <SettingsProvider settings={settings}>
+            <LayoutContent>{children}</LayoutContent>
+          </SettingsProvider>
+        </AntdRegistry>
         <Analytics />
       </body>
     </html>

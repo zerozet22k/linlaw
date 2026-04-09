@@ -35,15 +35,19 @@ import { normalizeUrl, isEmbeddableMapUrl, platformLabel } from "@/utils/urlUtil
 
 const { Title, Text, Paragraph } = Typography;
 
-const RelatedBusinessSlugContent: React.FC = () => {
+type RelatedBusinessSlugContentProps = {
+  initialItem?: RelatedBusinessAPI | null;
+};
+
+const RelatedBusinessSlugContent: React.FC<RelatedBusinessSlugContentProps> = ({ initialItem }) => {
   const params = useParams();
   const router = useRouter();
   const { language } = useLanguage();
   const { token } = theme.useToken();
 
   const slug = String((params as any)?.slug || "").trim();
-  const [item, setItem] = useState<RelatedBusinessAPI | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [item, setItem] = useState<RelatedBusinessAPI | null>(initialItem ?? null);
+  const [loading, setLoading] = useState(initialItem === undefined);
   const [error, setError] = useState<string | null>(null);
 
   const tLoadingProfile = useMemo(() => t(language, "relatedBusinesses.loadingProfile"), [language]);
@@ -76,6 +80,13 @@ const RelatedBusinessSlugContent: React.FC = () => {
   const tInactivePartner = useMemo(() => t(language, "relatedBusinesses.inactivePartner"), [language]);
 
   useEffect(() => {
+    if (initialItem !== undefined) {
+      setItem(initialItem);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     if (!slug) {
       setError(tInvalidSlug);
       setLoading(false);
@@ -112,7 +123,7 @@ const RelatedBusinessSlugContent: React.FC = () => {
     };
 
     fetchBySlug();
-  }, [slug, tInvalidSlug, tNotFound, tFailedToLoadProfile]);
+  }, [initialItem, slug, tInvalidSlug, tNotFound, tFailedToLoadProfile]);
 
   const title = useMemo(() => {
     if (!item) return "";

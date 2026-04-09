@@ -13,6 +13,8 @@ import {
 import { getPageSettings } from "@/utils/server/pageSettings";
 import { valuesOf } from "@/utils/typed";
 import { buildPageMetadataFromRequest } from "@/utils/server/metadata/buildPageMetadata";
+import NewsletterService from "@/services/NewsletterService";
+import type { INewsletterAPI } from "@/models/Newsletter";
 
 const defaults: NEWSLETTER_PAGE_SETTINGS_TYPES = {
   [NEWSLETTER_PAGE_SETTINGS_KEYS.PAGE_CONTENT]: undefined,
@@ -22,10 +24,24 @@ const defaults: NEWSLETTER_PAGE_SETTINGS_TYPES = {
 };
 
 async function loadData() {
-  return getPageSettings({
+  const data = await getPageSettings({
     keys: valuesOf(NEWSLETTER_PAGE_SETTINGS_KEYS),
     defaults,
   });
+
+  const limit = Math.max(
+    1,
+    Number(data[NEWSLETTER_PAGE_SETTINGS_KEYS.SECTIONS]?.maxNewslettersCount ?? 6)
+  );
+
+  const newsletterService = new NewsletterService();
+  const { newsletters, hasMore } = await newsletterService.getAllNewsletters("", 1, limit);
+
+  return {
+    data,
+    initialNewsletters: JSON.parse(JSON.stringify(newsletters ?? [])) as INewsletterAPI[],
+    initialHasMore: hasMore,
+  };
 }
 
 export async function generateMetadata({
@@ -33,7 +49,7 @@ export async function generateMetadata({
 }: {
   params: { lang: string };
 }): Promise<Metadata> {
-  const data = await loadData();
+  const { data } = await loadData();
 
   return buildPageMetadataFromRequest({
     params,
@@ -43,8 +59,14 @@ export async function generateMetadata({
 }
 
 const NewsletterPage = async () => {
-  const data = await loadData();
-  return <NewsletterContent data={data} />;
+  const { data, initialNewsletters, initialHasMore } = await loadData();
+  return (
+    <NewsletterContent
+      data={data}
+      initialNewsletters={initialNewsletters}
+      initialHasMore={initialHasMore}
+    />
+  );
 };
 
 export default NewsletterPage;

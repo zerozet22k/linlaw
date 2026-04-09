@@ -1,6 +1,11 @@
 // /auth/signup
 import { NextResponse } from "next/server";
 import UserService from "@/services/UserService";
+import {
+  SESSION_HINT_COOKIE,
+  SESSION_HINT_MAX_AGE_SECONDS,
+  SESSION_HINT_COOKIE_VALUE,
+} from "@/utils/auth/sessionHint";
 
 const userService = new UserService();
 
@@ -53,6 +58,13 @@ export async function POST(request: Request) {
       sameSite: "strict",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
+    });
+
+    res.cookies.set(SESSION_HINT_COOKIE, SESSION_HINT_COOKIE_VALUE, {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_HINT_MAX_AGE_SECONDS,
     });
 
     return res;

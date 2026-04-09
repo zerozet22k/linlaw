@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Upload,
   message,
@@ -35,12 +35,22 @@ function splitNameAndExtension(filename: string) {
 
 export default function FileUploader() {
   const router = useRouter();
-  const { firebaseLoading, firebaseReady, addPendingFiles, uploading } =
+  const {
+    firebaseLoading,
+    firebaseReady,
+    checkFirebaseConfig,
+    addPendingFiles,
+    uploading,
+  } =
     useFile();
 
   const [localFiles, setLocalFiles] = useState<
     { file: File; name: string; extension: string }[]
   >([]);
+
+  useEffect(() => {
+    void checkFirebaseConfig();
+  }, [checkFirebaseConfig]);
 
   if (firebaseLoading) {
     return <div>Loading Firebase config...</div>;

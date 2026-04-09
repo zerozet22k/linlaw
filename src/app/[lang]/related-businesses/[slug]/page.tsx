@@ -7,6 +7,7 @@ import { shortText } from "@/utils/textUtils";
 import { getRequestOrigin } from "@/utils/server/requestOrigin";
 import { tL } from "@/i18n";
 import type { RelatedBusinessAPI } from "@/models/RelatedBusinessModel";
+import RelatedBusinessService from "@/services/RelatedBusinessService";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,21 @@ export async function generateMetadata({
   });
 }
 
-export default function Page() {
-  return <RelatedBusinessSlugContent />;
+export default async function Page({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const rawSlug = String(params?.slug || "").trim();
+  let initialItem: RelatedBusinessAPI | null = null;
+
+  if (rawSlug) {
+    const relatedBusinessService = new RelatedBusinessService();
+    const item = await relatedBusinessService.getBusinessBySlug(rawSlug, true).catch(() => null);
+    if (item) {
+      initialItem = JSON.parse(JSON.stringify(item)) as RelatedBusinessAPI;
+    }
+  }
+
+  return <RelatedBusinessSlugContent initialItem={initialItem} />;
 }

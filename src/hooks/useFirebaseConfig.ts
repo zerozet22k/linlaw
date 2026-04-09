@@ -1,13 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import apiClient from "@/utils/api/apiClient";
 import { useUser } from "@/hooks/useUser";
 
 export const useFirebaseConfig = () => {
   const { user, initialLoading: userInitialLoading } = useUser();
-  const [firebaseLoading, setFirebaseLoading] = useState(true);
+  const [firebaseLoading, setFirebaseLoading] = useState(false);
   const [firebaseReady, setFirebaseReady] = useState(false);
 
   const fetchFirebaseConfig = useCallback(async () => {
+    if (userInitialLoading) {
+      return;
+    }
+
     if (!user) {
       setFirebaseLoading(false);
       setFirebaseReady(false);
@@ -24,13 +28,7 @@ export const useFirebaseConfig = () => {
     } finally {
       setFirebaseLoading(false);
     }
-  }, [user]);
-
-  useEffect(() => {
-    if (!userInitialLoading) {
-      void fetchFirebaseConfig();
-    }
-  }, [fetchFirebaseConfig, userInitialLoading]);
+  }, [user, userInitialLoading]);
 
   const checkFirebaseConfig = useCallback(async () => {
     await fetchFirebaseConfig();

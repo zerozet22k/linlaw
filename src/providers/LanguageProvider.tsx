@@ -35,10 +35,10 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     [enabled]
   );
 
-  // start from URL if possible, otherwise DEFAULT_LANG
+  // Start from the URL segment during the first render so SSR matches the page language.
+  const initialPathLang = segFromPath(pathname);
   const [language, setLanguageState] = useState<SupportedLanguage>(() => {
-    if (typeof window === "undefined") return DEFAULT_LANG;
-    return segFromPath(window.location.pathname) || DEFAULT_LANG;
+    return initialPathLang && enabled.includes(initialPathLang) ? initialPathLang : DEFAULT_LANG;
   });
 
   // follow URL language on public routes

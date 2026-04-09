@@ -18,9 +18,10 @@ const { Title } = Typography;
 
 type TeamContentProps = {
   data: TEAM_PAGE_SETTINGS_TYPES;
+  initialBlocks?: TeamBlockAPI[];
 };
 
-const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
+const TeamContent: React.FC<TeamContentProps> = ({ data, initialBlocks }) => {
   const pageContent = data[TEAM_PAGE_SETTINGS_KEYS.PAGE_CONTENT];
   const teamSection = data[TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 
@@ -37,11 +38,20 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
   const tFailedToLoad = useMemo(() => t(language, "team.failedToLoad"), [language]);
   const tTeamNameFallback = useMemo(() => t(language, "team.teamNameFallback"), [language]);
 
-  const [blocks, setBlocks] = useState<TeamBlockAPI[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [blocks, setBlocks] = useState<TeamBlockAPI[]>(() => initialBlocks ?? []);
+  const [loading, setLoading] = useState(initialBlocks === undefined);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialBlocks === undefined) return;
+    setBlocks(initialBlocks);
+    setLoading(false);
+    setError(null);
+  }, [initialBlocks]);
+
+  useEffect(() => {
+    if (initialBlocks !== undefined) return;
+
     (async () => {
       try {
         const { data: apiBlocks } = await apiClient.get<TeamBlockAPI[]>("/team");
@@ -68,7 +78,7 @@ const TeamContent: React.FC<TeamContentProps> = ({ data }) => {
         setLoading(false);
       }
     })();
-  }, [teamSection?.maxMembersCount, tFailedToLoad]);
+  }, [initialBlocks, teamSection?.maxMembersCount, tFailedToLoad]);
 
   const variants = {
     initial: { opacity: 0, y: 10 },

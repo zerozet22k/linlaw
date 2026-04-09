@@ -63,19 +63,19 @@ export default async function Page({
   params: { lang: string; username: string };
 }) {
   const rawUsername = String(params?.username || "").trim();
+  let initialUser: any = null;
 
-  try {
-    if (rawUsername) {
-      await dbConnect();
-      const u = await _userService.getUserByIdOrUsername(rawUsername);
-      if (u) {
-        const canonicalSlug = String((u as any).username || "").trim();
-        if (canonicalSlug && canonicalSlug !== rawUsername) {
-          redirect(`/${params.lang}/team-members/${encodeURIComponent(canonicalSlug)}`);
-        }
+  if (rawUsername) {
+    await dbConnect();
+    const u = await _userService.getUserByIdOrUsername(rawUsername).catch(() => null);
+    if (u) {
+      const canonicalSlug = String((u as any).username || "").trim();
+      if (canonicalSlug && canonicalSlug !== rawUsername) {
+        redirect(`/${params.lang}/team-members/${encodeURIComponent(canonicalSlug)}`);
       }
+      initialUser = JSON.parse(JSON.stringify(u));
     }
-  } catch {}
+  }
 
-  return <TeamMemberContent />;
+  return <TeamMemberContent initialUser={initialUser} />;
 }

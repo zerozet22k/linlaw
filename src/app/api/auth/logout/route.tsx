@@ -1,6 +1,7 @@
 // /auth/logout
 import { NextRequest, NextResponse } from "next/server";
 import UserService from "@/services/UserService";
+import { SESSION_HINT_COOKIE } from "@/utils/auth/sessionHint";
 
 const userService = new UserService();
 
@@ -30,6 +31,13 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
+
+    res.cookies.set(SESSION_HINT_COOKIE, "", {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       path: "/",
       maxAge: 0,
     });

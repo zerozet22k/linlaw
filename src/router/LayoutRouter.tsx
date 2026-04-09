@@ -7,7 +7,6 @@ import { Typography } from "antd";
 
 import DashboardLayout from "@/layouts/DashboardLayout";
 import MainLayout from "@/layouts/MainLayout";
-import "@/styles/globals.css";
 
 import { useUser } from "@/hooks/useUser";
 import LoadingSpin from "@/components/loaders/LoadingSpin";
@@ -35,12 +34,16 @@ const LayoutRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const router = useRouter();
 
   const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isAuthEntryRoute = /\/(login|signup)$/.test(pathname);
 
   
   const routeConfig = useMemo(() => {
     const basePath = isDashboardRoute ? pathname : stripLangPrefix(pathname);
     return matchRoute(basePath, hash);
   }, [pathname, hash, isDashboardRoute]);
+
+  const shouldWaitForAuth =
+    initialLoading && (isDashboardRoute || !!routeConfig?.loginRequired || isAuthEntryRoute);
 
   const hasAccess = useMemo(() => {
     if (!routeConfig) return true;
@@ -59,23 +62,23 @@ const LayoutRouter: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, [routeConfig, settings, language]);
 
   useEffect(() => {
-    if (initialLoading) return;
+    if (shouldWaitForAuth) return;
 
     if (!user && routeConfig?.loginRequired) {
       router.replace(routeConfig.IfNotLoggedInRedirectUrl || "/login");
       return;
     }
 
-    if (user && pathname === "/login") {
+    if (user && pathname.endsWith("/login")) {
       router.replace(
         hasPermission(user, [APP_PERMISSIONS.VIEW_DASHBOARD])
           ? routeConfig?.IfLoggedInRedirectUrl || "/dashboard"
           : "/"
       );
     }
-  }, [initialLoading, user, routeConfig, pathname, router]);
+  }, [shouldWaitForAuth, user, routeConfig, pathname, router]);
 
-  if (initialLoading) return <LoadingSpin />;
+  if (shouldWaitForAuth) return <LoadingSpin />;
 
   const content =
     user && routeConfig?.access && !hasAccess ? (
