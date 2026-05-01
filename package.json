@@ -4,7 +4,7 @@
   "private": true,
   "description": "Lin Law multilingual business platform built with Next.js and TypeScript.",
   "author": "LinLaw",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zerozet22k/linlaw.git"
