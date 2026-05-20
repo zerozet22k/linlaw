@@ -1,10 +1,10 @@
 import React from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import RelatedBusinessSlugContent from "./content";
 import { buildPageMetadataFromRequest } from "@/utils/server/metadata/buildPageMetadata";
 import { shortText } from "@/utils/textUtils";
-import { getRequestOrigin } from "@/utils/server/requestOrigin";
 import { tL } from "@/i18n";
 import type { RelatedBusinessAPI } from "@/models/RelatedBusinessModel";
 import RelatedBusinessService from "@/services/RelatedBusinessService";
@@ -17,8 +17,6 @@ export async function generateMetadata({
   params: { lang: string; slug: string };
 }): Promise<Metadata> {
   const rawSlug = String(params?.slug || "").trim();
-  const slug = encodeURIComponent(rawSlug);
-
   // fallback (shouldn't really happen if route param is present, but safe)
   if (!rawSlug) {
     return buildPageMetadataFromRequest({
@@ -29,26 +27,19 @@ export async function generateMetadata({
     });
   }
 
-  const origin = await getRequestOrigin();
-
   let title = "Related Business";
   let desc = "";
   let ogImageRaw: string | undefined;
 
   try {
-    if (origin) {
-      const res = await fetch(`${origin}/api/related-businesses/slug/${slug}`, {
-        cache: "no-store",
-      });
+    const relatedBusinessService = new RelatedBusinessService();
+    const item = await relatedBusinessService.getBusinessBySlug(rawSlug);
 
-      if (res.ok) {
-        const item = (await res.json()) as RelatedBusinessAPI;
-
-        // use params.lang (segment) as the language source
-        title = tL(params.lang as any, item?.title, item?.slug || "Related Business");
-        desc = tL(params.lang as any, item?.description, "");
-        ogImageRaw = String(item?.image || "").trim() || undefined;
-      }
+    if (item) {
+      // use params.lang (segment) as the language source
+      title = tL(params.lang as any, item?.title, item?.slug || "Related Business");
+      desc = tL(params.lang as any, item?.description, "");
+      ogImageRaw = String(item?.image || "").trim() || undefined;
     }
   } catch {}
 
@@ -72,11 +63,13 @@ export default async function Page({
 
   if (rawSlug) {
     const relatedBusinessService = new RelatedBusinessService();
-    const item = await relatedBusinessService.getBusinessBySlug(rawSlug, true).catch(() => null);
+    const item = await relatedBusinessService.getBusinessBySlug(rawSlug).catch(() => null);
     if (item) {
       initialItem = JSON.parse(JSON.stringify(item)) as RelatedBusinessAPI;
     }
   }
+
+  if (!initialItem) notFound();
 
   return <RelatedBusinessSlugContent initialItem={initialItem} />;
 }

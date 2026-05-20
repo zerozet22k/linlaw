@@ -27,12 +27,24 @@ class NewsletterService {
     return this.newsletterRepo.findById(toObjectId(id));
   }
 
+  async getPublicNewsletterById(id: string): Promise<INewsletter | null> {
+    return this.newsletterRepo.findById(toObjectId(id), true);
+  }
+
   async getAllNewsletters(
     searchQuery: string = "",
     page?: number,
     limit?: number
   ): Promise<{ newsletters: INewsletter[]; hasMore: boolean }> {
     return this.newsletterRepo.findAll(searchQuery, page, limit);
+  }
+
+  async getPublicNewsletters(
+    searchQuery: string = "",
+    page?: number,
+    limit?: number
+  ): Promise<{ newsletters: INewsletter[]; hasMore: boolean }> {
+    return this.newsletterRepo.findAll(searchQuery, page, limit, true);
   }
 
   async updateNewsletter(

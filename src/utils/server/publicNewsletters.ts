@@ -14,7 +14,7 @@ export async function getPublicNewsletters(opts?: {
 
   try {
     const service = new NewsletterService();
-    const { newsletters } = await service.getAllNewsletters(search, 1, limit);
+    const { newsletters } = await service.getPublicNewsletters(search, 1, limit);
 
     // Safety sort: newest first
     const sorted = [...(newsletters ?? [])].sort((a: any, b: any) => {

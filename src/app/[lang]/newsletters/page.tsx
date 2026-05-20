@@ -35,7 +35,7 @@ async function loadData() {
   );
 
   const newsletterService = new NewsletterService();
-  const { newsletters, hasMore } = await newsletterService.getAllNewsletters("", 1, limit);
+  const { newsletters, hasMore } = await newsletterService.getPublicNewsletters("", 1, limit);
 
   return {
     data,

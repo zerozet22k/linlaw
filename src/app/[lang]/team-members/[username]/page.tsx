@@ -1,6 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import TeamMemberContent from "./content";
 import { buildPageMetadataFromRequest } from "@/utils/server/metadata/buildPageMetadata";
@@ -76,6 +76,8 @@ export default async function Page({
       initialUser = JSON.parse(JSON.stringify(u));
     }
   }
+
+  if (!initialUser) notFound();
 
   return <TeamMemberContent initialUser={initialUser} />;
 }

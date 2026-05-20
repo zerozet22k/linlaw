@@ -4,12 +4,12 @@ export const revalidate = 0;
 
 import React from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import NewsletterDetailContent from "./content";
 
 import { buildPageMetadataFromRequest } from "@/utils/server/metadata/buildPageMetadata";
 import { shortText } from "@/utils/textUtils";
-import { getRequestOrigin } from "@/utils/server/requestOrigin";
 import { tL } from "@/i18n";
 import type { INewsletterAPI } from "@/models/Newsletter";
 import NewsletterService from "@/services/NewsletterService";
@@ -48,7 +48,6 @@ export async function generateMetadata({
   params: { lang: string; id: string };
 }): Promise<Metadata> {
   const rawId = String(params?.id || "").trim();
-  const id = encodeURIComponent(rawId);
 
   if (!rawId) {
     return buildPageMetadataFromRequest({
@@ -60,34 +59,27 @@ export async function generateMetadata({
     });
   }
 
-  const origin = await getRequestOrigin();
-
   let title = "Newsletter";
   let desc = "";
   let ogImageRaw: string | undefined;
 
   try {
-    if (origin) {
-      const res = await fetch(`${origin}/api/newsletters/${id}`, {
-        cache: "no-store",
-      });
+    const newsletterService = new NewsletterService();
+    const item = await newsletterService.getPublicNewsletterById(rawId);
 
-      if (res.ok) {
-        const item = (await res.json()) as INewsletterAPI;
+    if (item) {
+      title =
+        tL(params.lang as any, (item as any)?.title, "") ||
+        String((item as any)?._id || rawId) ||
+        "Newsletter";
 
-        title =
-          tL(params.lang as any, (item as any)?.title, "") ||
-          String((item as any)?._id || rawId) ||
-          "Newsletter";
+      desc =
+        tL(params.lang as any, (item as any)?.summary, "") ||
+        tL(params.lang as any, (item as any)?.description, "") ||
+        tL(params.lang as any, (item as any)?.content, "") ||
+        "";
 
-        desc =
-          tL(params.lang as any, (item as any)?.summary, "") ||
-          tL(params.lang as any, (item as any)?.description, "") ||
-          tL(params.lang as any, (item as any)?.content, "") ||
-          "";
-
-        ogImageRaw = pickOgImageFromNewsletter(item);
-      }
+      ogImageRaw = pickOgImageFromNewsletter(item as any);
     }
   } catch {}
 
@@ -111,11 +103,13 @@ export default async function Page({
 
   if (rawId) {
     const newsletterService = new NewsletterService();
-    const item = await newsletterService.getNewsletterById(rawId).catch(() => null);
+    const item = await newsletterService.getPublicNewsletterById(rawId).catch(() => null);
     if (item) {
       initialNewsletter = JSON.parse(JSON.stringify(item)) as INewsletterAPI;
     }
   }
+
+  if (!initialNewsletter) notFound();
 
   return <NewsletterDetailContent initialNewsletter={initialNewsletter} />;
 }

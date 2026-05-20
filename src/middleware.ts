@@ -45,6 +45,12 @@
     const url = req.nextUrl;
     const pathname = normalizePath(url.pathname || "/");
 
+    if (url.pathname !== pathname) {
+      const u = url.clone();
+      u.pathname = pathname;
+      return NextResponse.redirect(u, 308);
+    }
+
     const seg = getPathLang(pathname);
     const basePath = normalizePath(seg ? stripLangPrefix(pathname) : pathname);
 

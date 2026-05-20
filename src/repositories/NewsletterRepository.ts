@@ -61,10 +61,15 @@ class NewsletterRepository {
   async findAll(
     searchQuery: string = "",
     page?: number,
-    limit?: number
+    limit?: number,
+    publicOnly = false
   ): Promise<{ newsletters: INewsletter[]; hasMore: boolean }> {
     await dbConnect();
     const filter: any = {};
+
+    if (publicOnly) {
+      filter.isPublic = { $ne: false };
+    }
 
     if (searchQuery.trim()) {
       filter.$expr = {
@@ -107,9 +112,16 @@ class NewsletterRepository {
     return { newsletters, hasMore };
   }
 
-  async findById(id: Types.ObjectId): Promise<INewsletter | null> {
+  async findById(
+    id: Types.ObjectId,
+    publicOnly = false
+  ): Promise<INewsletter | null> {
     await dbConnect();
-    const pipeline = this.getUnifiedPipeline({ _id: id });
+    const matchStage: any = { _id: id };
+    if (publicOnly) {
+      matchStage.isPublic = { $ne: false };
+    }
+    const pipeline = this.getUnifiedPipeline(matchStage);
     const result = await NewsletterModel.aggregate(pipeline).exec();
     return result[0] || null;
   }

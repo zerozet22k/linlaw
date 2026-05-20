@@ -110,9 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const blk of blocks ?? []) {
           const members = Array.isArray((blk as any)?.members) ? (blk as any).members : [];
           for (const m of members) {
-            const username = String(m?.username || "").trim();
-            const id = String(m?._id || "").trim();
-            const slug = username || id;
+            const slug = String(m?.username || "").trim();
             if (!slug) continue;
 
             const lm = toDateOr(m?.updatedAt ?? m?.createdAt, now);
@@ -135,7 +133,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         while (guard++ < 200) {
           const { newsletters, hasMore } =
-            await newsletterService.getAllNewsletters("", page, limit);
+            await newsletterService.getPublicNewsletters("", page, limit);
 
           const list = Array.isArray(newsletters) ? newsletters : [];
           for (const n of list as any[]) {
