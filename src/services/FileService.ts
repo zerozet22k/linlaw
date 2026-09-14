@@ -67,7 +67,8 @@ class FileService {
     await this.firebaseService.initFirebase();
 
     const timestamp = new Date().toISOString().replace(/[:.-]/g, "");
-    const rawFilePath = `profile_images/${userId}/${timestamp}.jpg`;
+    const extension = normalizeContentType(contentType) === "image/png" ? "png" : "jpg";
+    const rawFilePath = `profile_images/${userId}/${timestamp}.${extension}`;
 
     const signedUrl = await this.firebaseService.generateSignedUrl(
       rawFilePath,
@@ -81,7 +82,8 @@ class FileService {
     await this.firebaseService.initFirebase();
 
     const timestamp = new Date().toISOString().replace(/[:.-]/g, "");
-    const rawFilePath = `cover_images/${userId}/${timestamp}.jpg`;
+    const extension = normalizeContentType(contentType) === "image/png" ? "png" : "jpg";
+    const rawFilePath = `cover_images/${userId}/${timestamp}.${extension}`;
 
     const signedUrl = await this.firebaseService.generateSignedUrl(
       rawFilePath,
@@ -138,12 +140,22 @@ class FileService {
     try {
       await this.firebaseService.initFirebase();
       const bucket = this.firebaseService.getBucket();
+      const prefixes = [
+        `${this.folderPath}/`,
+        "profile_images/",
+        "cover_images/",
+      ];
 
-      const [files] = await bucket.getFiles({
-        prefix: `${this.folderPath}/`,
-      });
+      const results = await Promise.all(
+        prefixes.map((prefix) => bucket.getFiles({ prefix }))
+      );
 
-      return files.map((file) => {
+      const uniqueFiles = new Map<string, (typeof results)[number][0][number]>();
+      for (const [files] of results) {
+        for (const file of files) uniqueFiles.set(file.name, file);
+      }
+
+      return Array.from(uniqueFiles.values()).map((file) => {
         const rawFilePath = file.name;
         return {
           rawFilePath,
