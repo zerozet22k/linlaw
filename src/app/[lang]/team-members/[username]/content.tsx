@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Typography, theme } from "antd";
 import { useParams } from "next/navigation";
 import apiClient from "@/utils/api/apiClient";
+import { toUserMediaUrl } from "@/utils/userMediaUrl";
 import { UserAPI } from "@/models/UserModel";
 import { rgba } from "polished";
 import Image from "next/image";
@@ -80,7 +81,7 @@ const TeamMemberClient: React.FC<TeamMemberClientProps> = ({ initialUser }) => {
 
   const glass = rgba(token.colorBgContainer, 0.2);
 
-  const coverSrc = user.cover_image ?? "/images/default-cover.jpg";
+  const coverSrc = toUserMediaUrl(user.cover_image, "/images/default-cover.jpg");
   const who = String(user.name ?? user.username ?? "").trim();
   const alt = who ? `${who} ${tCoverAltSuffix}` : tCoverAltSuffix;
   const displayName = user.name ?? user.username;
