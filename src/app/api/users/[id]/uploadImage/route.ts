@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import FirebaseService from "@/ThirdPartyServices/FirebaseService";
 import UserService from "@/services/UserService";
+import FileService from "@/services/FileService";
 import { withAuthMiddleware } from "@/middlewares/authMiddleware";
 import { APP_PERMISSIONS } from "@/config/permissions";
 import { User } from "@/models/UserModel";
+import { STORAGE_SERVICES } from "@/models/FileModel";
 
 const firebaseService = FirebaseService.getInstance();
 const userService = new UserService();
+const fileService = new FileService();
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_CONTENT_TYPES = new Set(["image/png", "image/jpeg"]);
@@ -34,7 +37,7 @@ function parseImageDataUrl(value: unknown): {
 
 async function uploadImage(
   request: Request,
-  _currentUser: User,
+  currentUser: User,
   params: { id: string }
 ) {
   let uploadedFile: any = null;
@@ -90,6 +93,25 @@ async function uploadImage(
     if (!updatedUser) {
       await file.delete({ ignoreNotFound: true }).catch(() => undefined);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (currentUser._id) {
+      try {
+        await fileService.saveFileMetadata(
+          {
+            rawFilePath: filePath,
+            service: STORAGE_SERVICES.FIREBASE,
+            size: parsed.buffer.length,
+            createdAt: new Date(),
+            isPublic: true,
+          },
+          currentUser._id
+        );
+      } catch (metadataError: any) {
+        if (metadataError?.message !== "File with the same path already exists.") {
+          console.error("Failed to register uploaded image in file manager:", metadataError);
+        }
+      }
     }
 
     return NextResponse.json(
