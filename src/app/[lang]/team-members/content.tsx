@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Card, Row, Col, Alert, theme, Typography } from "antd";
 import Link from "next/link";
 import apiClient from "@/utils/api/apiClient";
+import { toUserMediaUrl } from "@/utils/userMediaUrl";
 import PageWrapper from "@/components/ui/PageWrapper";
 import SubLoader from "@/components/loaders/SubLoader";
 import { TEAM_PAGE_SETTINGS_KEYS, TEAM_PAGE_SETTINGS_TYPES } from "@/config/CMS/pages/keys/TEAM_PAGE_SETTINGS";
@@ -158,10 +159,9 @@ const TeamContent: React.FC<TeamContentProps> = ({ data, initialBlocks }) => {
                             hoverable
                             cover={
                               <div style={{ position: "relative" }}>
-                                {/* Team card image uses dynamic remote URLs; keep img for broad compatibility. */}
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                  src={member.avatar || placeholder}
+                                  src={toUserMediaUrl(member.avatar, placeholder)}
                                   alt={member.name || member.username}
                                   style={{
                                     width: "100%",
