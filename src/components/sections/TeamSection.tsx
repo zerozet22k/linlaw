@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Alert, Typography } from "antd";
 import Image from "next/image";
 import apiClient from "@/utils/api/apiClient";
+import { toUserMediaUrl } from "@/utils/userMediaUrl";
 import SubLoader from "@/components/loaders/SubLoader";
 import CustomCarousel from "@/components/sections/CustomCarousel";
 import {
@@ -17,14 +18,6 @@ const { Title, Text } = Typography;
 type TeamSectionProps = {
   teamSection: TEAM_PAGE_SETTINGS_TYPES[typeof TEAM_PAGE_SETTINGS_KEYS.SECTIONS];
 };
-
-function normalizeImageSrc(src?: string | null) {
-  const s = (src ?? "").trim();
-  if (!s) return "/images/default-avatar.webp";
-  if (s.startsWith("http://") || s.startsWith("https://")) return s;
-  if (s.startsWith("/")) return s;
-  return `/${s}`;
-}
 
 const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
   const maxMembers = teamSection.maxMembersCount ?? 0;
@@ -102,9 +95,12 @@ const TeamSection: React.FC<TeamSectionProps> = ({ teamSection }) => {
           <div style={{ margin: "0 auto", maxWidth: 1200 }}>
             <CustomCarousel autoplay slidesToShow={3} dots infinite>
               {block.members.map((m, memberIndex) => {
-                const avatarSrc = normalizeImageSrc(m.avatar);
+                const avatarSrc = toUserMediaUrl(
+                  m.avatar,
+                  "/images/default-avatar.webp"
+                );
                 const altText = m.name || m.username || "Team member";
-                const shouldPriority = blockIndex === 0 && memberIndex < 3; // only first few
+                const shouldPriority = blockIndex === 0 && memberIndex < 3;
 
                 return (
                   <div
