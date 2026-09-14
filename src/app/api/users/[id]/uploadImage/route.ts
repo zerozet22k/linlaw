@@ -37,7 +37,7 @@ async function uploadImage(
   _currentUser: User,
   params: { id: string }
 ) {
-  let uploadedFile: ReturnType<ReturnType<typeof firebaseService.getBucket>["file"]> | null = null;
+  let uploadedFile: any = null;
 
   try {
     const targetUser = await userService.getUserById(params.id);
