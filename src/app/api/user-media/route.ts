@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     const [metadata] = await file.getMetadata();
     const [buffer] = await file.download();
 
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
         "Content-Type": metadata.contentType || "application/octet-stream",
