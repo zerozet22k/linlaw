@@ -1,11 +1,13 @@
 "use client";
 
 import { FileType } from "@/models/FileModel";
+import { toUserMediaUrl } from "@/utils/userMediaUrl";
 import {
   CodeOutlined,
   FileOutlined,
-  VideoCameraOutlined
+  VideoCameraOutlined,
 } from "@ant-design/icons";
+
 const FileThumbnail = ({ file }: { file: any }) => {
   const baseStyle = {
     display: "flex",
@@ -17,12 +19,14 @@ const FileThumbnail = ({ file }: { file: any }) => {
   };
 
   if (file.type === FileType.IMAGE) {
+    const imageSrc = toUserMediaUrl(file.rawFilePath, file.publicUrl);
+
     return (
       // Admin thumbnail preview from dynamic URLs; keep img for compatibility.
       // eslint-disable-next-line @next/next/no-img-element
       <img
         alt={file.name}
-        src={file.publicUrl}
+        src={imageSrc}
         style={{
           width: "100%",
           height: "150px",
